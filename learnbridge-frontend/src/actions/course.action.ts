@@ -1,0 +1,7 @@
+"use server";
+
+import { courseService } from "@/services/course.service";
+
+export const getPopularCourses = async (limit = 3) => {
+  return await courseService.getPopularCourses(limit);
+};
