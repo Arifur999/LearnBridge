@@ -5,6 +5,7 @@ import { Menu } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import logo from "../../../../public/logo.png";
 import {
   Sheet,
   SheetContent,
@@ -12,6 +13,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import Image from "next/image";
 
 interface MenuItem {
   title: string;
@@ -41,7 +43,8 @@ const Navbar = ({ className }: NavbarProps) => {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <span className="text-xl font-extrabold tracking-tight">
-            Learn<span className="text-primary">Bridge</span>
+                            <Image height={70} width={120} src={logo} alt="LearnBridge logo"></Image>
+
           </span>
         </Link>
 
@@ -80,8 +83,9 @@ const Navbar = ({ className }: NavbarProps) => {
             <SheetContent side="right" className="w-80 px-6">
               <SheetHeader>
                 <SheetTitle>
-                  <Link href="/" className="text-lg font-extrabold">
-                    Learn<span className="text-primary">Bridge</span>
+                  <Link href="/" >
+                  <Image height={70} width={120} src={logo} alt="LearnBridge logo"></Image>
+        
                   </Link>
                 </SheetTitle>
               </SheetHeader>
