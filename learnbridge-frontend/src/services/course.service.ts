@@ -43,6 +43,30 @@ class CourseService {
       return { data: [], meta: null };
     }
   }
+
+
+
+async getCourseById(id: string) {
+  try {
+    const res = await fetch(
+      `${API_BASE_URL}/api/v1/courses/${id}`,
+      { cache: "no-store" }
+    );
+
+    if (!res.ok) {
+      return null;
+    }
+
+    const data = await res.json();
+    return data?.data || null;
+  } catch {
+    return null;
+  }
+}
+
+
+
+
 }
 
 export const courseService = new CourseService();

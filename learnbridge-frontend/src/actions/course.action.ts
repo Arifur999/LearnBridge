@@ -9,3 +9,7 @@ export const getPopularCourses = async (limit = 3) => {
 export const getAllCourses = async (query?: string) => {
   return await courseService.getAllCourses(query);
 };
+
+export const getCourseById = async (id: string) => {
+  return await courseService.getCourseById(id);
+};
