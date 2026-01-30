@@ -5,6 +5,12 @@ interface LoginPayload {
   password: string;
 }
 
+interface SignupPayload {
+  name: string;
+  email: string;
+  password: string;
+}
+
 class AuthService {
   async login(payload: LoginPayload) {
     const res = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
@@ -19,7 +25,26 @@ class AuthService {
     const data = await res.json();
 
     if (!res.ok) {
-      throw new Error(data.message || "Login failed");
+      throw new Error(data?.message || "Login failed");
+    }
+
+    return data;
+  }
+
+  async signup(payload: SignupPayload) {
+    const res = await fetch(`${API_BASE_URL}/api/v1/auth/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+      cache: "no-store",
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data?.message || "Signup failed");
     }
 
     return data;

@@ -1,20 +1,34 @@
-import { Button } from "@/components/ui/button"
+"use client";
+
+import { useFormState } from "react-dom";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { signupAction } from "@/actions/auth.action";
 
-export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
+const initialState = {
+  success: false,
+  message: "",
+};
+
+export function SignupForm(props: React.ComponentProps<typeof Card>) {
+  const [state, formAction] = useFormState(
+    signupAction,
+    initialState
+  );
+
   return (
     <Card {...props}>
       <CardHeader>
@@ -23,54 +37,58 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
           Enter your information below to create your account
         </CardDescription>
       </CardHeader>
+
       <CardContent>
-        <form>
+        <form action={formAction}>
           <FieldGroup>
             <Field>
-              <FieldLabel htmlFor="name">Full Name</FieldLabel>
-              <Input id="name" type="text" placeholder="John Doe" required />
+              <FieldLabel>Full Name</FieldLabel>
+              <Input name="name" type="text" required />
             </Field>
+
             <Field>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-              />
-              <FieldDescription>
-                We&apos;ll use this to contact you. We will not share your email
-                with anyone else.
+              <FieldLabel>Email</FieldLabel>
+              <Input name="email" type="email" required />
+            </Field>
+
+            <Field>
+              <FieldLabel>Password</FieldLabel>
+              <Input name="password" type="password" required />
+            </Field>
+
+            <Field>
+              <FieldLabel>Confirm Password</FieldLabel>
+              <Input name="confirmPassword" type="password" required />
+            </Field>
+
+            {state.message && (
+              <FieldDescription
+                className={
+                  state.success
+                    ? "text-green-600 text-center"
+                    : "text-red-500 text-center"
+                }
+              >
+                {state.message}
+              </FieldDescription>
+            )}
+
+            <Field>
+              <Button type="submit">Create Account</Button>
+              <Button variant="outline" type="button" disabled>
+                Sign up with Google
+              </Button>
+
+              <FieldDescription className="text-center">
+                Already have an account?{" "}
+                <a href="/login" className="underline">
+                  Sign in
+                </a>
               </FieldDescription>
             </Field>
-            <Field>
-              <FieldLabel htmlFor="password">Password</FieldLabel>
-              <Input id="password" type="password" required />
-              <FieldDescription>
-                Must be at least 8 characters long.
-              </FieldDescription>
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="confirm-password">
-                Confirm Password
-              </FieldLabel>
-              <Input id="confirm-password" type="password" required />
-              <FieldDescription>Please confirm your password.</FieldDescription>
-            </Field>
-            <FieldGroup>
-              <Field>
-                <Button type="submit">Create Account</Button>
-                <Button variant="outline" type="button">
-                  Sign up with Google
-                </Button>
-                <FieldDescription className="px-6 text-center">
-                  Already have an account? <a href="#">Sign in</a>
-                </FieldDescription>
-              </Field>
-            </FieldGroup>
           </FieldGroup>
         </form>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -2,7 +2,9 @@
 
 import { authService } from "@/services/auth.service";
 
-interface LoginActionState {
+/* ================= LOGIN ================= */
+
+export interface LoginActionState {
   success: boolean;
   message?: string;
   data?: {
@@ -43,9 +45,51 @@ export const loginAction = async (
     return {
       success: false,
       message:
-        error instanceof Error
-          ? error.message
-          : "Login failed",
+        error instanceof Error ? error.message : "Login failed",
+    };
+  }
+};
+
+/* ================= SIGNUP ================= */
+
+export interface SignupActionState {
+  success: boolean;
+  message?: string;
+}
+
+export const signupAction = async (
+  _prevState: SignupActionState,
+  formData: FormData
+): Promise<SignupActionState> => {
+  try {
+    const name = formData.get("name");
+    const email = formData.get("email");
+    const password = formData.get("password");
+    const confirmPassword = formData.get("confirmPassword");
+
+    if (!name || !email || !password || !confirmPassword) {
+      return { success: false, message: "All fields are required" };
+    }
+
+    if (password !== confirmPassword) {
+      return { success: false, message: "Passwords do not match" };
+    }
+
+    await authService.signup({
+      name: name.toString(),
+      email: email.toString(),
+      password: password.toString(),
+    });
+
+    return {
+      success: true,
+      message: "Account created successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : "Signup failed",
     };
   }
 };
