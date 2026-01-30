@@ -1,6 +1,7 @@
 import { getAllCourses } from "@/actions/course.action";
 import CourseCard from "./CourseCard";
 import CoursesFilter from "./CoursesFilter";
+import Pagination from "./Pagination";
 
 interface Course {
   id: string;
@@ -12,13 +13,26 @@ interface Course {
 export default async function CoursesPage({
   searchParams,
 }: {
-  searchParams: { search?: string };
+  searchParams: {
+    search?: string;
+    page?: string;
+  };
 }) {
-  const query = searchParams.search
-    ? `?search=${searchParams.search}`
-    : "";
+  const page = Number(searchParams.page) || 1;
+  const limit = 9;
 
-  const courses: Course[] = await getAllCourses(query);
+  const params = new URLSearchParams();
+  params.set("page", page.toString());
+  params.set("limit", limit.toString());
+  if (searchParams.search) {
+    params.set("search", searchParams.search);
+  }
+
+  // ✅ SAFE destructuring with fallback
+  const result = await getAllCourses(`?${params.toString()}`);
+
+  const courses: Course[] = result?.data ?? [];
+  const meta = result?.meta ?? null;
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-16">
@@ -51,6 +65,15 @@ export default async function CoursesPage({
             />
           ))}
         </div>
+      )}
+
+      {/* Pagination */}
+      {meta && (
+        <Pagination
+          page={meta.page}
+          limit={meta.limit}
+          total={meta.total}
+        />
       )}
     </section>
   );

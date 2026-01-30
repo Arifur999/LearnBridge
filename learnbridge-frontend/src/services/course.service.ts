@@ -1,38 +1,47 @@
 import { API_BASE_URL } from "@/lib/config";
 
 class CourseService {
-
   async getPopularCourses(limit = 3) {
-    const res = await fetch(
-      `${API_BASE_URL}/api/v1/courses/search?limit=${limit}`,
-      {
-        cache: "no-store",
-      }
-    );
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/api/v1/courses/search?limit=${limit}`,
+        { cache: "no-store" }
+      );
 
-    if (!res.ok) {
+      if (!res.ok) {
+        console.error("Course API failed:", res.status);
+        return [];
+      }
+
+      const data = await res.json();
+      return data?.data || [];
+    } catch (error) {
+      console.error("Course fetch error:", error);
       return [];
     }
-
-    const data = await res.json();
-    return data?.data || [];
   }
 
- 
   async getAllCourses(query = "") {
-    const res = await fetch(
-      `${API_BASE_URL}/api/v1/courses/search${query}`,
-      {
-        cache: "no-store",
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/api/v1/courses/search${query}`,
+        { cache: "no-store" }
+      );
+
+      if (!res.ok) {
+        return { data: [], meta: null };
       }
-    );
 
-    if (!res.ok) {
-      return [];
+      const result = await res.json();
+
+      return {
+        data: result?.data || [],
+        meta: result?.meta || null,
+      };
+    } catch (error) {
+      console.error("Course fetch error:", error);
+      return { data: [], meta: null };
     }
-
-    const data = await res.json();
-    return data?.data || [];
   }
 }
 
