@@ -1,6 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import { useFormState } from "react-dom";
+import { useRouter } from "next/navigation";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,13 +27,23 @@ const initialState = {
 };
 
 export function SignupForm(props: React.ComponentProps<typeof Card>) {
+  const router = useRouter();
+
   const [state, formAction] = useFormState(
     signupAction,
     initialState
   );
 
+  // ✅ SUCCESS HANDLER
+  useEffect(() => {
+    if (state.success) {
+      alert("Account created successfully 🎉");
+      router.replace("/"); // 🔥 always go to home
+    }
+  }, [state.success, router]);
+
   return (
-    <Card {...props}>
+    <Card className="w-full" {...props}>
       <CardHeader>
         <CardTitle>Create an account</CardTitle>
         <CardDescription>
@@ -58,24 +71,31 @@ export function SignupForm(props: React.ComponentProps<typeof Card>) {
 
             <Field>
               <FieldLabel>Confirm Password</FieldLabel>
-              <Input name="confirmPassword" type="password" required />
+              <Input
+                name="confirmPassword"
+                type="password"
+                required
+              />
             </Field>
 
-            {state.message && (
-              <FieldDescription
-                className={
-                  state.success
-                    ? "text-green-600 text-center"
-                    : "text-red-500 text-center"
-                }
-              >
+            {/* ❌ Error only */}
+            {!state.success && state.message && (
+              <FieldDescription className="text-center text-red-500">
                 {state.message}
               </FieldDescription>
             )}
 
             <Field>
-              <Button type="submit">Create Account</Button>
-              <Button variant="outline" type="button" disabled>
+              <Button type="submit" className="w-full">
+                Create Account
+              </Button>
+
+              <Button
+                variant="outline"
+                type="button"
+                disabled
+                className="w-full"
+              >
                 Sign up with Google
               </Button>
 
