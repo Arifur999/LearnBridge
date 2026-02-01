@@ -34,11 +34,11 @@ export function SignupForm(props: React.ComponentProps<typeof Card>) {
     initialState
   );
 
-  // ✅ SUCCESS HANDLER
+
   useEffect(() => {
     if (state.success) {
       alert("Account created successfully 🎉");
-      router.replace("/"); // 🔥 always go to home
+      router.replace("/");
     }
   }, [state.success, router]);
 
@@ -78,7 +78,7 @@ export function SignupForm(props: React.ComponentProps<typeof Card>) {
               />
             </Field>
 
-            {/* ❌ Error only */}
+    
             {!state.success && state.message && (
               <FieldDescription className="text-center text-red-500">
                 {state.message}
