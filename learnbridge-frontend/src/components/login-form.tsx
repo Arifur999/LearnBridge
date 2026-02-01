@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,6 @@ import {
 } from "@/components/ui/card";
 import {
   Field,
-  FieldDescription,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
@@ -38,13 +38,25 @@ export function LoginForm({
     initialState
   );
 
-
+  // ✅ SUCCESS TOAST + REDIRECT
   useEffect(() => {
     if (state.success) {
-      alert("Login successful ");
+      toast.success("Login successful 🎉", {
+        description: "Welcome back to LearnBridge",
+      });
+
       router.replace("/");
     }
   }, [state.success, router]);
+
+  // ❌ ERROR TOAST
+  useEffect(() => {
+    if (!state.success && state.message) {
+      toast.error("Login failed", {
+        description: state.message,
+      });
+    }
+  }, [state.success, state.message]);
 
   return (
     <div
@@ -92,13 +104,6 @@ export function LoginForm({
                 />
               </Field>
 
-            
-              {!state.success && state.message && (
-                <FieldDescription className="text-center text-red-500">
-                  {state.message}
-                </FieldDescription>
-              )}
-
               <Field>
                 <Button type="submit" className="w-full">
                   Login
@@ -113,12 +118,12 @@ export function LoginForm({
                   Login with Google
                 </Button>
 
-                <FieldDescription className="text-center">
+                <p className="text-center text-sm text-muted-foreground">
                   Don&apos;t have an account?{" "}
                   <a href="/register" className="underline">
                     Sign up
                   </a>
-                </FieldDescription>
+                </p>
               </Field>
             </FieldGroup>
           </form>

@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,7 +15,6 @@ import {
 } from "@/components/ui/card";
 import {
   Field,
-  FieldDescription,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
@@ -37,10 +37,22 @@ export function SignupForm(props: React.ComponentProps<typeof Card>) {
 
   useEffect(() => {
     if (state.success) {
-      alert("Account created successfully 🎉");
+      toast.success("Account created successfully 🎉", {
+        description: "You can now login with your credentials",
+      });
+
       router.replace("/");
     }
   }, [state.success, router]);
+
+ 
+  useEffect(() => {
+    if (!state.success && state.message) {
+      toast.error("Signup failed", {
+        description: state.message,
+      });
+    }
+  }, [state.success, state.message]);
 
   return (
     <Card className="w-full" {...props}>
@@ -78,13 +90,6 @@ export function SignupForm(props: React.ComponentProps<typeof Card>) {
               />
             </Field>
 
-    
-            {!state.success && state.message && (
-              <FieldDescription className="text-center text-red-500">
-                {state.message}
-              </FieldDescription>
-            )}
-
             <Field>
               <Button type="submit" className="w-full">
                 Create Account
@@ -99,12 +104,12 @@ export function SignupForm(props: React.ComponentProps<typeof Card>) {
                 Sign up with Google
               </Button>
 
-              <FieldDescription className="text-center">
+              <p className="text-center text-sm text-muted-foreground">
                 Already have an account?{" "}
                 <a href="/login" className="underline">
                   Sign in
                 </a>
-              </FieldDescription>
+              </p>
             </Field>
           </FieldGroup>
         </form>
