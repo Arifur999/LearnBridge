@@ -1,8 +1,8 @@
 "use server";
 
 import { authService } from "@/services/auth.service";
+import { cookies } from "next/headers"; 
 
-/* ================= LOGIN ================= */
 
 export interface LoginActionState {
   success: boolean;
@@ -37,6 +37,19 @@ export const loginAction = async (
       password: password.toString(),
     });
 
+ 
+    if (result?.data?.accessToken) {
+      const cookieStore = await cookies();
+      
+      cookieStore.set("accessToken", result.data.accessToken, {
+        httpOnly: true, 
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 7 * 24 * 60 * 60, 
+        sameSite: "strict",
+      });
+    }
+
     return {
       success: true,
       data: result.data,
@@ -50,7 +63,6 @@ export const loginAction = async (
   }
 };
 
-/* ================= SIGNUP ================= */
 
 export interface SignupActionState {
   success: boolean;

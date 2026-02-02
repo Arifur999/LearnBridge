@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "@/lib/config";
+import { cookies } from "next/headers"; 
 
 interface LoginPayload {
   email: string;
@@ -52,3 +53,14 @@ class AuthService {
 }
 
 export const authService = new AuthService();
+
+
+export const getAuthHeaders = async () => {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("accessToken")?.value;
+
+  return {
+    "Content-Type": "application/json",
+    Authorization: token ? `Bearer ${token}` : "",
+  };
+};
