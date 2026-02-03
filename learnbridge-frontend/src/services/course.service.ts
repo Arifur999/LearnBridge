@@ -1,6 +1,8 @@
 import { API_BASE_URL } from "@/lib/config";
 
 class CourseService {
+  
+
   async getPopularCourses(limit = 3) {
     try {
       const res = await fetch(
@@ -21,6 +23,7 @@ class CourseService {
     }
   }
 
+ 
   async getAllCourses(query = "") {
     try {
       const res = await fetch(
@@ -45,27 +48,31 @@ class CourseService {
   }
 
 
+  async getCourseById(id: string) {
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/api/v1/courses/${id}`,
+        { cache: "no-store" }
+      );
 
-async getCourseById(id: string) {
-  try {
-    const res = await fetch(
-      `${API_BASE_URL}/api/v1/courses/${id}`,
-      { cache: "no-store" }
-    );
+      if (!res.ok) {
+        return null;
+      }
 
-    if (!res.ok) {
+      const responseBody = await res.json();
+
+   
+      if (responseBody?.data) {
+        return responseBody.data;
+      }
+      
+  
+      return responseBody || null;
+
+    } catch {
       return null;
     }
-
-    const data = await res.json();
-    return data?.data || null;
-  } catch {
-    return null;
   }
-}
-
-
-
 
 }
 

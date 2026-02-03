@@ -10,25 +10,29 @@ interface Course {
   price?: number;
 }
 
+
 export default async function CoursesPage({
   searchParams,
 }: {
-  searchParams: {
+  searchParams: Promise<{
     search?: string;
     page?: string;
-  };
+  }>;
 }) {
-  const page = Number(searchParams.page) || 1;
+ 
+  const { search, page: pageQuery } = await searchParams;
+
+  const page = Number(pageQuery) || 1;
   const limit = 9;
 
   const params = new URLSearchParams();
   params.set("page", page.toString());
   params.set("limit", limit.toString());
-  if (searchParams.search) {
-    params.set("search", searchParams.search);
+  
+  if (search) {
+    params.set("search", search);
   }
 
-  // ✅ SAFE destructuring with fallback
   const result = await getAllCourses(`?${params.toString()}`);
 
   const courses: Course[] = result?.data ?? [];
@@ -36,7 +40,6 @@ export default async function CoursesPage({
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-16">
-      {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold">All Courses</h1>
         <p className="mt-2 text-muted-foreground">
@@ -44,15 +47,12 @@ export default async function CoursesPage({
         </p>
       </div>
 
-      {/* Filter */}
       <CoursesFilter />
 
-      {/* Empty */}
       {courses.length === 0 && (
         <p className="text-muted-foreground">No courses found.</p>
       )}
 
-      {/* Grid */}
       {courses.length > 0 && (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {courses.map((course) => (
@@ -67,7 +67,6 @@ export default async function CoursesPage({
         </div>
       )}
 
-      {/* Pagination */}
       {meta && (
         <Pagination
           page={meta.page}

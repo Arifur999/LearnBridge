@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import Image from "next/image";
+import { Menu, LayoutDashboard, LogOut } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import Image from "next/image";
+
+interface User {
+  name: string;
+  role: "admin" | "trainer" | "student";
+}
 
 interface MenuItem {
   title: string;
@@ -32,6 +37,14 @@ const menu: MenuItem[] = [
 ];
 
 const Navbar = ({ className }: NavbarProps) => {
+  
+  
+  
+  const user: User | null = { name: "Arif", role: "student" };
+
+
+  const dashboardUrl = user ? `/${user.role}` : "/login";
+
   return (
     <header
       className={cn(
@@ -40,15 +53,19 @@ const Navbar = ({ className }: NavbarProps) => {
       )}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
+
         <Link href="/" className="flex items-center gap-2">
           <span className="text-xl font-extrabold tracking-tight">
-                            <Image height={70} width={120} src={logo} alt="LearnBridge logo"></Image>
-
+            <Image
+              height={70}
+              width={120}
+              src={logo}
+              alt="LearnBridge logo"
+              className="object-contain" 
+            />
           </span>
         </Link>
 
-        {/* Desktop Menu */}
         <nav className="hidden items-center gap-8 lg:flex">
           {menu.map((item) => (
             <Link
@@ -61,17 +78,34 @@ const Navbar = ({ className }: NavbarProps) => {
           ))}
         </nav>
 
-        {/* Auth Buttons (Desktop) */}
         <div className="hidden items-center gap-3 lg:flex">
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/login">Login</Link>
-          </Button>
-          <Button asChild size="sm">
-            <Link href="/register">Sign up</Link>
-          </Button>
+          {user ? (
+      
+            <>
+              <Button asChild size="sm" variant="default">
+                <Link href={dashboardUrl} className="flex items-center gap-2">
+                  <LayoutDashboard className="size-4" />
+                  Dashboard
+                </Link>
+              </Button>
+              <Button size="sm" variant="outline">
+                <LogOut className="size-4 mr-2" />
+                Logout
+              </Button>
+            </>
+          ) : (
+    
+            <>
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/login">Login</Link>
+              </Button>
+              <Button asChild size="sm">
+                <Link href="/register">Sign up</Link>
+              </Button>
+            </>
+          )}
         </div>
 
-        {/* Mobile Menu */}
         <div className="lg:hidden">
           <Sheet>
             <SheetTrigger asChild>
@@ -83,9 +117,13 @@ const Navbar = ({ className }: NavbarProps) => {
             <SheetContent side="right" className="w-80 px-6">
               <SheetHeader>
                 <SheetTitle>
-                  <Link href="/" >
-                  <Image height={70} width={120} src={logo} alt="LearnBridge logo"></Image>
-        
+                  <Link href="/">
+                    <Image
+                      height={70}
+                      width={120}
+                      src={logo}
+                      alt="LearnBridge logo"
+                    />
                   </Link>
                 </SheetTitle>
               </SheetHeader>
@@ -101,13 +139,33 @@ const Navbar = ({ className }: NavbarProps) => {
                   </Link>
                 ))}
 
+             
                 <div className="mt-6 flex flex-col gap-3">
-                  <Button asChild variant="outline">
-                    <Link href="/login">Login</Link>
-                  </Button>
-                  <Button asChild>
-                    <Link href="/register">Sign up</Link>
-                  </Button>
+                  {user ? (
+                  
+                    <>
+                      <Button asChild className="w-full">
+                        <Link href={dashboardUrl}>
+                          <LayoutDashboard className="mr-2 size-4" />
+                          Dashboard
+                        </Link>
+                      </Button>
+                      <Button variant="outline" className="w-full">
+                        <LogOut className="mr-2 size-4" />
+                        Logout
+                      </Button>
+                    </>
+                  ) : (
+                 
+                    <>
+                      <Button asChild variant="outline">
+                        <Link href="/login">Login</Link>
+                      </Button>
+                      <Button asChild>
+                        <Link href="/register">Sign up</Link>
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </SheetContent>

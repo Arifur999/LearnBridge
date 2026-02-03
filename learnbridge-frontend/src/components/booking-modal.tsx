@@ -33,9 +33,8 @@ export function BookingModal({ trainerId, trainerName }: BookingModalProps) {
   const [loading, setLoading] = useState(false);
   const [bookingLoading, setBookingLoading] = useState<string | null>(null);
 
-  // Modal open hole slots fetch korbe
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && trainerId) {
       const fetchSlots = async () => {
         setLoading(true);
         const data = await getTrainerSlots(trainerId);
@@ -46,33 +45,30 @@ export function BookingModal({ trainerId, trainerName }: BookingModalProps) {
     }
   }, [isOpen, trainerId]);
 
-  // Slot Book korar function
   const handleBook = async (slotId: string) => {
     setBookingLoading(slotId);
-    
     const result = await bookSlotAction(slotId);
 
     if (result.success) {
       toast.success(result.message);
-      setIsOpen(false); // Modal bondho korbe
+      setIsOpen(false);
     } else {
       toast.error(result.message);
     }
-    
     setBookingLoading(null);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full">
+        <Button variant="outline" className="w-full mt-2">
           Book Session with {trainerName}
         </Button>
       </DialogTrigger>
       
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Available Slots for {trainerName}</DialogTitle>
+          <DialogTitle>Available Slots</DialogTitle>
         </DialogHeader>
 
         <div className="mt-4 space-y-3">
@@ -82,7 +78,7 @@ export function BookingModal({ trainerId, trainerName }: BookingModalProps) {
             </div>
           ) : slots.length === 0 ? (
             <p className="text-center text-sm text-muted-foreground py-4">
-              No available slots found.
+              No available slots found for this trainer.
             </p>
           ) : (
             <div className="grid gap-2 max-h-[300px] overflow-y-auto pr-2">
@@ -92,7 +88,7 @@ export function BookingModal({ trainerId, trainerName }: BookingModalProps) {
                   className="flex items-center justify-between rounded-lg border p-3 hover:bg-accent"
                 >
                   <div className="text-sm">
-                    <p className="font-medium">{slot.date}</p>
+                    <p className="font-medium">{new Date(slot.date).toDateString()}</p>
                     <p className="text-muted-foreground">
                       {slot.startTime} - {slot.endTime}
                     </p>

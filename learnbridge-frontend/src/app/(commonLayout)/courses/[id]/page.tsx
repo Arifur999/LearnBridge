@@ -8,26 +8,33 @@ interface Course {
   description: string;
   price?: number;
   category?: string;
-
   trainer?: {
     id: string;
     name: string;
   };
 }
 
+
 export default async function CourseDetailsPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>; 
 }) {
+
   const { id } = await params;
+
+
+  console.log("Fetching Course for ID:", id); 
 
   const course: Course | null = await getCourseById(id);
 
   if (!course) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-20">
-        <p className="text-muted-foreground">Course not found.</p>
+      <div className="mx-auto max-w-7xl px-4 py-20 text-center">
+        <h2 className="text-xl font-bold text-destructive">Course Not Found</h2>
+        <p className="text-muted-foreground">
+           Could not find course with ID: {id}
+        </p>
       </div>
     );
   }
@@ -35,10 +42,9 @@ export default async function CourseDetailsPage({
   return (
     <section className="mx-auto max-w-7xl px-4 py-16">
       <div className="grid gap-10 lg:grid-cols-3">
-     
+       
         <div className="lg:col-span-2">
           <h1 className="mb-4 text-3xl font-bold">{course.title}</h1>
-
           <p className="mb-6 text-muted-foreground">{course.description}</p>
 
           <div className="rounded-xl border bg-muted p-6">
@@ -51,7 +57,7 @@ export default async function CourseDetailsPage({
           </div>
         </div>
 
-
+        {/* Sidebar */}
         <div className="rounded-xl border bg-background p-6">
           <p className="mb-4 text-2xl font-bold">
             {course.price ? `৳ ${course.price}` : "Free"}
