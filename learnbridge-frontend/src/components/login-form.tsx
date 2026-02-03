@@ -38,18 +38,24 @@ export function LoginForm({
     initialState
   );
 
-  // ✅ SUCCESS TOAST + REDIRECT
+
   useEffect(() => {
     if (state.success) {
       toast.success("Login successful 🎉", {
         description: "Welcome back to LearnBridge",
       });
 
+
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("auth-change"));
+      }
+
+
+      router.refresh();
       router.replace("/");
     }
   }, [state.success, router]);
 
-  // ❌ ERROR TOAST
   useEffect(() => {
     if (!state.success && state.message) {
       toast.error("Login failed", {
@@ -108,17 +114,8 @@ export function LoginForm({
                 <Button type="submit" className="w-full">
                   Login
                 </Button>
-
-                <Button
-                  variant="outline"
-                  type="button"
-                  className="w-full"
-                  disabled
-                >
-                  Login with Google
-                </Button>
-
-                <p className="text-center text-sm text-muted-foreground">
+           
+                <p className="text-center text-sm text-muted-foreground mt-4">
                   Don&apos;t have an account?{" "}
                   <a href="/register" className="underline">
                     Sign up

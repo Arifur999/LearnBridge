@@ -41,11 +41,17 @@ export function SignupForm(props: React.ComponentProps<typeof Card>) {
         description: "You can now login with your credentials",
       });
 
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("auth-change"));
+      }
+
+
+      router.refresh();
       router.replace("/");
     }
   }, [state.success, router]);
 
- 
+
   useEffect(() => {
     if (!state.success && state.message) {
       toast.error("Signup failed", {
@@ -65,7 +71,8 @@ export function SignupForm(props: React.ComponentProps<typeof Card>) {
 
       <CardContent>
         <form action={formAction}>
-          <FieldGroup>
+     
+           <FieldGroup>
             <Field>
               <FieldLabel>Full Name</FieldLabel>
               <Input name="name" type="text" required />
@@ -94,17 +101,8 @@ export function SignupForm(props: React.ComponentProps<typeof Card>) {
               <Button type="submit" className="w-full">
                 Create Account
               </Button>
-
-              <Button
-                variant="outline"
-                type="button"
-                disabled
-                className="w-full"
-              >
-                Sign up with Google
-              </Button>
-
-              <p className="text-center text-sm text-muted-foreground">
+          
+              <p className="text-center text-sm text-muted-foreground mt-4">
                 Already have an account?{" "}
                 <a href="/login" className="underline">
                   Sign in

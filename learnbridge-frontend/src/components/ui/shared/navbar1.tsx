@@ -1,12 +1,14 @@
 "use client";
 
+import { useState, useEffect } from "react"; 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter, usePathname } from "next/navigation"; // 🔥 ১. usePathname ইম্পোর্ট করো
 import { Menu, LayoutDashboard, LogOut } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import logo from "../../../../public/logo.png";
+import logo from "../../../../public/logo.png"; 
 import {
   Sheet,
   SheetContent,
@@ -14,9 +16,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { authService } from "@/services/auth.service"; 
 
 interface User {
   name: string;
+  email: string;
   role: "admin" | "trainer" | "student";
 }
 
@@ -37,13 +41,35 @@ const menu: MenuItem[] = [
 ];
 
 const Navbar = ({ className }: NavbarProps) => {
+  const router = useRouter();
+  const pathname = usePathname(); 
   
-  
-  
-  const user: User | null = { name: "Arif", role: "student" };
+  const [user, setUser] = useState<User | null>(null);
 
+
+  useEffect(() => {
+    const fetchUser = () => {
+      const currentUser = authService.getCurrentUser();
+      if (currentUser) {
+        setUser(currentUser as User);
+      } else {
+        setUser(null);
+      }
+    };
+
+    const timer = setTimeout(fetchUser, 100);
+
+    return () => clearTimeout(timer);
+  }, [pathname]); 
 
   const dashboardUrl = user ? `/${user.role}` : "/login";
+
+  const handleLogout = () => {
+    authService.logout(); 
+    setUser(null); 
+    router.refresh(); 
+
+  };
 
   return (
     <header
@@ -53,7 +79,7 @@ const Navbar = ({ className }: NavbarProps) => {
       )}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-
+  
         <Link href="/" className="flex items-center gap-2">
           <span className="text-xl font-extrabold tracking-tight">
             <Image
@@ -61,7 +87,7 @@ const Navbar = ({ className }: NavbarProps) => {
               width={120}
               src={logo}
               alt="LearnBridge logo"
-              className="object-contain" 
+              className="object-contain"
             />
           </span>
         </Link>
@@ -80,7 +106,6 @@ const Navbar = ({ className }: NavbarProps) => {
 
         <div className="hidden items-center gap-3 lg:flex">
           {user ? (
-      
             <>
               <Button asChild size="sm" variant="default">
                 <Link href={dashboardUrl} className="flex items-center gap-2">
@@ -88,13 +113,17 @@ const Navbar = ({ className }: NavbarProps) => {
                   Dashboard
                 </Link>
               </Button>
-              <Button size="sm" variant="outline">
+              
+              <Button 
+                size="sm" 
+                variant="outline" 
+                onClick={handleLogout}
+              >
                 <LogOut className="size-4 mr-2" />
                 Logout
               </Button>
             </>
           ) : (
-    
             <>
               <Button asChild variant="ghost" size="sm">
                 <Link href="/login">Login</Link>
@@ -139,10 +168,8 @@ const Navbar = ({ className }: NavbarProps) => {
                   </Link>
                 ))}
 
-             
                 <div className="mt-6 flex flex-col gap-3">
                   {user ? (
-                  
                     <>
                       <Button asChild className="w-full">
                         <Link href={dashboardUrl}>
@@ -150,13 +177,17 @@ const Navbar = ({ className }: NavbarProps) => {
                           Dashboard
                         </Link>
                       </Button>
-                      <Button variant="outline" className="w-full">
+                      
+                      <Button 
+                        variant="outline" 
+                        className="w-full"
+                        onClick={handleLogout}
+                      >
                         <LogOut className="mr-2 size-4" />
                         Logout
                       </Button>
                     </>
                   ) : (
-                 
                     <>
                       <Button asChild variant="outline">
                         <Link href="/login">Login</Link>

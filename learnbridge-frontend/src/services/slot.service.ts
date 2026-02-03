@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "@/lib/config";
-import { getAuthHeaders } from "./auth.service";
+import { getAuthHeaders } from "./auth.server";
 
 export interface CreateSlotPayload {
   courseId: string; 
