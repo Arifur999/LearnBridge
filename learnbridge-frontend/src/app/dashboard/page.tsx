@@ -13,11 +13,19 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { getCurrentUserFromServer } from "@/lib/auth"
+import { redirect } from "next/navigation"
 
-export default function Page() {
+export default async function Page() {
+  const user = await getCurrentUserFromServer()
+
+  if (!user) {
+    redirect("/login")
+  }
+
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar user={user} />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />

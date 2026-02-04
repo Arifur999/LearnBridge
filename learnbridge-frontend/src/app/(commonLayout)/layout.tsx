@@ -16,7 +16,7 @@ export default async function CommonLayout({
     <>
       <Navbar user={user} />
       <main>{children}</main>
-      <Footer user={user} />
+      <Footer />
     </>
   );
 }

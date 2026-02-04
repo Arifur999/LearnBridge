@@ -125,6 +125,11 @@ class AuthService {
   }
 
   logout() {
+    try {
+      fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+    } catch {
+      // ignore
+    }
     Cookies.remove(TOKEN_KEY);
     Cookies.remove(AUTH_USER_KEY);
     window.location.href = "/login";

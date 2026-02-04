@@ -21,13 +21,30 @@ import {
 } from "@/components/ui/sidebar";
 
 import { navConfig, UserRole } from "@/lib/nav.config";
+import { authService } from "@/services/auth.service";
 
-const CURRENT_ROLE: UserRole = "trainer";
+interface SidebarUser {
+  name?: string;
+  email?: string;
+  role?: UserRole | string;
+}
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  user,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & { user?: SidebarUser | null }) {
   const pathname = usePathname();
 
-  const items = navConfig[CURRENT_ROLE] || [];
+  const role = user?.role;
+  const isValidRole =
+    role === "admin" || role === "trainer" || role === "student";
+  const items = isValidRole ? navConfig[role] || [] : [];
+  const roleLabel = isValidRole ? role : "guest";
+  const nameLabel = user?.name ?? "User";
+
+  const handleLogout = () => {
+    authService.logout();
+  };
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -84,14 +101,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
+              onClick={handleLogout}
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-slate-200 text-slate-900">
                 <User2 className="size-4" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">John Doe</span>
-                <span className="truncate text-xs text-muted-foreground">{CURRENT_ROLE}</span>
+                <span className="truncate font-semibold">{nameLabel}</span>
+                <span className="truncate text-xs text-muted-foreground">{roleLabel}</span>
               </div>
               <LogOut className="ml-auto size-4" />
             </SidebarMenuButton>

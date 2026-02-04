@@ -1,6 +1,7 @@
 import { getCourseById } from "@/actions/course.action";
-import { Button } from "@/components/ui/button";
 import { BookingModal } from "@/components/booking-modal"; 
+import { EnrollButton } from "@/components/enroll-button";
+import { getCurrentUserFromServer } from "@/lib/auth";
 
 interface Course {
   id: string;
@@ -22,6 +23,7 @@ export default async function CourseDetailsPage({
 }) {
 
   const { id } = await params;
+  const user = await getCurrentUserFromServer();
 
 
   console.log("Fetching Course for ID:", id); 
@@ -64,7 +66,7 @@ export default async function CourseDetailsPage({
           </p>
 
           <div className="flex flex-col gap-3">
-            <Button className="w-full">Enroll Now</Button>
+            <EnrollButton courseId={course.id} userRole={user?.role ?? null} />
 
            
             {course.trainer && (
