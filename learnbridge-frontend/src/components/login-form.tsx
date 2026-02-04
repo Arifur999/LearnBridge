@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
-import { useFormState } from "react-dom";
-import { useRouter } from "next/navigation";
+import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
+import Cookies from "js-cookie";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -31,13 +30,10 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const router = useRouter();
-
-  const [state, formAction] = useFormState(
+  const [state, formAction] = useActionState(
     loginAction,
     initialState
   );
-
 
   useEffect(() => {
     if (state.success) {
@@ -45,16 +41,25 @@ export function LoginForm({
         description: "Welcome back to LearnBridge",
       });
 
-
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(new Event("auth-change"));
+      const accessToken = state.data?.accessToken;
+      if (accessToken) {
+        Cookies.set("accessToken", accessToken, { expires: 7, path: "/" });
       }
 
+      const user =
+        state.data?.user ??
+        state.data?.data?.user ??
+        state.data?.data?.data?.user;
+      if (user) {
+        Cookies.set("authUser", JSON.stringify(user), {
+          expires: 7,
+          path: "/",
+        });
+      }
 
-      router.refresh();
-      router.replace("/");
+      window.location.href = "/";
     }
-  }, [state.success, router]);
+  }, [state.success]);
 
   useEffect(() => {
     if (!state.success && state.message) {
@@ -114,7 +119,6 @@ export function LoginForm({
                 <Button type="submit" className="w-full">
                   Login
                 </Button>
-           
                 <p className="text-center text-sm text-muted-foreground mt-4">
                   Don&apos;t have an account?{" "}
                   <a href="/register" className="underline">

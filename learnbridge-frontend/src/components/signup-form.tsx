@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
-import { useFormState } from "react-dom";
-import { useRouter } from "next/navigation";
+import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
+import Cookies from "js-cookie";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -27,13 +26,10 @@ const initialState = {
 };
 
 export function SignupForm(props: React.ComponentProps<typeof Card>) {
-  const router = useRouter();
-
-  const [state, formAction] = useFormState(
+  const [state, formAction] = useActionState(
     signupAction,
     initialState
   );
-
 
   useEffect(() => {
     if (state.success) {
@@ -41,16 +37,25 @@ export function SignupForm(props: React.ComponentProps<typeof Card>) {
         description: "You can now login with your credentials",
       });
 
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(new Event("auth-change"));
+      const accessToken = state.data?.accessToken;
+      if (accessToken) {
+        Cookies.set("accessToken", accessToken, { expires: 7, path: "/" });
       }
 
+      const user =
+        state.data?.user ??
+        state.data?.data?.user ??
+        state.data?.data?.data?.user;
+      if (user) {
+        Cookies.set("authUser", JSON.stringify(user), {
+          expires: 7,
+          path: "/",
+        });
+      }
 
-      router.refresh();
-      router.replace("/");
+      window.location.href = "/";
     }
-  }, [state.success, router]);
-
+  }, [state.success]);
 
   useEffect(() => {
     if (!state.success && state.message) {
@@ -71,8 +76,7 @@ export function SignupForm(props: React.ComponentProps<typeof Card>) {
 
       <CardContent>
         <form action={formAction}>
-     
-           <FieldGroup>
+          <FieldGroup>
             <Field>
               <FieldLabel>Full Name</FieldLabel>
               <Input name="name" type="text" required />
@@ -101,7 +105,6 @@ export function SignupForm(props: React.ComponentProps<typeof Card>) {
               <Button type="submit" className="w-full">
                 Create Account
               </Button>
-          
               <p className="text-center text-sm text-muted-foreground mt-4">
                 Already have an account?{" "}
                 <a href="/login" className="underline">

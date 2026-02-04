@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react"; 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter, usePathname } from "next/navigation"; // 🔥 ১. usePathname ইম্পোর্ট করো
+import { useRouter } from "next/navigation"; 
 import { Menu, LayoutDashboard, LogOut } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import logo from "../../../../public/logo.png"; 
@@ -29,10 +28,6 @@ interface MenuItem {
   url: string;
 }
 
-interface NavbarProps {
-  className?: string;
-}
-
 const menu: MenuItem[] = [
   { title: "Home", url: "/" },
   { title: "Courses", url: "/courses" },
@@ -40,35 +35,59 @@ const menu: MenuItem[] = [
   { title: "Blog", url: "/blog" },
 ];
 
-const Navbar = ({ className }: NavbarProps) => {
+const Navbar = ({
+  className,
+  user: userProp,
+}: {
+  className?: string;
+  user?: User | null;
+}) => {
   const router = useRouter();
-  const pathname = usePathname(); 
-  
-  const [user, setUser] = useState<User | null>(null);
-
+  const [user, setUser] = useState<User | null>(userProp ?? null);
 
   useEffect(() => {
-    const fetchUser = () => {
-      const currentUser = authService.getCurrentUser();
-      if (currentUser) {
-        setUser(currentUser as User);
-      } else {
-        setUser(null);
+    if (userProp) {
+      setUser(userProp);
+      return;
+    }
+    const currentUser = authService.getCurrentUser();
+    console.log("Navbar User Check:", currentUser); 
+
+    if (currentUser) {
+      setUser(currentUser as User);
+      return;
+    }
+
+    const loadFromServer = async () => {
+      try {
+        const res = await fetch("/api/auth/me", { cache: "no-store" });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data?.user) {
+          setUser(data.user as User);
+        }
+      } catch {
+        // ignore
       }
     };
 
-    const timer = setTimeout(fetchUser, 100);
+    loadFromServer();
+  }, [userProp]);
 
-    return () => clearTimeout(timer);
-  }, [pathname]); 
+  let dashboardUrl = "/dashboard"; 
 
-  const dashboardUrl = user ? `/${user.role}` : "/login";
+  if (user?.role === "admin") {
+    dashboardUrl = "/admin";
+  } else if (user?.role === "trainer") {
+    dashboardUrl = "/trainer";
+  } else if (user?.role === "student") {
+    dashboardUrl = "/student";
+  }
 
   const handleLogout = () => {
     authService.logout(); 
-    setUser(null); 
-    router.refresh(); 
-
+    setUser(null);
+    window.location.href = "/login"; 
   };
 
   return (
@@ -79,26 +98,17 @@ const Navbar = ({ className }: NavbarProps) => {
       )}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-  
+        
+        {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <span className="text-xl font-extrabold tracking-tight">
-            <Image
-              height={70}
-              width={120}
-              src={logo}
-              alt="LearnBridge logo"
-              className="object-contain"
-            />
+            <Image height={70} width={120} src={logo} alt="LearnBridge" className="object-contain" />
           </span>
         </Link>
 
         <nav className="hidden items-center gap-8 lg:flex">
           {menu.map((item) => (
-            <Link
-              key={item.title}
-              href={item.url}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
+            <Link key={item.title} href={item.url} className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
               {item.title}
             </Link>
           ))}
@@ -107,30 +117,23 @@ const Navbar = ({ className }: NavbarProps) => {
         <div className="hidden items-center gap-3 lg:flex">
           {user ? (
             <>
+          
               <Button asChild size="sm" variant="default">
                 <Link href={dashboardUrl} className="flex items-center gap-2">
                   <LayoutDashboard className="size-4" />
-                  Dashboard
+                  {user.role === "admin" ? "Admin Panel" : user.role === "trainer" ? "Trainer Board" : "Student Dashboard"}
                 </Link>
               </Button>
               
-              <Button 
-                size="sm" 
-                variant="outline" 
-                onClick={handleLogout}
-              >
+              <Button size="sm" variant="outline" onClick={handleLogout}>
                 <LogOut className="size-4 mr-2" />
                 Logout
               </Button>
             </>
           ) : (
             <>
-              <Button asChild variant="ghost" size="sm">
-                <Link href="/login">Login</Link>
-              </Button>
-              <Button asChild size="sm">
-                <Link href="/register">Sign up</Link>
-              </Button>
+              <Button asChild variant="ghost" size="sm"><Link href="/login">Login</Link></Button>
+              <Button asChild size="sm"><Link href="/register">Sign up</Link></Button>
             </>
           )}
         </div>
@@ -138,63 +141,36 @@ const Navbar = ({ className }: NavbarProps) => {
         <div className="lg:hidden">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="size-5" />
-              </Button>
+              <Button variant="ghost" size="icon"><Menu className="size-5" /></Button>
             </SheetTrigger>
-
             <SheetContent side="right" className="w-80 px-6">
               <SheetHeader>
                 <SheetTitle>
-                  <Link href="/">
-                    <Image
-                      height={70}
-                      width={120}
-                      src={logo}
-                      alt="LearnBridge logo"
-                    />
-                  </Link>
+                  <Link href="/"><Image height={70} width={120} src={logo} alt="LearnBridge" /></Link>
                 </SheetTitle>
               </SheetHeader>
-
               <div className="mt-8 flex flex-col gap-6">
                 {menu.map((item) => (
-                  <Link
-                    key={item.title}
-                    href={item.url}
-                    className="text-base font-medium"
-                  >
-                    {item.title}
-                  </Link>
+                  <Link key={item.title} href={item.url} className="text-base font-medium">{item.title}</Link>
                 ))}
-
+                
                 <div className="mt-6 flex flex-col gap-3">
                   {user ? (
                     <>
                       <Button asChild className="w-full">
                         <Link href={dashboardUrl}>
-                          <LayoutDashboard className="mr-2 size-4" />
-                          Dashboard
+                            <LayoutDashboard className="mr-2 size-4"/> 
+                            {user.role === "admin" ? "Admin Panel" : user.role === "trainer" ? "Trainer Board" : "Dashboard"}
                         </Link>
                       </Button>
-                      
-                      <Button 
-                        variant="outline" 
-                        className="w-full"
-                        onClick={handleLogout}
-                      >
-                        <LogOut className="mr-2 size-4" />
-                        Logout
+                      <Button variant="outline" className="w-full" onClick={handleLogout}>
+                        <LogOut className="mr-2 size-4" /> Logout
                       </Button>
                     </>
                   ) : (
                     <>
-                      <Button asChild variant="outline">
-                        <Link href="/login">Login</Link>
-                      </Button>
-                      <Button asChild>
-                        <Link href="/register">Sign up</Link>
-                      </Button>
+                      <Button asChild variant="outline"><Link href="/login">Login</Link></Button>
+                      <Button asChild><Link href="/register">Sign up</Link></Button>
                     </>
                   )}
                 </div>

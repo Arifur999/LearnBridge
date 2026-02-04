@@ -2,8 +2,8 @@ import { API_BASE_URL } from "@/lib/config";
 import { getAuthHeaders } from "./auth.server";
 
 export interface CreateSlotPayload {
-  courseId: string; 
-  startTime: string; 
+  courseId: string; // Jodi specific course er jonno hoy, noile optional
+  startTime: string; // Format: "10:00"
   endTime: string;   
   date: string;      
 }
