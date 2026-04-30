@@ -9,6 +9,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 import ed_1 from "../../../../public/ed-1.jpg";
 import ed_2 from "../../../../public/ed-2.jpg";
@@ -25,21 +26,21 @@ const slides: Slide[] = [
   {
     title: "Learn Skills. Build Your Future.",
     description:
-      "Join LearnBridge and learn in-demand skills from verified trainers.",
+      "Join SkillBridge and book sessions with verified expert tutors.",
     image: ed_1,
-    cta: "Browse Courses",
+    cta: "Browse Tutors",
   },
   {
     title: "Teach. Inspire. Earn.",
     description:
-      "Become a trainer and share your knowledge with thousands of learners.",
+      "Become a tutor and share your knowledge with motivated learners.",
     image: ed_2,
-    cta: "Become a Trainer",
+    cta: "Become a Tutor",
   },
   {
     title: "Upgrade Your Career",
     description:
-      "Learn at your own pace and enroll in industry-focused courses.",
+      "Find the right subject expert and book a session instantly.",
     image: ed_3,
     cta: "Get Started",
   },
@@ -73,8 +74,10 @@ export default function Home() {
                   <p className="mb-6 max-w-2xl text-base text-gray-200 md:text-lg">
                     {slide.description}
                   </p>
-                  <Button size="lg" className="px-8">
-                    {slide.cta}
+                  <Button asChild size="lg" className="px-8">
+                    <Link href={index === 1 ? "/register" : "/tutors"}>
+                      {slide.cta}
+                    </Link>
                   </Button>
                 </div>
               </div>

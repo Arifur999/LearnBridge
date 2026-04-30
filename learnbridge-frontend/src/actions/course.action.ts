@@ -13,3 +13,10 @@ export const getAllCourses = async (query?: string) => {
 export const getCourseById = async (id: string) => {
   return await courseService.getCourseById(id);
 };
+export const getTrainerCoursesAction = async () => {
+  return await courseService.getTrainerCourses();
+};
+
+export const getCategories = async () => {
+  return await courseService.getCategories();
+};

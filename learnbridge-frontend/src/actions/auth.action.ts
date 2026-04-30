@@ -42,7 +42,11 @@ const isUserLike = (value: unknown) => {
   );
 };
 
-const findJwtInObject = (value: unknown, depth = 0, seen = new Set<unknown>()) => {
+const findJwtInObject = (
+  value: unknown,
+  depth = 0,
+  seen = new Set<unknown>()
+): string | null => {
   if (depth > 6) return null;
   if (isJwt(value)) return value as string;
   if (!value || typeof value !== "object") return null;
@@ -65,7 +69,11 @@ const findJwtInObject = (value: unknown, depth = 0, seen = new Set<unknown>()) =
   return null;
 };
 
-const findUserInObject = (value: unknown, depth = 0, seen = new Set<unknown>()) => {
+const findUserInObject = (
+  value: unknown,
+  depth = 0,
+  seen = new Set<unknown>()
+): Record<string, unknown> | null => {
   if (depth > 6) return null;
   if (isUserLike(value)) return value as Record<string, unknown>;
   if (!value || typeof value !== "object") return null;
@@ -110,15 +118,23 @@ const extractTokenFromSetCookie = (setCookie: string | null) => {
   return null;
 };
 
-const extractAccessToken = (result: any, setCookie?: string | null) => {
+const extractAccessToken = (result: unknown, setCookie?: string | null) => {
+  const root =
+    result && typeof result === "object" && !Array.isArray(result)
+      ? (result as Record<string, unknown>)
+      : {};
+  const nested =
+    root.data && typeof root.data === "object" && !Array.isArray(root.data)
+      ? (root.data as Record<string, unknown>)
+      : {};
   const token =
     (
-    result?.data?.accessToken ??
-    result?.data?.token ??
-    result?.data?.jwt ??
-    result?.accessToken ??
-    result?.token ??
-    result?.jwt
+    nested.accessToken ??
+    nested.token ??
+    nested.jwt ??
+    root.accessToken ??
+    root.token ??
+    root.jwt
     );
 
   return (
@@ -152,6 +168,10 @@ const buildFallbackUser = (email: string, name?: string) => {
     role: "student",
     name: safeName,
   };
+};
+
+const normalizeRegisterRole = (role: FormDataEntryValue | null) => {
+  return role?.toString() === "tutor" ? "tutor" : "student";
 };
 
 export const loginAction = async (
@@ -227,7 +247,7 @@ export const loginAction = async (
       success: true,
       data: {
         ...result.data,
-        accessToken: accessToken,
+        accessToken: accessToken ?? undefined,
         user: user ?? result?.data?.data?.user ?? result?.data?.user,
       },
     };
@@ -263,6 +283,7 @@ export const signupAction = async (
     const email = formData.get("email");
     const password = formData.get("password");
     const confirmPassword = formData.get("confirmPassword");
+    const role = normalizeRegisterRole(formData.get("role"));
 
     if (!name || !email || !password || !confirmPassword) {
       return { success: false, message: "All fields are required" };
@@ -276,6 +297,7 @@ export const signupAction = async (
       name: name.toString(),
       email: email.toString(),
       password: password.toString(),
+      role,
     });
 
     const accessToken = extractAccessToken(result?.data, result?.setCookie);
@@ -324,7 +346,7 @@ export const signupAction = async (
       success: true,
       message: "Account created successfully",
       data: {
-        accessToken,
+        accessToken: accessToken ?? undefined,
         user: user ?? result?.data?.data?.user ?? result?.data?.user,
       },
     };

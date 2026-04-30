@@ -1,18 +1,18 @@
 "use server";
 
-import { bookingService } from "@/services/booking.service";
+import { bookingService, BookSessionPayload } from "@/services/booking.service";
 import { revalidatePath } from "next/cache";
 
 export const getTrainerSlots = async (trainerId: string) => {
   return await bookingService.getTrainerSlots(trainerId);
 };
 
-export const bookSlotAction = async (slotId: string) => {
+export const bookSlotAction = async (payload: string | BookSessionPayload) => {
   try {
-    const result = await bookingService.bookSlot(slotId);
+    const result = await bookingService.bookSlot(payload);
     
    
-    revalidatePath("/courses/[id]", "page"); 
+    revalidatePath("/tutors/[id]", "page"); 
     
     return { success: true, message: "Booking successful!", data: result };
   } catch (error) {

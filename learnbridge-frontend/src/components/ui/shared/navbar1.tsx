@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation"; 
 import { Menu, LayoutDashboard, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -20,7 +19,7 @@ import { authService } from "@/services/auth.service";
 interface User {
   name: string;
   email: string;
-  role: "admin" | "trainer" | "student";
+  role: "admin" | "trainer" | "tutor" | "student";
 }
 
 interface MenuItem {
@@ -30,9 +29,8 @@ interface MenuItem {
 
 const menu: MenuItem[] = [
   { title: "Home", url: "/" },
-  { title: "Courses", url: "/courses" },
-  { title: "Pricing", url: "/pricing" },
-  { title: "Blog", url: "/blog" },
+  { title: "Tutors", url: "/tutors" },
+  { title: "Login", url: "/login" },
 ];
 
 const Navbar = ({
@@ -42,19 +40,15 @@ const Navbar = ({
   className?: string;
   user?: User | null;
 }) => {
-  const router = useRouter();
-  const [user, setUser] = useState<User | null>(userProp ?? null);
+  const [user, setUser] = useState<User | null>(
+    userProp ?? (authService.getCurrentUser() as User | null)
+  );
 
   useEffect(() => {
     if (userProp) {
-      setUser(userProp);
       return;
     }
-    const currentUser = authService.getCurrentUser();
-    console.log("Navbar User Check:", currentUser); 
-
-    if (currentUser) {
-      setUser(currentUser as User);
+    if (user) {
       return;
     }
 
@@ -72,14 +66,14 @@ const Navbar = ({
     };
 
     loadFromServer();
-  }, [userProp]);
+  }, [user, userProp]);
 
   let dashboardUrl = "/dashboard"; 
 
   if (user?.role === "admin") {
     dashboardUrl = "/admin";
-  } else if (user?.role === "trainer") {
-    dashboardUrl = "/trainer";
+  } else if (user?.role === "trainer" || user?.role === "tutor") {
+    dashboardUrl = "/tutor/dashboard";
   } else if (user?.role === "student") {
     dashboardUrl = "/student";
   }
@@ -121,7 +115,7 @@ const Navbar = ({
               <Button asChild size="sm" variant="default">
                 <Link href={dashboardUrl} className="flex items-center gap-2">
                   <LayoutDashboard className="size-4" />
-                  {user.role === "admin" ? "Admin Panel" : user.role === "trainer" ? "Trainer Board" : "Student Dashboard"}
+                  {user.role === "admin" ? "Admin Panel" : user.role === "trainer" || user.role === "tutor" ? "Tutor Board" : "Student Dashboard"}
                 </Link>
               </Button>
               
@@ -160,7 +154,7 @@ const Navbar = ({
                       <Button asChild className="w-full">
                         <Link href={dashboardUrl}>
                             <LayoutDashboard className="mr-2 size-4"/> 
-                            {user.role === "admin" ? "Admin Panel" : user.role === "trainer" ? "Trainer Board" : "Dashboard"}
+                            {user.role === "admin" ? "Admin Panel" : user.role === "trainer" || user.role === "tutor" ? "Tutor Board" : "Dashboard"}
                         </Link>
                       </Button>
                       <Button variant="outline" className="w-full" onClick={handleLogout}>

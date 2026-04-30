@@ -1,78 +1,124 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, ArrowUpDown } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowUpDown, Search } from "lucide-react";
 
-export default function CoursesFilter() {
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+interface Category {
+  id?: string;
+  _id?: string;
+  name?: string;
+  title?: string;
+}
+
+export default function CoursesFilter({
+  categories = [],
+}: {
+  categories?: Category[];
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [search, setSearch] = useState(
-    searchParams.get("search") || ""
-  );
-
-  const [sort, setSort] = useState(
-    searchParams.get("sort") || "latest"
-  );
+  const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [category, setCategory] = useState(searchParams.get("category") || "all");
+  const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") || "");
+  const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "");
 
   useEffect(() => {
     const timeout = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
 
-      // search
       if (search.trim()) {
         params.set("search", search.trim());
       } else {
         params.delete("search");
       }
 
-      // sort
-      if (sort) {
-        params.set("sort", sort);
+      if (category && category !== "all") {
+        params.set("category", category);
       } else {
-        params.delete("sort");
+        params.delete("category");
       }
 
-      params.delete("page"); // reset pagination
+      if (minPrice.trim()) {
+        params.set("minPrice", minPrice.trim());
+      } else {
+        params.delete("minPrice");
+      }
 
-      router.push(`/courses?${params.toString()}`);
+      if (maxPrice.trim()) {
+        params.set("maxPrice", maxPrice.trim());
+      } else {
+        params.delete("maxPrice");
+      }
+
+      params.delete("page");
+      router.push(`/tutors?${params.toString()}`);
     }, 400);
 
     return () => clearTimeout(timeout);
-  }, [search, sort, router, searchParams]);
+  }, [search, category, minPrice, maxPrice, router, searchParams]);
 
   return (
     <div className="mb-10 rounded-xl border bg-background p-4 shadow-sm">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        {/* Search */}
         <div className="relative w-full md:max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search courses..."
+            placeholder="Search tutors or subjects..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(event) => setSearch(event.target.value)}
             className="pl-9"
           />
         </div>
 
-        {/* Sort */}
-        <div className="flex items-center gap-2">
-          <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <ArrowUpDown className="hidden h-4 w-4 text-muted-foreground sm:block" />
 
-          <Select value={sort} onValueChange={setSort}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Sort by" />
+          <Select value={category} onValueChange={setCategory}>
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="latest">Latest</SelectItem>
-              <SelectItem value="price_low">Price: Low to High</SelectItem>
-              <SelectItem value="price_high">Price: High to Low</SelectItem>
-              <SelectItem value="title_asc">Title: A–Z</SelectItem>
+              <SelectItem value="all">All categories</SelectItem>
+              {categories.map((item) => {
+                const label = item.name ?? item.title ?? "Category";
+                const value = item.id ?? item._id ?? label;
+                return (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
+
+          <Input
+            type="number"
+            min="0"
+            placeholder="Min price"
+            value={minPrice}
+            onChange={(event) => setMinPrice(event.target.value)}
+            className="w-full sm:w-28"
+          />
+
+          <Input
+            type="number"
+            min="0"
+            placeholder="Max price"
+            value={maxPrice}
+            onChange={(event) => setMaxPrice(event.target.value)}
+            className="w-full sm:w-28"
+          />
         </div>
       </div>
     </div>

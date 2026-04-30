@@ -15,16 +15,16 @@ export default async function PopularCourses() {
     <section className="bg-muted py-20">
       <div className="mx-auto max-w-7xl px-4">
         <div className="mb-10 flex items-center justify-between">
-          <h2 className="text-3xl font-bold">Popular Courses</h2>
+          <h2 className="text-3xl font-bold">Featured Tutors</h2>
 
           <Button asChild variant="outline">
-            <Link href="/courses">View All</Link>
+            <Link href="/tutors">View All</Link>
           </Button>
         </div>
 
         {courses.length === 0 && (
           <p className="text-muted-foreground">
-            No courses available right now.
+            No tutors available right now.
           </p>
         )}
 
@@ -46,8 +46,8 @@ export default async function PopularCourses() {
                 </p>
 
                 <Button asChild size="sm">
-                  <Link href={`/courses/${course.id}`}>
-                    View Details
+                  <Link href={`/tutors/${course.id}`}>
+                    View Profile
                   </Link>
                 </Button>
               </div>

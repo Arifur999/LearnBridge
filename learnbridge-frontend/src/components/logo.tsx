@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
+
 import { Download } from "lucide-react";
 
 import { cn } from "@/lib/utils";

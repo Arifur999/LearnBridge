@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "@/lib/config";
+import { API_V1_URL } from "@/lib/config";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 
@@ -14,32 +14,41 @@ interface SignupPayload {
   name: string;
   email: string;
   password: string;
+  role: "student" | "tutor";
 }
 
 interface DecodedToken {
   id: string;
   email: string;
-  role: "admin" | "trainer" | "student";
+  role: "admin" | "tutor" | "student";
   name?: string;
   exp: number;
 }
 
-const extractAccessToken = (data: any) => {
+const getRecord = (value: unknown): Record<string, unknown> => {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : {};
+};
+
+const extractAccessToken = (data: unknown): string | null => {
+  const root = getRecord(data);
+  const nested = getRecord(root.data);
   const token =
     (
-    data?.data?.accessToken ??
-    data?.data?.token ??
-    data?.data?.jwt ??
-    data?.accessToken ??
-    data?.token ??
-    data?.jwt
+    nested.accessToken ??
+    nested.token ??
+    nested.jwt ??
+    root.accessToken ??
+    root.token ??
+    root.jwt
     );
 
   if (typeof token === "string" && token.startsWith("Bearer ")) {
     return token.slice(7);
   }
 
-  return token;
+  return typeof token === "string" ? token : null;
 };
 
 class AuthService {
@@ -63,7 +72,7 @@ class AuthService {
   }
 
   async login(payload: LoginPayload) {
-    const res = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+    const res = await fetch(`${API_V1_URL}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -82,7 +91,8 @@ class AuthService {
       Cookies.set(TOKEN_KEY, accessToken, { expires: 7, path: "/" });
     }
 
-    const user = data?.data?.user ?? data?.user;
+    const root = getRecord(data);
+    const user = getRecord(root.data).user ?? root.user;
     if (user) {
       Cookies.set(AUTH_USER_KEY, JSON.stringify(user), {
         expires: 7,
@@ -94,7 +104,7 @@ class AuthService {
   }
 
   async signup(payload: SignupPayload) {
-    const res = await fetch(`${API_BASE_URL}/api/v1/auth/register`, {
+    const res = await fetch(`${API_V1_URL}/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -113,7 +123,8 @@ class AuthService {
       Cookies.set(TOKEN_KEY, accessToken, { expires: 7, path: "/" });
     }
 
-    const user = data?.data?.user ?? data?.user;
+    const root = getRecord(data);
+    const user = getRecord(root.data).user ?? root.user;
     if (user) {
       Cookies.set(AUTH_USER_KEY, JSON.stringify(user), {
         expires: 7,
@@ -161,7 +172,7 @@ class AuthService {
         email: decoded.email,
         role: decoded.role,
       };
-    } catch (error) {
+    } catch {
       return this.parseUserCookie(rawUser);
     }
   }

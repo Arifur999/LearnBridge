@@ -4,7 +4,7 @@ import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
 
-import { cn } from "@/lib/utils";
+import { loginAction } from "@/actions/auth.action";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,13 +13,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { loginAction } from "@/actions/auth.action";
+import { cn } from "@/lib/utils";
 
 const initialState = {
   success: false,
@@ -30,15 +26,12 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [state, formAction] = useActionState(
-    loginAction,
-    initialState
-  );
+  const [state, formAction] = useActionState(loginAction, initialState);
 
   useEffect(() => {
     if (state.success) {
-      toast.success("Login successful 🎉", {
-        description: "Welcome back to LearnBridge",
+      toast.success("Login successful", {
+        description: "Welcome back to SkillBridge",
       });
 
       const accessToken = state.data?.accessToken;
@@ -46,10 +39,7 @@ export function LoginForm({
         Cookies.set("accessToken", accessToken, { expires: 7, path: "/" });
       }
 
-      const user =
-        state.data?.user ??
-        state.data?.data?.user ??
-        state.data?.data?.data?.user;
+      const user = state.data?.user;
       if (user) {
         Cookies.set("authUser", JSON.stringify(user), {
           expires: 7,
@@ -59,7 +49,7 @@ export function LoginForm({
 
       window.location.href = "/";
     }
-  }, [state.success]);
+  }, [state.data?.accessToken, state.data?.user, state.success]);
 
   useEffect(() => {
     if (!state.success && state.message) {
@@ -108,11 +98,7 @@ export function LoginForm({
                     Forgot password?
                   </a>
                 </div>
-                <Input
-                  name="password"
-                  type="password"
-                  required
-                />
+                <Input name="password" type="password" required />
               </Field>
 
               <Field>

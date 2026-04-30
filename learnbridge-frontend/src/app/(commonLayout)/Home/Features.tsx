@@ -4,18 +4,18 @@ export default function Features() {
   const features = [
     {
       icon: BookOpen,
-      title: "Industry Focused Courses",
-      desc: "Learn skills companies actually need",
+      title: "Expert Tutors",
+      desc: "Learn from subject specialists",
     },
     {
       icon: Users,
-      title: "Verified Trainers",
-      desc: "All trainers are admin approved",
+      title: "Verified Profiles",
+      desc: "Tutors are reviewed and moderated",
     },
     {
       icon: Clock,
-      title: "Learn Anytime",
-      desc: "Self-paced learning experience",
+      title: "Instant Booking",
+      desc: "Choose a slot and confirm quickly",
     },
     {
       icon: Shield,
@@ -27,7 +27,7 @@ export default function Features() {
   return (
     <section className="py-20">
       <div className="mx-auto max-w-7xl px-4 text-center">
-        <h2 className="mb-12 text-3xl font-bold">Why LearnBridge?</h2>
+        <h2 className="mb-12 text-3xl font-bold">Why SkillBridge?</h2>
 
         <div className="grid gap-8 md:grid-cols-4">
           {features.map((f) => (

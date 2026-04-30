@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 import { LogOut, User2 } from "lucide-react";
@@ -22,6 +23,7 @@ import {
 
 import { navConfig, UserRole } from "@/lib/nav.config";
 import { authService } from "@/services/auth.service";
+import logo from "../../public/logo.png";
 
 interface SidebarUser {
   name?: string;
@@ -36,10 +38,11 @@ export function AppSidebar({
   const pathname = usePathname();
 
   const role = user?.role;
+  const normalizedRole = role === "trainer" ? "tutor" : role;
   const isValidRole =
-    role === "admin" || role === "trainer" || role === "student";
-  const items = isValidRole ? navConfig[role] || [] : [];
-  const roleLabel = isValidRole ? role : "guest";
+    normalizedRole === "admin" || normalizedRole === "tutor" || normalizedRole === "student";
+  const items = isValidRole ? navConfig[normalizedRole] || [] : [];
+  const roleLabel = isValidRole ? normalizedRole : "guest";
   const nameLabel = user?.name ?? "User";
 
   const handleLogout = () => {
@@ -54,12 +57,12 @@ export function AppSidebar({
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href="/">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <span className="font-bold text-lg">LB</span>
+                <div className="flex aspect-square size-8 items-center justify-center overflow-hidden rounded-lg bg-background">
+                  <Image src={logo} alt="SkillBridge" className="size-8 object-contain" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-semibold">LearnBridge</span>
-                  <span className="">v1.0.0</span>
+                  <span className="font-semibold">SkillBridge</span>
+                  <span>Dashboard</span>
                 </div>
               </Link>
             </SidebarMenuButton>

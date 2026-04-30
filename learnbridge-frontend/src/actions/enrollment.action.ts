@@ -30,3 +30,4 @@ export const enrollCourseAction = async (courseId: string) => {
 export const getMyEnrollments = async () => {
   return await enrollmentService.getMyEnrollments();
 };
+

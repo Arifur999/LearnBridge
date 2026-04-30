@@ -1,8 +1,8 @@
-import { API_BASE_URL } from "@/lib/config";
+import { API_V1_URL } from "@/lib/config";
 import { getAuthHeaders } from "./auth.server";
 
 export interface CreateSlotPayload {
-  courseId: string; // Jodi specific course er jonno hoy, noile optional
+  courseId?: string;
   startTime: string; // Format: "10:00"
   endTime: string;   
   date: string;      
@@ -11,7 +11,7 @@ export interface CreateSlotPayload {
 export const createSlotService = async (payload: CreateSlotPayload) => {
   const headers = await getAuthHeaders();
 
-  const res = await fetch(`${API_BASE_URL}/api/v1/slots`, {
+  const res = await fetch(`${API_V1_URL}/slots`, {
     method: "POST",
     headers: headers,
     body: JSON.stringify(payload),

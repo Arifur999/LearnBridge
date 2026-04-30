@@ -4,6 +4,7 @@ import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
 
+import { signupAction } from "@/actions/auth.action";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,13 +13,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { signupAction } from "@/actions/auth.action";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const initialState = {
   success: false,
@@ -26,14 +29,11 @@ const initialState = {
 };
 
 export function SignupForm(props: React.ComponentProps<typeof Card>) {
-  const [state, formAction] = useActionState(
-    signupAction,
-    initialState
-  );
+  const [state, formAction] = useActionState(signupAction, initialState);
 
   useEffect(() => {
     if (state.success) {
-      toast.success("Account created successfully 🎉", {
+      toast.success("Account created successfully", {
         description: "You can now login with your credentials",
       });
 
@@ -42,10 +42,7 @@ export function SignupForm(props: React.ComponentProps<typeof Card>) {
         Cookies.set("accessToken", accessToken, { expires: 7, path: "/" });
       }
 
-      const user =
-        state.data?.user ??
-        state.data?.data?.user ??
-        state.data?.data?.data?.user;
+      const user = state.data?.user;
       if (user) {
         Cookies.set("authUser", JSON.stringify(user), {
           expires: 7,
@@ -55,7 +52,7 @@ export function SignupForm(props: React.ComponentProps<typeof Card>) {
 
       window.location.href = "/";
     }
-  }, [state.success]);
+  }, [state.data?.accessToken, state.data?.user, state.success]);
 
   useEffect(() => {
     if (!state.success && state.message) {
@@ -88,17 +85,26 @@ export function SignupForm(props: React.ComponentProps<typeof Card>) {
             </Field>
 
             <Field>
+              <FieldLabel>Role</FieldLabel>
+              <Select name="role" defaultValue="student">
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="student">Student</SelectItem>
+                  <SelectItem value="tutor">Tutor</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+
+            <Field>
               <FieldLabel>Password</FieldLabel>
               <Input name="password" type="password" required />
             </Field>
 
             <Field>
               <FieldLabel>Confirm Password</FieldLabel>
-              <Input
-                name="confirmPassword"
-                type="password"
-                required
-              />
+              <Input name="confirmPassword" type="password" required />
             </Field>
 
             <Field>

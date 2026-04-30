@@ -1,13 +1,13 @@
-﻿import { API_BASE_URL } from "@/lib/config";
+import { API_V1_URL } from "@/lib/config";
 import { getAuthHeaders } from "./auth.server";
 
-const ENROLLMENTS_ENDPOINT = "/api/v1/student/enrollments";
+const ENROLLMENTS_ENDPOINT = "/student/enrollments";
 
 class EnrollmentService {
   async enrollCourse(courseId: string) {
     const headers = await getAuthHeaders();
 
-    const res = await fetch(`${API_BASE_URL}${ENROLLMENTS_ENDPOINT}`, {
+    const res = await fetch(`${API_V1_URL}${ENROLLMENTS_ENDPOINT}`, {
       method: "POST",
       headers,
       body: JSON.stringify({ courseId }),
@@ -26,7 +26,7 @@ class EnrollmentService {
   async getMyEnrollments() {
     const headers = await getAuthHeaders();
 
-    const res = await fetch(`${API_BASE_URL}${ENROLLMENTS_ENDPOINT}`, {
+    const res = await fetch(`${API_V1_URL}${ENROLLMENTS_ENDPOINT}`, {
       method: "GET",
       headers,
       cache: "no-store",

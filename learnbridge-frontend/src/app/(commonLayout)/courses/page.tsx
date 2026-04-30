@@ -1,4 +1,4 @@
-import { getAllCourses } from "@/actions/course.action";
+import { getAllCourses, getCategories } from "@/actions/course.action";
 import CourseCard from "./CourseCard";
 import CoursesFilter from "./CoursesFilter";
 import Pagination from "./Pagination";
@@ -8,19 +8,38 @@ interface Course {
   title: string;
   description: string;
   price?: number;
+  category?: string;
 }
 
+interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+}
+
+const isPaginationMeta = (value: unknown): value is PaginationMeta => {
+  return (
+    !!value &&
+    typeof value === "object" &&
+    "page" in value &&
+    "limit" in value &&
+    "total" in value
+  );
+};
 
 export default async function CoursesPage({
   searchParams,
 }: {
   searchParams: Promise<{
     search?: string;
+    category?: string;
+    minPrice?: string;
+    maxPrice?: string;
     page?: string;
   }>;
 }) {
  
-  const { search, page: pageQuery } = await searchParams;
+  const { search, category, minPrice, maxPrice, page: pageQuery } = await searchParams;
 
   const page = Number(pageQuery) || 1;
   const limit = 9;
@@ -32,25 +51,37 @@ export default async function CoursesPage({
   if (search) {
     params.set("search", search);
   }
+  if (category) {
+    params.set("category", category);
+  }
+  if (minPrice) {
+    params.set("minPrice", minPrice);
+  }
+  if (maxPrice) {
+    params.set("maxPrice", maxPrice);
+  }
 
-  const result = await getAllCourses(`?${params.toString()}`);
+  const [result, categories] = await Promise.all([
+    getAllCourses(`?${params.toString()}`),
+    getCategories(),
+  ]);
 
   const courses: Course[] = result?.data ?? [];
-  const meta = result?.meta ?? null;
+  const meta = isPaginationMeta(result?.meta) ? result.meta : null;
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-16">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">All Courses</h1>
+        <h1 className="text-3xl font-bold">Browse Tutors</h1>
         <p className="mt-2 text-muted-foreground">
-          Explore all available courses and start learning today.
+          Find expert tutors by subject, category, and hourly price.
         </p>
       </div>
 
-      <CoursesFilter />
+      <CoursesFilter categories={categories} />
 
       {courses.length === 0 && (
-        <p className="text-muted-foreground">No courses found.</p>
+        <p className="text-muted-foreground">No tutors found.</p>
       )}
 
       {courses.length > 0 && (
@@ -62,6 +93,7 @@ export default async function CoursesPage({
               title={course.title}
               description={course.description}
               price={course.price}
+              category={course.category}
             />
           ))}
         </div>
