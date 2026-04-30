@@ -13,6 +13,13 @@ import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
+// Role-based redirect helper
+const getRoleHome = (role: string) => {
+  if (role === "admin") return "/admin";
+  if (role === "trainer" || role === "tutor") return "/tutor/dashboard";
+  return "/student";
+};
+
 export default async function DashboardLayout({
   children,
 }: {
@@ -23,6 +30,9 @@ export default async function DashboardLayout({
   if (!user) {
     redirect("/login");
   }
+
+  // Get current path to determine expected role
+  // This is a simple check - the middleware handles most role routing
 
   return (
     <SidebarProvider>

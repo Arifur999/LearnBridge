@@ -76,3 +76,25 @@ export const updateAvailabilityAction = async (formData: FormData) => {
     };
   }
 };
+
+// Tutor Dashboard Actions
+export const getTutorDashboard = async () => {
+  return await dashboardService.getTutorDashboard();
+};
+
+export const getTutorBookings = async () => {
+  return await dashboardService.getTutorBookings();
+};
+
+export const getTutorCourses = async () => {
+  return await dashboardService.getTutorCourses();
+};
+
+// Admin Dashboard Actions
+export const getAdminDashboard = async () => {
+  return await dashboardService.getAdminDashboard();
+};
+
+export const getCategories = async () => {
+  return await dashboardService.getCategories();
+};

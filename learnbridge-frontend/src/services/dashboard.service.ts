@@ -105,6 +105,48 @@ class DashboardService {
       body: JSON.stringify(payload),
     });
   }
+
+  // Tutor Dashboard
+  async getTutorDashboard() {
+    try {
+      return unwrapData(await safeFetch("/tutor/dashboard"));
+    } catch {
+      return null;
+    }
+  }
+
+  async getTutorBookings() {
+    try {
+      return toArray(await safeFetch("/tutor/bookings"));
+    } catch {
+      return [];
+    }
+  }
+
+  async getTutorCourses() {
+    try {
+      return toArray(await safeFetch("/tutor/courses"));
+    } catch {
+      return [];
+    }
+  }
+
+  // Admin Dashboard
+  async getAdminDashboard() {
+    try {
+      return unwrapData(await safeFetch("/admin/dashboard"));
+    } catch {
+      return null;
+    }
+  }
+
+  async getCategories() {
+    try {
+      return toArray(await safeFetch("/categories"));
+    } catch {
+      return [];
+    }
+  }
 }
 
 export const dashboardService = new DashboardService();

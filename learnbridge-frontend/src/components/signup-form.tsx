@@ -50,7 +50,18 @@ export function SignupForm(props: React.ComponentProps<typeof Card>) {
         });
       }
 
-      window.location.href = "/";
+      // Role-based redirect after signup
+      const userRole = user?.role;
+      let redirectUrl = "/login";
+      if (userRole === "admin") {
+        redirectUrl = "/admin";
+      } else if (userRole === "trainer" || userRole === "tutor") {
+        redirectUrl = "/tutor/dashboard";
+      } else {
+        redirectUrl = "/student";
+      }
+      
+      window.location.href = redirectUrl;
     }
   }, [state.data?.accessToken, state.data?.user, state.success]);
 
