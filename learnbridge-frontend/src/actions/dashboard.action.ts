@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { dashboardService } from "@/services/dashboard.service";
+import { bookingService } from "@/services/booking.service";
 
 export const getStudentDashboard = async () => {
   return await dashboardService.getStudentDashboard();
@@ -32,29 +33,32 @@ export const updateUserStatusAction = async (userId: string, status: string) => 
   }
 };
 
-export const updateTutorProfileAction = async (formData: FormData) => {
+export const updateTutorProfileAction = async (
+  _prevState: { success: boolean; message: string },
+  formData: FormData
+): Promise<{ success: boolean; message: string }> => {
   try {
     const payload = {
       bio: formData.get("bio")?.toString() ?? "",
-      subjects: formData
-        .get("subjects")
-        ?.toString()
-        .split(",")
-        .map((item) => item.trim())
-        .filter(Boolean) ?? [],
+      subjects: formData.get("subjects")?.toString().trim() ?? "",
       hourlyRate: Number(formData.get("hourlyRate") || 0),
       category: formData.get("category")?.toString() ?? "",
+      profileImage: formData.get("profileImage")?.toString() ?? undefined,
     };
 
-    const result = await dashboardService.updateTutorProfile(payload);
+    await dashboardService.updateTutorProfile(payload);
     revalidatePath("/tutor/profile");
-    return { success: true, message: "Profile saved", data: result };
+    return { success: true, message: "Profile saved successfully" };
   } catch (error) {
     return {
       success: false,
       message: error instanceof Error ? error.message : "Failed to save profile",
     };
   }
+};
+
+export const getTutorProfileAction = async () => {
+  return await dashboardService.getTutorProfile();
 };
 
 export const updateAvailabilityAction = async (formData: FormData) => {
@@ -73,6 +77,38 @@ export const updateAvailabilityAction = async (formData: FormData) => {
       success: false,
       message:
         error instanceof Error ? error.message : "Failed to save availability",
+    };
+  }
+};
+
+export const getTutorSlotsAction = async () => {
+  return await dashboardService.getTutorSlots();
+};
+
+export const cancelBookingAction = async (bookingId: string) => {
+  try {
+    const result = await bookingService.cancelBooking(bookingId);
+    revalidatePath("/student/bookings");
+    revalidatePath("/tutor/dashboard");
+    return { success: true, message: "Booking cancelled", data: result };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to cancel booking",
+    };
+  }
+};
+
+export const completeBookingAction = async (bookingId: string) => {
+  try {
+    const result = await bookingService.completeBooking(bookingId);
+    revalidatePath("/tutor/dashboard");
+    revalidatePath("/student/bookings");
+    return { success: true, message: "Session marked complete", data: result };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to complete booking",
     };
   }
 };
@@ -97,4 +133,33 @@ export const getAdminDashboard = async () => {
 
 export const getCategories = async () => {
   return await dashboardService.getCategories();
+};
+
+export const createCategoryAction = async (formData: FormData) => {
+  try {
+    const result = await dashboardService.createCategory({
+      name: formData.get("name")?.toString() ?? "",
+      description: formData.get("description")?.toString() ?? "",
+    });
+    revalidatePath("/admin/categories");
+    return { success: true, message: "Category created", data: result };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to create category",
+    };
+  }
+};
+
+export const deleteCategoryAction = async (categoryId: string) => {
+  try {
+    await dashboardService.deleteCategory(categoryId);
+    revalidatePath("/admin/categories");
+    return { success: true, message: "Category deleted" };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to delete category",
+    };
+  }
 };

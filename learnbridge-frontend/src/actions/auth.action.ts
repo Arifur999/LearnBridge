@@ -19,8 +19,9 @@ export interface LoginActionState {
 }
 
 interface DecodedToken {
-  id: string;
-  email: string;
+  userId?: string;
+  id?: string;
+  email?: string;
   role: string;
   name?: string;
   exp?: number;
@@ -148,11 +149,11 @@ const buildUserFromToken = (token: string | null) => {
   if (!token) return null;
   try {
     const decoded = jwtDecode<DecodedToken>(token);
-    if (!decoded?.email || !decoded?.role) return null;
+    if (!decoded?.role) return null;
     return {
-      id: decoded.id,
-      email: decoded.email,
-      role: decoded.role,
+      id: decoded.userId ?? decoded.id ?? "",
+      email: decoded.email ?? "",
+      role: decoded.role.toLowerCase(),
       name: decoded.name ?? "User",
     };
   } catch {
@@ -202,6 +203,15 @@ export const loginAction = async (
       findUserInObject(result?.data) ??
       buildUserFromToken(accessToken) ??
       null;
+
+    if (user && typeof user === "object") {
+      const u = user as Record<string, unknown>;
+      user = {
+        ...u,
+        id: String(u.id ?? u.userId ?? u._id ?? email.toString()),
+        role: String(u.role ?? "student").toLowerCase(),
+      };
+    }
 
     if (!user && process.env.NODE_ENV !== "production") {
       user = buildFallbackUser(email.toString());
@@ -307,6 +317,15 @@ export const signupAction = async (
       findUserInObject(result?.data) ??
       buildUserFromToken(accessToken) ??
       null;
+
+    if (user && typeof user === "object") {
+      const u = user as Record<string, unknown>;
+      user = {
+        ...u,
+        id: String(u.id ?? u.userId ?? u._id ?? email.toString()),
+        role: String(u.role ?? "student").toLowerCase(),
+      };
+    }
 
     if (!user && process.env.NODE_ENV !== "production") {
       user = buildFallbackUser(email.toString(), name.toString());

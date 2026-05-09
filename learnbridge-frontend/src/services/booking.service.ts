@@ -14,15 +14,43 @@ class BookingService {
   async getTrainerSlots(trainerId: string) {
     try {
       const res = await fetch(
-        `${API_V1_URL}/slots?trainerId=${trainerId}&isBooked=false`,
+        `${API_V1_URL}/tutors/${trainerId}/slots`,
         { cache: "no-store" }
       );
+      if (!res.ok) return [];
       const data = await res.json();
-      return data?.data || [];
+      const raw = data?.data ?? data;
+      return Array.isArray(raw) ? raw : (Array.isArray(raw?.slots) ? raw.slots : []);
     } catch (error) {
       console.error("Error fetching slots:", error);
       return [];
     }
+  }
+
+  async cancelBooking(bookingId: string) {
+    const headers = await getAuthHeaders();
+    const res = await fetch(`${API_V1_URL}/bookings/${bookingId}`, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify({ status: "CANCELLED" }),
+      cache: "no-store",
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.message || "Cancel failed");
+    return data;
+  }
+
+  async completeBooking(bookingId: string) {
+    const headers = await getAuthHeaders();
+    const res = await fetch(`${API_V1_URL}/bookings/${bookingId}`, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify({ status: "COMPLETED" }),
+      cache: "no-store",
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.message || "Update failed");
+    return data;
   }
 
 

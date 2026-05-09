@@ -19,7 +19,7 @@ import { authService } from "@/services/auth.service";
 interface User {
   name: string;
   email: string;
-  role: "admin" | "trainer" | "tutor" | "student";
+  role: string;
 }
 
 interface MenuItem {
@@ -30,7 +30,9 @@ interface MenuItem {
 const menu: MenuItem[] = [
   { title: "Home", url: "/" },
   { title: "Tutors", url: "/tutors" },
-  { title: "Login", url: "/login" },
+  { title: "About", url: "/about" },
+  { title: "FAQ", url: "/faq" },
+  { title: "Contact", url: "/contact" },
 ];
 
 const Navbar = ({
@@ -68,13 +70,14 @@ const Navbar = ({
     loadFromServer();
   }, [user, userProp]);
 
-  let dashboardUrl = "/dashboard"; 
+  let dashboardUrl = "/dashboard";
+  const userRole = user?.role?.toLowerCase();
 
-  if (user?.role === "admin") {
+  if (userRole === "admin") {
     dashboardUrl = "/admin";
-  } else if (user?.role === "trainer" || user?.role === "tutor") {
+  } else if (userRole === "trainer" || userRole === "tutor") {
     dashboardUrl = "/tutor/dashboard";
-  } else if (user?.role === "student") {
+  } else if (userRole === "student") {
     dashboardUrl = "/student";
   }
 
@@ -115,7 +118,7 @@ const Navbar = ({
               <Button asChild size="sm" variant="default">
                 <Link href={dashboardUrl} className="flex items-center gap-2">
                   <LayoutDashboard className="size-4" />
-                  {user.role === "admin" ? "Admin Panel" : user.role === "trainer" || user.role === "tutor" ? "Tutor Board" : "Student Dashboard"}
+                  {userRole === "admin" ? "Admin Panel" : userRole === "trainer" || userRole === "tutor" ? "Tutor Board" : "Student Dashboard"}
                 </Link>
               </Button>
               
@@ -154,7 +157,7 @@ const Navbar = ({
                       <Button asChild className="w-full">
                         <Link href={dashboardUrl}>
                             <LayoutDashboard className="mr-2 size-4"/> 
-                            {user.role === "admin" ? "Admin Panel" : user.role === "trainer" || user.role === "tutor" ? "Tutor Board" : "Dashboard"}
+                            {userRole === "admin" ? "Admin Panel" : userRole === "trainer" || userRole === "tutor" ? "Tutor Board" : "Dashboard"}
                         </Link>
                       </Button>
                       <Button variant="outline" className="w-full" onClick={handleLogout}>

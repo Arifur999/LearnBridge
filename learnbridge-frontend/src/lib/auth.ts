@@ -2,11 +2,12 @@ import { cookies } from "next/headers";
 import { jwtDecode } from "jwt-decode";
 
 interface DecodedToken {
-  id: string;
-  email: string;
+  userId?: string;
+  id?: string;
+  email?: string;
   role: string;
   name?: string;
-  exp: number;
+  exp?: number;
 }
 
 export async function getCurrentUserFromServer() {
@@ -37,22 +38,32 @@ export async function getCurrentUserFromServer() {
     }
   };
 
+  const cookieUser = parseUserCookie(rawUser);
+
   if (!token) {
-    return parseUserCookie(rawUser);
+    if (!cookieUser) return null;
+    return {
+      ...cookieUser,
+      role: String(cookieUser.role ?? "student").toLowerCase(),
+    };
   }
 
   try {
     const decoded: DecodedToken = jwtDecode(token);
 
-    if (decoded.exp * 1000 < Date.now()) return null;
+    if (decoded.exp && decoded.exp * 1000 < Date.now()) return null;
 
-    return {
-      id: decoded.id,
-      email: decoded.email,
-      role: decoded.role,
-      name: decoded.name ?? "User",
-    };
+    const id = decoded.userId ?? decoded.id ?? cookieUser?.id ?? "";
+    const role = (decoded.role ?? cookieUser?.role ?? "student").toLowerCase();
+    const email = decoded.email ?? cookieUser?.email ?? "";
+    const name = decoded.name ?? cookieUser?.name ?? "User";
+
+    return { id, email, role, name };
   } catch {
-    return parseUserCookie(rawUser);
+    if (!cookieUser) return null;
+    return {
+      ...cookieUser,
+      role: String(cookieUser.role ?? "student").toLowerCase(),
+    };
   }
 }

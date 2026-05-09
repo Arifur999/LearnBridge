@@ -10,7 +10,6 @@ export default async function CommonLayout({
   children: React.ReactNode;
 }) {
   const user = await getCurrentUserFromServer();
-  console.log("SERVER USER", user);
 
   return (
     <>

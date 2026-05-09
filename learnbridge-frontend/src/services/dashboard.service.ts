@@ -18,6 +18,9 @@ const toArray = (value: unknown): ApiRecord[] => {
   if (Array.isArray(data)) return data.filter(isRecord);
   if (isRecord(data) && Array.isArray(data.items)) return data.items.filter(isRecord);
   if (isRecord(data) && Array.isArray(data.result)) return data.result.filter(isRecord);
+  if (isRecord(data) && Array.isArray(data.bookings)) return (data.bookings as unknown[]).filter(isRecord);
+  if (isRecord(data) && Array.isArray(data.sessions)) return (data.sessions as unknown[]).filter(isRecord);
+  if (isRecord(data) && Array.isArray(data.slots)) return (data.slots as unknown[]).filter(isRecord);
   return [];
 };
 
@@ -50,7 +53,11 @@ class DashboardService {
     try {
       return unwrapData(await safeFetch("/student/dashboard"));
     } catch {
-      return null;
+      try {
+        return unwrapData(await safeFetch("/bookings"));
+      } catch {
+        return null;
+      }
     }
   }
 
@@ -93,23 +100,40 @@ class DashboardService {
   }
 
   async updateTutorProfile(payload: ApiRecord) {
-    return await safeFetch("/tutor/profile", {
+    return await safeFetch("/tutors/profile/me", {
       method: "PUT",
       body: JSON.stringify(payload),
     });
+  }
+
+  async getTutorProfile() {
+    try {
+      const data = await safeFetch("/tutors/profile/me");
+      const raw = unwrapData(data);
+      return isRecord(raw) ? raw : null;
+    } catch {
+      return null;
+    }
   }
 
   async updateTutorAvailability(payload: ApiRecord) {
-    return await safeFetch("/tutor/availability", {
-      method: "PUT",
+    return await safeFetch("/slots", {
+      method: "POST",
       body: JSON.stringify(payload),
     });
   }
 
-  // Tutor Dashboard
+  async getTutorSlots() {
+    try {
+      return toArray(await safeFetch("/tutors/slots/mine"));
+    } catch {
+      return [];
+    }
+  }
+
   async getTutorDashboard() {
     try {
-      return unwrapData(await safeFetch("/tutor/dashboard"));
+      return unwrapData(await safeFetch("/trainer/dashboard"));
     } catch {
       return null;
     }
@@ -117,21 +141,24 @@ class DashboardService {
 
   async getTutorBookings() {
     try {
-      return toArray(await safeFetch("/tutor/bookings"));
+      return toArray(await safeFetch("/tutors/sessions/mine"));
     } catch {
-      return [];
+      try {
+        return toArray(await safeFetch("/bookings"));
+      } catch {
+        return [];
+      }
     }
   }
 
   async getTutorCourses() {
     try {
-      return toArray(await safeFetch("/tutor/courses"));
+      return toArray(await safeFetch("/tutors/sessions/mine"));
     } catch {
       return [];
     }
   }
 
-  // Admin Dashboard
   async getAdminDashboard() {
     try {
       return unwrapData(await safeFetch("/admin/dashboard"));
@@ -142,10 +169,36 @@ class DashboardService {
 
   async getCategories() {
     try {
-      return toArray(await safeFetch("/categories"));
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_V1_URL}/categories`, {
+        headers,
+        cache: "no-store",
+      });
+      const data = await res.json();
+      return toArray(data);
     } catch {
       return [];
     }
+  }
+
+  async createCategory(payload: ApiRecord) {
+    return await safeFetch("/categories", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async updateCategory(categoryId: string, payload: ApiRecord) {
+    return await safeFetch(`/categories/${categoryId}`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async deleteCategory(categoryId: string) {
+    return await safeFetch(`/categories/${categoryId}`, {
+      method: "DELETE",
+    });
   }
 }
 

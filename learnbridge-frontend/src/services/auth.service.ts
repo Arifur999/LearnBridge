@@ -18,11 +18,12 @@ interface SignupPayload {
 }
 
 interface DecodedToken {
-  id: string;
-  email: string;
-  role: "admin" | "tutor" | "student";
+  userId?: string;
+  id?: string;
+  email?: string;
+  role: string;
   name?: string;
-  exp: number;
+  exp?: number;
 }
 
 const getRecord = (value: unknown): Record<string, unknown> => {
@@ -92,9 +93,14 @@ class AuthService {
     }
 
     const root = getRecord(data);
-    const user = getRecord(root.data).user ?? root.user;
-    if (user) {
-      Cookies.set(AUTH_USER_KEY, JSON.stringify(user), {
+    const rawUser = getRecord(root.data).user ?? root.user ?? (
+      typeof root.data === "object" && root.data && !Array.isArray(root.data) &&
+      typeof (root.data as Record<string,unknown>).role === "string" ? root.data : null
+    );
+    if (rawUser && typeof rawUser === "object") {
+      const u = rawUser as Record<string, unknown>;
+      const normalized = { ...u, role: String(u.role ?? "student").toLowerCase() };
+      Cookies.set(AUTH_USER_KEY, JSON.stringify(normalized), {
         expires: 7,
         path: "/",
       });
@@ -124,9 +130,14 @@ class AuthService {
     }
 
     const root = getRecord(data);
-    const user = getRecord(root.data).user ?? root.user;
-    if (user) {
-      Cookies.set(AUTH_USER_KEY, JSON.stringify(user), {
+    const rawUser2 = getRecord(root.data).user ?? root.user ?? (
+      typeof root.data === "object" && root.data && !Array.isArray(root.data) &&
+      typeof (root.data as Record<string,unknown>).role === "string" ? root.data : null
+    );
+    if (rawUser2 && typeof rawUser2 === "object") {
+      const u = rawUser2 as Record<string, unknown>;
+      const normalized = { ...u, role: String(u.role ?? "student").toLowerCase() };
+      Cookies.set(AUTH_USER_KEY, JSON.stringify(normalized), {
         expires: 7,
         path: "/",
       });
@@ -162,7 +173,7 @@ class AuthService {
       const decoded: DecodedToken = jwtDecode(token);
 
       const currentTime = Date.now() / 1000;
-      if (decoded.exp < currentTime) {
+      if (decoded.exp && decoded.exp < currentTime) {
         this.logout();
         return null;
       }
@@ -170,7 +181,7 @@ class AuthService {
       return {
         name: decoded.name || "User",
         email: decoded.email,
-        role: decoded.role,
+        role: decoded.role?.toLowerCase() ?? "student",
       };
     } catch {
       return this.parseUserCookie(rawUser);

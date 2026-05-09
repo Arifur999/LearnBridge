@@ -37,7 +37,7 @@ export function AppSidebar({
 }: React.ComponentProps<typeof Sidebar> & { user?: SidebarUser | null }) {
   const pathname = usePathname();
 
-  const role = user?.role;
+  const role = user?.role?.toLowerCase();
   const normalizedRole = role === "trainer" ? "tutor" : role;
   const isValidRole =
     normalizedRole === "admin" || normalizedRole === "tutor" || normalizedRole === "student";

@@ -15,8 +15,9 @@ export const dynamic = "force-dynamic";
 
 // Role-based redirect helper
 const getRoleHome = (role: string) => {
-  if (role === "admin") return "/admin";
-  if (role === "trainer" || role === "tutor") return "/tutor/dashboard";
+  const r = (role ?? "").toLowerCase();
+  if (r === "admin") return "/admin";
+  if (r === "trainer" || r === "tutor") return "/tutor/dashboard";
   return "/student";
 };
 
