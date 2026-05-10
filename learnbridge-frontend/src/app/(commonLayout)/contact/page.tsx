@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Mail, MapPin, Phone, Clock, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,13 +36,24 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero */}
-      <section className="border-b bg-linear-to-br from-indigo-600 via-indigo-700 to-violet-800 py-20 text-white">
-        <div className="mx-auto max-w-7xl px-4 text-center">
+      <section className="relative min-h-[56vh] overflow-hidden">
+        <Image
+          src="/ed-1.jpg"
+          alt="Contact Us"
+          fill
+          sizes="(max-width: 768px) 100vw, 1280px"
+          className="object-cover object-center"
+          priority
+        />
+        <div className="absolute inset-0 bg-indigo-900/60" />
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 py-16 text-center text-white">
           <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-indigo-200">
             Get In Touch
           </p>
-          <h1 className="mb-4 text-4xl font-extrabold md:text-5xl">Contact Us</h1>
-          <p className="mx-auto max-w-xl text-lg text-indigo-100">
+          <h1 className="mb-4 max-w-3xl text-4xl font-extrabold drop-shadow-lg md:text-5xl">
+            Contact Us
+          </h1>
+          <p className="mx-auto max-w-xl text-lg text-indigo-100 drop-shadow">
             Have a question or need help? Our team is ready to assist you — reach out any time.
           </p>
         </div>

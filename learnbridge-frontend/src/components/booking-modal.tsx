@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Loader2, CreditCard } from "lucide-react";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
 
 import {
   Dialog,
@@ -12,7 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { bookSlotAction, getTrainerSlots } from "@/actions/booking.action";
+import { getTrainerSlots } from "@/actions/booking.action";
 
 interface Slot {
   id: string;
@@ -25,84 +26,98 @@ interface Slot {
 interface BookingModalProps {
   trainerId: string;
   trainerName: string;
+  price?: number;
 }
 
-export function BookingModal({ trainerId, trainerName }: BookingModalProps) {
+export function BookingModal({ trainerId, trainerName, price = 0 }: BookingModalProps) {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [slots, setSlots] = useState<Slot[]>([]);
   const [loading, setLoading] = useState(false);
-  const [bookingLoading, setBookingLoading] = useState<string | null>(null);
+  const [redirectingSlot, setRedirectingSlot] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen && trainerId) {
-      const fetchSlots = async () => {
-        setLoading(true);
-        const data = await getTrainerSlots(trainerId);
+      setLoading(true);
+      getTrainerSlots(trainerId).then((data) => {
         setSlots(data);
         setLoading(false);
-      };
-      fetchSlots();
+      });
     }
   }, [isOpen, trainerId]);
 
-  const handleBook = async (slotId: string) => {
-    setBookingLoading(slotId);
-    const result = await bookSlotAction(slotId);
+  const handleBook = (slot: Slot) => {
+    setRedirectingSlot(slot.id);
+    toast.info("Redirecting to payment…");
 
-    if (result.success) {
-      toast.success(result.message);
-      setIsOpen(false);
-    } else {
-      toast.error(result.message);
-    }
-    setBookingLoading(null);
+    const params = new URLSearchParams({
+      slotId: slot.id,
+      tutorName: trainerName,
+      price: String(price),
+      date: slot.date,
+      startTime: slot.startTime,
+      endTime: slot.endTime,
+    });
+
+    router.push(`/payments/checkout?${params.toString()}`);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full mt-2">
+        <Button size="lg" className="w-full mt-2 gap-2">
+          <CreditCard className="size-4" />
           Book Session with {trainerName}
         </Button>
       </DialogTrigger>
-      
+
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Available Slots</DialogTitle>
+          <DialogTitle>Available Slots — {trainerName}</DialogTitle>
         </DialogHeader>
 
         <div className="mt-4 space-y-3">
           {loading ? (
-            <div className="flex justify-center py-6">
+            <div className="flex justify-center py-8">
               <Loader2 className="animate-spin text-muted-foreground" />
             </div>
           ) : slots.length === 0 ? (
-            <p className="text-center text-sm text-muted-foreground py-4">
-              No available slots found for this trainer.
+            <p className="py-6 text-center text-sm text-muted-foreground">
+              No available slots found for this tutor.
             </p>
           ) : (
-            <div className="grid gap-2 max-h-[300px] overflow-y-auto pr-2">
+            <div className="grid gap-2 max-h-[320px] overflow-y-auto pr-1">
               {slots.map((slot) => (
                 <div
                   key={slot.id}
-                  className="flex items-center justify-between rounded-lg border p-3 hover:bg-accent"
+                  className="flex items-center justify-between rounded-xl border bg-muted/30 p-3"
                 >
                   <div className="text-sm">
-                    <p className="font-medium">{new Date(slot.date).toDateString()}</p>
+                    <p className="font-medium">
+                      {new Date(slot.date).toLocaleDateString("en-US", {
+                        weekday: "short",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </p>
                     <p className="text-muted-foreground">
-                      {slot.startTime} - {slot.endTime}
+                      {slot.startTime} – {slot.endTime}
                     </p>
                   </div>
-                  
-                  <Button 
-                    size="sm" 
-                    onClick={() => handleBook(slot.id)}
-                    disabled={!!bookingLoading}
+
+                  <Button
+                    size="sm"
+                    className="gap-1.5"
+                    onClick={() => handleBook(slot)}
+                    disabled={!!redirectingSlot}
                   >
-                    {bookingLoading === slot.id ? (
-                      <Loader2 className="size-4 animate-spin" />
+                    {redirectingSlot === slot.id ? (
+                      <Loader2 className="size-3.5 animate-spin" />
                     ) : (
-                      "Book"
+                      <>
+                        <CreditCard className="size-3.5" />
+                        {price > 0 ? `BDT ${price}` : "Book"}
+                      </>
                     )}
                   </Button>
                 </div>

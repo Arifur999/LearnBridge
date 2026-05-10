@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { HelpCircle, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -85,18 +86,27 @@ export default function FAQPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero */}
-      <section className="border-b bg-linear-to-br from-violet-600 via-indigo-700 to-blue-800 py-20 text-white">
-        <div className="mx-auto max-w-7xl px-4 text-center">
+      <section className="relative min-h-[56vh] overflow-hidden">
+        <Image
+          src="/ed-3.jpg"
+          alt="FAQ"
+          fill
+          sizes="(max-width: 768px) 100vw, 1280px"
+          className="object-cover object-center"
+          priority
+        />
+        <div className="absolute inset-0 bg-violet-900/60" />
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 py-16 text-center text-white">
           <div className="mx-auto mb-4 inline-flex items-center justify-center rounded-full bg-white/20 p-3 backdrop-blur-sm">
             <HelpCircle className="size-8" />
           </div>
           <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-indigo-200">
             Help Center
           </p>
-          <h1 className="mb-4 text-4xl font-extrabold md:text-5xl">
+          <h1 className="mb-4 max-w-3xl text-4xl font-extrabold drop-shadow-lg md:text-5xl">
             Frequently Asked Questions
           </h1>
-          <p className="mx-auto max-w-xl text-lg text-indigo-100">
+          <p className="mx-auto max-w-xl text-lg text-indigo-100 drop-shadow">
             Find quick answers to the most common questions about SkillBridge.
           </p>
         </div>

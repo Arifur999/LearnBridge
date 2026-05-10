@@ -190,7 +190,7 @@ export default async function CourseDetailsPage({
             </div>
           )}
 
-          <BookingModal trainerId={tutorId} trainerName={tutorName} />
+          <BookingModal trainerId={tutorId} trainerName={tutorName} price={tutor.price ?? 0} />
 
           <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
             <li className="flex items-center gap-2">

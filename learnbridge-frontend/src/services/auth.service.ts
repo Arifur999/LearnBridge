@@ -88,22 +88,27 @@ class AuthService {
     }
 
     const accessToken = extractAccessToken(data);
-    if (accessToken) {
-      Cookies.set(TOKEN_KEY, accessToken, { expires: 7, path: "/" });
-    }
 
-    const root = getRecord(data);
-    const rawUser = getRecord(root.data).user ?? root.user ?? (
-      typeof root.data === "object" && root.data && !Array.isArray(root.data) &&
-      typeof (root.data as Record<string,unknown>).role === "string" ? root.data : null
-    );
-    if (rawUser && typeof rawUser === "object") {
-      const u = rawUser as Record<string, unknown>;
-      const normalized = { ...u, role: String(u.role ?? "student").toLowerCase() };
-      Cookies.set(AUTH_USER_KEY, JSON.stringify(normalized), {
-        expires: 7,
-        path: "/",
-      });
+    // Only touch js-cookie on the client — server actions run in Node.js
+    // where `document` is undefined and js-cookie would throw.
+    if (typeof window !== "undefined") {
+      if (accessToken) {
+        Cookies.set(TOKEN_KEY, accessToken, { expires: 7, path: "/" });
+      }
+
+      const root = getRecord(data);
+      const rawUser = getRecord(root.data).user ?? root.user ?? (
+        typeof root.data === "object" && root.data && !Array.isArray(root.data) &&
+        typeof (root.data as Record<string, unknown>).role === "string" ? root.data : null
+      );
+      if (rawUser && typeof rawUser === "object") {
+        const u = rawUser as Record<string, unknown>;
+        const normalized = { ...u, role: String(u.role ?? "student").toLowerCase() };
+        Cookies.set(AUTH_USER_KEY, JSON.stringify(normalized), {
+          expires: 7,
+          path: "/",
+        });
+      }
     }
 
     return { data, setCookie };
@@ -125,22 +130,25 @@ class AuthService {
     }
 
     const accessToken = extractAccessToken(data);
-    if (accessToken) {
-      Cookies.set(TOKEN_KEY, accessToken, { expires: 7, path: "/" });
-    }
 
-    const root = getRecord(data);
-    const rawUser2 = getRecord(root.data).user ?? root.user ?? (
-      typeof root.data === "object" && root.data && !Array.isArray(root.data) &&
-      typeof (root.data as Record<string,unknown>).role === "string" ? root.data : null
-    );
-    if (rawUser2 && typeof rawUser2 === "object") {
-      const u = rawUser2 as Record<string, unknown>;
-      const normalized = { ...u, role: String(u.role ?? "student").toLowerCase() };
-      Cookies.set(AUTH_USER_KEY, JSON.stringify(normalized), {
-        expires: 7,
-        path: "/",
-      });
+    if (typeof window !== "undefined") {
+      if (accessToken) {
+        Cookies.set(TOKEN_KEY, accessToken, { expires: 7, path: "/" });
+      }
+
+      const root = getRecord(data);
+      const rawUser2 = getRecord(root.data).user ?? root.user ?? (
+        typeof root.data === "object" && root.data && !Array.isArray(root.data) &&
+        typeof (root.data as Record<string, unknown>).role === "string" ? root.data : null
+      );
+      if (rawUser2 && typeof rawUser2 === "object") {
+        const u = rawUser2 as Record<string, unknown>;
+        const normalized = { ...u, role: String(u.role ?? "student").toLowerCase() };
+        Cookies.set(AUTH_USER_KEY, JSON.stringify(normalized), {
+          expires: 7,
+          path: "/",
+        });
+      }
     }
 
     return { data, setCookie };

@@ -25,8 +25,7 @@ export function middleware(request: NextRequest) {
     if (token) {
       try {
         const decoded = jwtDecode<DecodedToken>(token);
- 
-        return NextResponse.redirect(new URL(roleHome(decoded.role), request.url))
+        return NextResponse.redirect(new URL(roleHome((decoded.role ?? "").toLowerCase()), request.url))
       } catch {
 
         return NextResponse.next()
@@ -43,11 +42,11 @@ export function middleware(request: NextRequest) {
 
   try {
     const decoded = jwtDecode<DecodedToken>(token);
-    const role = decoded.role; 
-
+    // Normalize to lowercase — backend returns uppercase ("STUDENT", "TRAINER", "ADMIN")
+    const role = (decoded.role ?? "").toLowerCase();
 
     if (pathname.startsWith('/admin') && role !== 'admin') {
-      return NextResponse.redirect(new URL(roleHome(role), request.url)) 
+      return NextResponse.redirect(new URL(roleHome(role), request.url))
     }
 
     if (pathname.startsWith('/trainer') && role !== 'trainer' && role !== 'tutor') {

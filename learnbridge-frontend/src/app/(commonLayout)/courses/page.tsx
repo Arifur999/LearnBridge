@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getAllCourses, getCategories } from "@/actions/course.action";
 import CourseCard from "./CourseCard";
 import CoursesFilter from "./CoursesFilter";
@@ -78,7 +79,9 @@ export default async function CoursesPage({
         </p>
       </div>
 
-      <CoursesFilter categories={categories} />
+      <Suspense fallback={<div className="mb-10 h-20 animate-pulse rounded-xl bg-muted" />}>
+        <CoursesFilter categories={categories} />
+      </Suspense>
 
       {courses.length === 0 && (
         <p className="text-muted-foreground">No tutors found.</p>

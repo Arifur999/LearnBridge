@@ -47,23 +47,24 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero */}
-      <section className="relative overflow-hidden border-b py-24 text-white">
+      <section className="relative min-h-[56vh] overflow-hidden">
         <Image
           src="/ed-2.jpg"
           alt="About SkillBridge"
           fill
-          className="object-cover"
+          sizes="(max-width: 768px) 100vw, 1280px"
+          className="object-cover object-center"
           priority
         />
-        <div className="absolute inset-0 bg-indigo-900/70" />
-        <div className="relative z-10 mx-auto max-w-7xl px-4 text-center">
+        <div className="absolute inset-0 bg-indigo-900/60" />
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 py-16 text-center text-white">
           <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-indigo-200">
             Our Story
           </p>
-          <h1 className="mb-5 text-4xl font-extrabold leading-tight drop-shadow md:text-5xl">
+          <h1 className="mb-5 max-w-3xl text-4xl font-extrabold leading-tight drop-shadow-lg md:text-5xl">
             Bridging Knowledge Gaps,<br />One Session at a Time
           </h1>
-          <p className="mx-auto max-w-2xl text-lg text-indigo-100">
+          <p className="mx-auto max-w-2xl text-lg text-indigo-100 drop-shadow">
             SkillBridge was founded with a single belief: every student deserves access to
             a great teacher. We connect motivated learners with verified expert tutors — simply,
             reliably, and affordably.

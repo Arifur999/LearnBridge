@@ -76,11 +76,12 @@ const Footer = ({ className }: FooterProps) => {
             <ul className="space-y-3 text-sm">
               {[
                 { text: "Browse Tutors", url: "/tutors" },
-                { text: "Become a Student", url: "/register" },
                 { text: "Become a Tutor", url: "/register" },
                 { text: "About Us", url: "/about" },
                 { text: "FAQ", url: "/faq" },
                 { text: "Contact", url: "/contact" },
+                { text: "Privacy Policy", url: "/privacy" },
+                { text: "Terms of Service", url: "/terms" },
               ].map((link) => (
                 <li key={link.text}>
                   <Link
@@ -165,10 +166,10 @@ const Footer = ({ className }: FooterProps) => {
             <Link href="/faq" className="transition hover:text-indigo-400">
               FAQ
             </Link>
-            <Link href="#" className="transition hover:text-indigo-400">
+            <Link href="/privacy" className="transition hover:text-indigo-400">
               Privacy Policy
             </Link>
-            <Link href="#" className="transition hover:text-indigo-400">
+            <Link href="/terms" className="transition hover:text-indigo-400">
               Terms of Service
             </Link>
           </div>
