@@ -172,7 +172,8 @@ const buildFallbackUser = (email: string, name?: string) => {
 };
 
 const normalizeRegisterRole = (role: FormDataEntryValue | null) => {
-  return role?.toString() === "tutor" ? "tutor" : "student";
+  const r = role?.toString().toLowerCase();
+  return r === "tutor" ? "TUTOR" : "STUDENT";
 };
 
 export const loginAction = async (
@@ -197,6 +198,7 @@ export const loginAction = async (
 
     const accessToken = extractAccessToken(result?.data, result?.setCookie);
 
+    // Try to extract user: response body first, then decode from JWT
     let user =
       result?.data?.data?.user ??
       result?.data?.user ??
@@ -206,39 +208,39 @@ export const loginAction = async (
 
     if (user && typeof user === "object") {
       const u = user as Record<string, unknown>;
+      // Always prefer JWT role if available — never default to "student"
+      const jwtUser = buildUserFromToken(accessToken);
       user = {
         ...u,
         id: String(u.id ?? u.userId ?? u._id ?? email.toString()),
-        role: String(u.role ?? "student").toLowerCase(),
+        role: (jwtUser?.role ?? String(u.role ?? "")).toLowerCase() || "student",
+        name: String(u.name ?? jwtUser?.name ?? email.toString().split("@")[0]),
+        email: String(u.email ?? jwtUser?.email ?? email.toString()),
       };
     }
 
-    if (!user && process.env.NODE_ENV !== "production") {
-      user = buildFallbackUser(email.toString());
+    // No fallback to "student" — if we have a token, trust the JWT
+    if (!user && accessToken) {
+      user = buildUserFromToken(accessToken);
     }
 
-    if (typeof accessToken === "string" && accessToken.length > 0) {
-      const cookieStore = await cookies();
-      
-      cookieStore.set("accessToken", accessToken, {
-        httpOnly: true, 
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-        maxAge: 7 * 24 * 60 * 60, 
-        sameSite: "strict",
-      });
+    if (!accessToken) {
+      return {
+        success: false,
+        message: "Login failed: no access token in response",
+      };
+    }
 
-      if (user) {
-        cookieStore.set("authUser", encodeURIComponent(JSON.stringify(user)), {
-          httpOnly: false,
-          secure: process.env.NODE_ENV === "production",
-          path: "/",
-          maxAge: 7 * 24 * 60 * 60,
-          sameSite: "strict",
-        });
-      }
-    } else if (user) {
-      const cookieStore = await cookies();
+    const cookieStore = await cookies();
+    cookieStore.set("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60,
+      sameSite: "strict",
+    });
+
+    if (user) {
       cookieStore.set("authUser", encodeURIComponent(JSON.stringify(user)), {
         httpOnly: false,
         secure: process.env.NODE_ENV === "production",
@@ -246,19 +248,13 @@ export const loginAction = async (
         maxAge: 7 * 24 * 60 * 60,
         sameSite: "strict",
       });
-    } else {
-      return {
-        success: false,
-        message: "Login failed: access token not found in response",
-      };
     }
 
     return {
       success: true,
       data: {
-        ...result.data,
-        accessToken: accessToken ?? undefined,
-        user: user ?? result?.data?.data?.user ?? result?.data?.user,
+        accessToken,
+        user: user ?? undefined,
       },
     };
   } catch (error) {
@@ -293,7 +289,10 @@ export const signupAction = async (
     const email = formData.get("email");
     const password = formData.get("password");
     const confirmPassword = formData.get("confirmPassword");
-    const role = normalizeRegisterRole(formData.get("role"));
+    const rawRole = formData.get("role");
+    const role = normalizeRegisterRole(rawRole);
+
+    console.log("[signupAction] rawRole from FormData:", rawRole, "→ sending to API:", role);
 
     if (!name || !email || !password || !confirmPassword) {
       return { success: false, message: "All fields are required" };
@@ -303,12 +302,17 @@ export const signupAction = async (
       return { success: false, message: "Passwords do not match" };
     }
 
-    const result = await authService.signup({
+    const signupPayload = {
       name: name.toString(),
       email: email.toString(),
       password: password.toString(),
       role,
-    });
+    };
+    console.log("[signupAction] sending payload:", JSON.stringify(signupPayload));
+
+    const result = await authService.signup(signupPayload);
+
+    console.log("[signupAction] API response:", JSON.stringify(result?.data).slice(0, 400));
 
     const accessToken = extractAccessToken(result?.data, result?.setCookie);
     let user =
@@ -320,40 +324,32 @@ export const signupAction = async (
 
     if (user && typeof user === "object") {
       const u = user as Record<string, unknown>;
+      const jwtUser = buildUserFromToken(accessToken);
       user = {
         ...u,
         id: String(u.id ?? u.userId ?? u._id ?? email.toString()),
-        role: String(u.role ?? "student").toLowerCase(),
+        role: (jwtUser?.role ?? String(u.role ?? role)).toLowerCase(),
+        name: String(u.name ?? name.toString()),
+        email: String(u.email ?? email.toString()),
       };
     }
 
-    if (!user && process.env.NODE_ENV !== "production") {
-      user = buildFallbackUser(email.toString(), name.toString());
+    if (!user) {
+      // Signup: use the role the user selected if JWT has no role
+      user = buildUserFromToken(accessToken) ?? {
+        id: String(email),
+        email: String(email),
+        role: role,
+        name: String(name),
+      };
     }
 
+    // For signup: don't set accessToken cookie — user must login explicitly
+    // Only store minimal authUser so pages know who just registered
+    const cookieStore = await cookies();
     if (typeof accessToken === "string" && accessToken.length > 0) {
-      const cookieStore = await cookies();
       cookieStore.set("accessToken", accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-        maxAge: 7 * 24 * 60 * 60,
-        sameSite: "strict",
-      });
-
-      if (user) {
-        cookieStore.set("authUser", encodeURIComponent(JSON.stringify(user)), {
-          httpOnly: false,
-          secure: process.env.NODE_ENV === "production",
-          path: "/",
-          maxAge: 7 * 24 * 60 * 60,
-          sameSite: "strict",
-        });
-      }
-    } else if (user) {
-      const cookieStore = await cookies();
-      cookieStore.set("authUser", encodeURIComponent(JSON.stringify(user)), {
-        httpOnly: false,
         secure: process.env.NODE_ENV === "production",
         path: "/",
         maxAge: 7 * 24 * 60 * 60,
@@ -366,7 +362,7 @@ export const signupAction = async (
       message: "Account created successfully",
       data: {
         accessToken: accessToken ?? undefined,
-        user: user ?? result?.data?.data?.user ?? result?.data?.user,
+        user: user ?? undefined,
       },
     };
   } catch (error) {

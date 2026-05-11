@@ -1,5 +1,5 @@
 import { Route } from "@/types";
-import { LayoutDashboard, CalendarDays, CreditCard, User, Star, Clock } from "lucide-react";
+import { LayoutDashboard, CalendarDays, CreditCard, User, Star, Clock, BookOpen } from "lucide-react";
 
 export const tutorRoutes: Route[] = [
   {
@@ -7,6 +7,7 @@ export const tutorRoutes: Route[] = [
     url: "#",
     items: [
       { title: "Overview",     url: "/tutor/dashboard",    icon: LayoutDashboard },
+      { title: "My Courses",   url: "/tutor/courses",      icon: BookOpen },
       { title: "My Bookings",  url: "/tutor/bookings",     icon: CalendarDays },
       { title: "Availability", url: "/tutor/availability", icon: Clock },
       { title: "Payments",     url: "/tutor/payments",     icon: CreditCard },

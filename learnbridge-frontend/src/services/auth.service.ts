@@ -14,7 +14,7 @@ interface SignupPayload {
   name: string;
   email: string;
   password: string;
-  role: "student" | "tutor";
+  role: string;
 }
 
 interface DecodedToken {

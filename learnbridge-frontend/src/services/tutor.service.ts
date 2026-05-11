@@ -95,6 +95,80 @@ class TutorService {
     return data;
   }
 
+  private async safeJson(res: Response) {
+    const text = await res.text();
+    if (text.trimStart().startsWith("<")) {
+      throw new Error(`Endpoint not found (received HTML). Status: ${res.status}`);
+    }
+    return JSON.parse(text);
+  }
+
+  async getMyCourses() {
+    try {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_V1_URL}/trainer/courses`, {
+        headers,
+        cache: "no-store",
+      });
+      if (!res.ok) return [];
+      const data = await this.safeJson(res);
+      const raw = data?.data ?? data ?? [];
+      return Array.isArray(raw) ? raw : [];
+    } catch {
+      return [];
+    }
+  }
+
+  async createCourse(payload: {
+    title: string;
+    description: string;
+    category: string;
+    price?: number;
+    image?: string;
+  }) {
+    const headers = await getAuthHeaders();
+    const res = await fetch(`${API_V1_URL}/trainer/courses`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+      cache: "no-store",
+    });
+    const data = await this.safeJson(res);
+    if (!res.ok) throw new Error(data?.message || "Failed to create course");
+    return data?.data ?? data;
+  }
+
+  async updateCourse(id: string, payload: {
+    title?: string;
+    description?: string;
+    category?: string;
+    price?: number;
+    image?: string;
+  }) {
+    const headers = await getAuthHeaders();
+    const res = await fetch(`${API_V1_URL}/trainer/courses/${id}`, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify(payload),
+      cache: "no-store",
+    });
+    const data = await this.safeJson(res);
+    if (!res.ok) throw new Error(data?.message || "Failed to update course");
+    return data?.data ?? data;
+  }
+
+  async deleteCourse(id: string) {
+    const headers = await getAuthHeaders();
+    const res = await fetch(`${API_V1_URL}/trainer/courses/${id}`, {
+      method: "DELETE",
+      headers,
+      cache: "no-store",
+    });
+    const data = await this.safeJson(res);
+    if (!res.ok) throw new Error(data?.message || "Failed to delete course");
+    return data;
+  }
+
   async getMyBookings(page = 1, limit = 20) {
     try {
       const headers = await getAuthHeaders();

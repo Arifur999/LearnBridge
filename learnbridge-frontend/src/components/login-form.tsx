@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 
 import { loginAction } from "@/actions/auth.action";
 import { Button } from "@/components/ui/button";
@@ -17,56 +18,59 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-const initialState = {
-  success: false,
-  message: "",
-};
+interface DecodedToken {
+  role?: string;
+}
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+function getDashboardForRole(role: string): string {
+  switch (role.toUpperCase()) {
+    case "ADMIN":      return "/admin/analytics";
+    case "TUTOR":
+    case "TRAINER":    return "/tutor/dashboard";
+    case "INSTITUTE":  return "/institute/dashboard";
+    case "MENTOR":     return "/mentor/dashboard";
+    case "MODERATOR":  return "/moderator/dashboard";
+    default:           return "/dashboard";
+  }
+}
+
+const initialState = { success: false, message: "" };
+
+function LoginFormInner({ className, ...props }: React.ComponentProps<"div">) {
+  const searchParams = useSearchParams();
   const [state, formAction] = useActionState(loginAction, initialState);
 
   useEffect(() => {
-    if (state.success) {
-      toast.success("Login successful", {
-        description: "Welcome back to SkillBridge",
-      });
+    if (!state.success) return;
 
-      const accessToken = state.data?.accessToken;
-      if (accessToken) {
-        Cookies.set("accessToken", accessToken, { expires: 7, path: "/" });
-      }
+    toast.success("Login successful!", { description: "Welcome back!" });
 
-      const user = state.data?.user;
-      if (user) {
-        Cookies.set("authUser", JSON.stringify(user), {
-          expires: 7,
-          path: "/",
-        });
+    // Decode role directly from JWT — most reliable source
+    let role = "student";
+    const token = state.data?.accessToken;
+    if (token) {
+      try {
+        const decoded = jwtDecode<DecodedToken>(token);
+        role = decoded.role ?? "student";
+      } catch {
+        role = state.data?.user?.role ?? "student";
       }
-
-      // Role-based redirect after login
-      const userRole = user?.role;
-      let redirectUrl = "/";
-      if (userRole === "admin") {
-        redirectUrl = "/admin";
-      } else if (userRole === "trainer" || userRole === "tutor") {
-        redirectUrl = "/tutor/dashboard";
-      } else {
-        redirectUrl = "/student";
-      }
-      
-      window.location.href = redirectUrl;
+    } else {
+      role = state.data?.user?.role ?? "student";
     }
-  }, [state.data?.accessToken, state.data?.user, state.success]);
+
+    // Redirect to returnUrl if safe, otherwise to role dashboard
+    const returnUrl = searchParams.get("returnUrl");
+    if (returnUrl && returnUrl.startsWith("/") && !returnUrl.startsWith("//")) {
+      window.location.href = returnUrl;
+    } else {
+      window.location.href = getDashboardForRole(role);
+    }
+  }, [state.success]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!state.success && state.message) {
-      toast.error("Login failed", {
-        description: state.message,
-      });
+      toast.error("Login failed", { description: state.message });
     }
   }, [state.success, state.message]);
 
@@ -128,5 +132,13 @@ export function LoginForm({
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <Suspense fallback={null}>
+      <LoginFormInner className={className} {...props} />
+    </Suspense>
   );
 }

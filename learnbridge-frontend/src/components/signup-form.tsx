@@ -1,8 +1,7 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
-import Cookies from "js-cookie";
 
 import { signupAction } from "@/actions/auth.action";
 import { Button } from "@/components/ui/button";
@@ -23,53 +22,25 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const initialState = {
-  success: false,
-  message: "",
-};
+const initialState = { success: false, message: "" };
 
 export function SignupForm(props: React.ComponentProps<typeof Card>) {
   const [state, formAction] = useActionState(signupAction, initialState);
+  // Track role in state so we can pass it via hidden input (Radix Select
+  // doesn't reliably populate FormData with Next.js server actions)
+  const [role, setRole] = useState<"student" | "tutor">("student");
 
   useEffect(() => {
-    if (state.success) {
-      toast.success("Account created successfully", {
-        description: "You can now login with your credentials",
-      });
-
-      const accessToken = state.data?.accessToken;
-      if (accessToken) {
-        Cookies.set("accessToken", accessToken, { expires: 7, path: "/" });
-      }
-
-      const user = state.data?.user;
-      if (user) {
-        Cookies.set("authUser", JSON.stringify(user), {
-          expires: 7,
-          path: "/",
-        });
-      }
-
-      // Role-based redirect after signup
-      const userRole = user?.role;
-      let redirectUrl = "/login";
-      if (userRole === "admin") {
-        redirectUrl = "/admin";
-      } else if (userRole === "trainer" || userRole === "tutor") {
-        redirectUrl = "/tutor/dashboard";
-      } else {
-        redirectUrl = "/student";
-      }
-      
-      window.location.href = redirectUrl;
-    }
-  }, [state.data?.accessToken, state.data?.user, state.success]);
+    if (!state.success) return;
+    toast.success("Account created!", {
+      description: "Please log in with your credentials.",
+    });
+    window.location.href = "/login";
+  }, [state.success]);
 
   useEffect(() => {
     if (!state.success && state.message) {
-      toast.error("Signup failed", {
-        description: state.message,
-      });
+      toast.error("Signup failed", { description: state.message });
     }
   }, [state.success, state.message]);
 
@@ -97,7 +68,12 @@ export function SignupForm(props: React.ComponentProps<typeof Card>) {
 
             <Field>
               <FieldLabel>Role</FieldLabel>
-              <Select name="role" defaultValue="student">
+              {/* hidden input carries the actual value to FormData */}
+              <input type="hidden" name="role" value={role} />
+              <Select
+                value={role}
+                onValueChange={(v) => setRole(v as "student" | "tutor")}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select role" />
                 </SelectTrigger>
