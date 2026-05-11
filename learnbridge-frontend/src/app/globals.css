@@ -123,3 +123,22 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Infinite marquee for TrustedPartners */
+.animate-marquee {
+  display: flex;
+  animation: marquee 30s linear infinite;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Flip video utility */
+.flip-video {
+  transform: scaleX(-1);
+}

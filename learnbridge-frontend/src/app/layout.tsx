@@ -1,9 +1,17 @@
 import type { Metadata } from "next";
+import { Lexend } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/providers/ThemeProvider";
+import AIChatbot from "@/components/modules/shared/AIChatbot";
+
+const lexend = Lexend({
+  subsets: ["latin"],
+  variable: "--font-lexend",
+});
 
 export const metadata: Metadata = {
-  title: "SkillBridge",
+  title: "LearnBridge",
   description: "Book tutoring sessions with expert tutors.",
 };
 
@@ -13,13 +21,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        suppressHydrationWarning
-        className="antialiased"
-      >
-        {children}
-          <Toaster />
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${lexend.variable} font-sans antialiased`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          <Toaster richColors />
+          <AIChatbot />
+        </ThemeProvider>
       </body>
     </html>
   );

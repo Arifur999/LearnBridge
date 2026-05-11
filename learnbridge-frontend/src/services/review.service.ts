@@ -1,15 +1,14 @@
 import { API_V1_URL } from "@/lib/config";
 import { getAuthHeaders } from "./auth.server";
 
-interface ReviewPayload {
-  tutorId: string;
-  bookingId?: string;
-  rating: number;
-  comment: string;
-}
-
 class ReviewService {
-  async createReview(payload: ReviewPayload) {
+  async createReview(payload: {
+    tutorId?: string;
+    bookingId?: string;
+    rating: number | string;
+    review?: string;
+    comment?: string;
+  }) {
     const headers = await getAuthHeaders();
     const res = await fetch(`${API_V1_URL}/reviews`, {
       method: "POST",
@@ -30,7 +29,22 @@ class ReviewService {
       if (!res.ok) return [];
       const data = await res.json();
       const raw = data?.data ?? data;
-      return Array.isArray(raw) ? raw : (Array.isArray(raw?.reviews) ? raw.reviews : []);
+      return Array.isArray(raw) ? raw : Array.isArray(raw?.reviews) ? raw.reviews : [];
+    } catch {
+      return [];
+    }
+  }
+
+  async getMyReviews() {
+    try {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_V1_URL}/tutor/reviews`, {
+        headers,
+        cache: "no-store",
+      });
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data?.data ?? data ?? [];
     } catch {
       return [];
     }

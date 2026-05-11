@@ -7,25 +7,28 @@ interface DecodedToken {
   exp: number;
 }
 
-const roleHome = (role: string) => {
-  if (role === "admin") return "/admin";
-  if (role === "trainer" || role === "tutor") return "/tutor/dashboard";
-  return "/student";
-};
+function getDashboardUrl(role: string): string {
+  switch (role.toUpperCase()) {
+    case "ADMIN":      return "/admin/analytics";
+    case "TUTOR":
+    case "TRAINER":    return "/tutor/dashboard";
+    case "INSTITUTE":  return "/institute/dashboard";
+    case "MENTOR":     return "/mentor/dashboard";
+    case "MODERATOR":  return "/moderator/dashboard";
+    default:           return "/dashboard";
+  }
+}
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get("accessToken")?.value;
 
-  // Redirect already-logged-in users away from login/register
   if (pathname === "/login" || pathname === "/register") {
     if (token) {
       try {
         const decoded = jwtDecode<DecodedToken>(token);
-        // Backend returns uppercase roles ("STUDENT", "TRAINER", "ADMIN") — normalize
-        return NextResponse.redirect(
-          new URL(roleHome((decoded.role ?? "").toLowerCase()), request.url)
-        );
+        const role = (decoded.role ?? "").toUpperCase();
+        return NextResponse.redirect(new URL(getDashboardUrl(role), request.url));
       } catch {
         return NextResponse.next();
       }
@@ -33,37 +36,27 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Require auth for all dashboard routes
   if (!token) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
   try {
     const decoded = jwtDecode<DecodedToken>(token);
-    const role = (decoded.role ?? "").toLowerCase();
+    const role = (decoded.role ?? "").toUpperCase();
 
-    if (pathname.startsWith("/admin") && role !== "admin") {
-      return NextResponse.redirect(new URL(roleHome(role), request.url));
-    }
+    const prefixMap: [string, string[]][] = [
+      ["/admin",      ["ADMIN"]],
+      ["/tutor",      ["TUTOR", "TRAINER"]],
+      ["/institute",  ["INSTITUTE"]],
+      ["/mentor",     ["MENTOR"]],
+      ["/moderator",  ["MODERATOR"]],
+      ["/dashboard",  ["STUDENT"]],
+    ];
 
-    if (
-      pathname.startsWith("/trainer") &&
-      role !== "trainer" &&
-      role !== "tutor"
-    ) {
-      return NextResponse.redirect(new URL(roleHome(role), request.url));
-    }
-
-    if (
-      pathname.startsWith("/tutor") &&
-      role !== "trainer" &&
-      role !== "tutor"
-    ) {
-      return NextResponse.redirect(new URL(roleHome(role), request.url));
-    }
-
-    if (pathname.startsWith("/student") && role !== "student") {
-      return NextResponse.redirect(new URL(roleHome(role), request.url));
+    for (const [prefix, allowed] of prefixMap) {
+      if (pathname.startsWith(prefix) && !allowed.includes(role)) {
+        return NextResponse.redirect(new URL(getDashboardUrl(role), request.url));
+      }
     }
   } catch {
     return NextResponse.redirect(new URL("/login", request.url));
@@ -75,9 +68,12 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     "/admin/:path*",
-    "/trainer/:path*",
     "/tutor/:path*",
-    "/student/:path*",
+    "/institute/:path*",
+    "/mentor/:path*",
+    "/moderator/:path*",
+    "/dashboard",
+    "/dashboard/:path*",
     "/login",
     "/register",
   ],
