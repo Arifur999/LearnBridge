@@ -23,6 +23,7 @@ export interface Booking {
   student: { id: string; name: string; email: string; image?: string };
   availability: { id: string; day: string; startTime: string; endTime: string; status: string; tutorId: string };
   completedAt: string | null;
+  createdAt?: string;
 }
 
 export interface AdminBooking extends Booking {}

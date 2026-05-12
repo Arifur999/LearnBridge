@@ -67,6 +67,19 @@ class CategoryService {
     return data;
   }
 
+  async updateSubject(subjectId: string, payload: { name?: string; categoryId?: string }) {
+    const headers = await getAuthHeaders();
+    const res = await fetch(`${API_V1_URL}/subjects/${subjectId}`, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify(payload),
+      cache: "no-store",
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.message || "Update failed");
+    return data;
+  }
+
   async deleteSubject(subjectId: string) {
     const headers = await getAuthHeaders();
     const res = await fetch(`${API_V1_URL}/subjects/${subjectId}`, {

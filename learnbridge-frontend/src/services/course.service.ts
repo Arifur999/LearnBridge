@@ -3,15 +3,12 @@ import { getAuthHeaders } from "./auth.server";
 
 type ApiRecord = Record<string, unknown>;
 
-const isRecord = (value: unknown): value is ApiRecord => {
-  return !!value && typeof value === "object" && !Array.isArray(value);
-};
+const isRecord = (value: unknown): value is ApiRecord =>
+  !!value && typeof value === "object" && !Array.isArray(value);
 
-const asRecord = (value: unknown): ApiRecord => isRecord(value) ? value : {};
-
-const asString = (value: unknown) => typeof value === "string" ? value : undefined;
-
-const asNumber = (value: unknown) => typeof value === "number" ? value : undefined;
+const asRecord = (value: unknown): ApiRecord => (isRecord(value) ? value : {});
+const asString = (value: unknown) => (typeof value === "string" ? value : undefined);
+const asNumber = (value: unknown) => (typeof value === "number" ? value : undefined);
 
 const unwrapData = (value: unknown): unknown => {
   const root = asRecord(value);
@@ -21,47 +18,63 @@ const unwrapData = (value: unknown): unknown => {
 };
 
 const normalizeTutor = (value: unknown) => {
-  const tutor = asRecord(value);
-  const user = asRecord(tutor.user ?? tutor.User);
-  const categoryRecord = asRecord(tutor.category);
-  const subjects = Array.isArray(tutor.subjects) ? tutor.subjects : [];
+  const item = asRecord(value);
+  const user = asRecord(item.user ?? item.User);
+  // trainer nested object (present on course objects)
+  const trainerObj = asRecord(item.trainer);
+  const trainerUser = asRecord(trainerObj.user ?? trainerObj.User);
+  const categoryRecord = asRecord(item.category);
+  const subjects = Array.isArray(item.subjects) ? item.subjects : [];
+
   const name =
-    asString(tutor.name) ??
+    asString(item.name) ??
     asString(user.name) ??
-    asString(tutor.fullName) ??
+    asString(item.fullName) ??
     "Tutor";
+
   const id =
-    asString(tutor.id) ??
-    asString(tutor._id) ??
-    asString(tutor.tutorProfileId) ??
+    asString(item.id) ??
+    asString(item._id) ??
+    asString(item.tutorProfileId) ??
     asString(user.id) ??
     name;
+
   const category =
     asString(categoryRecord.name) ??
-    asString(tutor.category) ??
-    asString(tutor.subject) ??
-    asString(subjects[0]) ??
+    asString(item.category) ??
+    asString(item.subject) ??
+    asString(subjects[0] as unknown) ??
     "";
 
+  // For courses: trainer.id is the actual trainer/tutor ID for booking
+  const trainerId =
+    asString(trainerObj.id) ??
+    asString(item.trainerId) ??
+    asString(trainerUser.id) ??
+    id;
+
+  const trainerName =
+    asString(trainerObj.name) ??
+    asString(trainerUser.name) ??
+    name;
+
   return {
-    ...tutor,
+    ...item,
     id,
-    title: asString(tutor.title) ?? name,
+    title: asString(item.title) ?? name,
     description:
-      asString(tutor.description) ??
-      asString(tutor.bio) ??
-      asString(tutor.about) ??
+      asString(item.description) ??
+      asString(item.bio) ??
+      asString(item.about) ??
       (category ? `Expert tutor for ${category}` : "Expert tutor"),
     price:
-      asNumber(tutor.price) ??
-      asNumber(tutor.hourlyRate) ??
-      asNumber(tutor.rate) ??
-      asNumber(tutor.sessionFee),
+      asNumber(item.price) ??
+      asNumber(item.hourlyRate) ??
+      asNumber(item.rate) ??
+      asNumber(item.sessionFee),
     category,
-    trainer: {
-      id,
-      name,
-    },
+    image: asString(item.image) ?? asString(item.thumbnail) ?? asString(item.coverImage),
+    trainer: { id: trainerId, name: trainerName },
   };
 };
 
@@ -69,131 +82,108 @@ const normalizeTutorListResponse = (result: unknown) => {
   const root = asRecord(result);
   const data = unwrapData(result);
   const dataRecord = asRecord(data);
+
   const list = Array.isArray(data)
     ? data
-    : Array.isArray(dataRecord.items)
-      ? dataRecord.items
-      : Array.isArray(dataRecord.result)
-        ? dataRecord.result
-        : [];
+    : Array.isArray(dataRecord.tutors)
+      ? dataRecord.tutors
+      : Array.isArray(dataRecord.courses)
+        ? dataRecord.courses
+        : Array.isArray(dataRecord.items)
+          ? dataRecord.items
+          : Array.isArray(dataRecord.result)
+            ? dataRecord.result
+            : [];
 
+  const rootData = asRecord(root.data);
   return {
     data: list.map(normalizeTutor),
-    meta: root.meta ?? asRecord(root.data).meta ?? dataRecord.meta ?? null,
+    meta:
+      root.meta ??
+      rootData.meta ??
+      rootData.pagination ??
+      dataRecord.meta ??
+      dataRecord.pagination ??
+      null,
   };
 };
 
 class CourseService {
   async getPopularCourses(limit = 3) {
-    try {
-      const res = await fetch(
-        `${API_V1_URL}/tutors?limit=${limit}`,
-        { cache: "no-store" }
-      );
-
-      if (!res.ok) {
-        console.error("Course API failed:", res.status);
-        return [];
-      }
-
-      const data = await res.json();
-      return normalizeTutorListResponse(data).data;
-    } catch (error) {
-      console.error("Course fetch error:", error);
-      return [];
+    // Try approved courses first, fall back to tutor profiles
+    for (const path of [`/courses?limit=${limit}&status=APPROVED`, `/tutors?limit=${limit}`]) {
+      try {
+        const res = await fetch(`${API_V1_URL}${path}`, { cache: "no-store" });
+        if (!res.ok) continue;
+        const data = await res.json();
+        const list = normalizeTutorListResponse(data).data;
+        if (list.length > 0) return list;
+      } catch { /* try next */ }
     }
+    return [];
   }
 
- 
   async getAllCourses(query = "") {
-    try {
-      const res = await fetch(
-        `${API_V1_URL}/tutors${query}`,
-        { cache: "no-store" }
-      );
+    // Try /courses (approved trainer courses) first, then /tutors (tutor profiles)
+    const coursesQuery = query.includes("?")
+      ? query + "&status=APPROVED"
+      : query
+        ? query + "&status=APPROVED"
+        : "?status=APPROVED";
 
-      if (!res.ok) {
-        return { data: [], meta: null };
-      }
-
-      const result = await res.json();
-
-      return normalizeTutorListResponse(result);
-    } catch (error) {
-      console.error("Course fetch error:", error);
-      return { data: [], meta: null };
+    for (const path of [`/courses${coursesQuery}`, `/courses${query}`, `/tutors${query}`]) {
+      try {
+        const res = await fetch(`${API_V1_URL}${path}`, { cache: "no-store" });
+        if (!res.ok) continue;
+        const result = await res.json();
+        const normalized = normalizeTutorListResponse(result);
+        if (normalized.data.length > 0) return normalized;
+      } catch { /* try next */ }
     }
+    return { data: [], meta: null };
   }
-
 
   async getCourseById(id: string) {
-    try {
-      const res = await fetch(
-        `${API_V1_URL}/tutors/${id}`,
-        { cache: "no-store" }
-      );
-
-      if (!res.ok) {
-        return null;
-      }
-
-      const responseBody = await res.json();
-
-      const tutor = unwrapData(responseBody);
-      return tutor ? normalizeTutor(tutor) : null;
-
-    } catch {
-      return null;
+    // Try /courses/:id first (trainer course), then /tutors/:id (tutor profile)
+    for (const path of [`/courses/${id}`, `/tutors/${id}`]) {
+      try {
+        const res = await fetch(`${API_V1_URL}${path}`, { cache: "no-store" });
+        if (!res.ok) continue;
+        const responseBody = await res.json();
+        const item = unwrapData(responseBody);
+        if (item) return normalizeTutor(item);
+      } catch { /* try next */ }
     }
+    return null;
   }
-
-
 
   async getTrainerCourses() {
     try {
       const headers = await getAuthHeaders();
       const res = await fetch(`${API_V1_URL}/tutor/profile`, {
-        method: "GET",
-        headers: headers,
+        headers,
         cache: "no-store",
       });
-
-      if (!res.ok) {
-        console.error("Failed to fetch trainer courses:", res.status);
-        return [];
-      }
-
+      if (!res.ok) return [];
       const result = await res.json();
       const data = unwrapData(result);
       return Array.isArray(data) ? data.map(normalizeTutor) : data ? [normalizeTutor(data)] : [];
-    } catch (error) {
-      console.error("Trainer courses fetch error:", error);
+    } catch {
       return [];
     }
   }
 
   async getCategories() {
     try {
-      const res = await fetch(`${API_V1_URL}/categories`, {
-        cache: "no-store",
-      });
-
-      if (!res.ok) {
-        return [];
-      }
-
+      const res = await fetch(`${API_V1_URL}/categories`, { cache: "no-store" });
+      if (!res.ok) return [];
       const result = await res.json();
       const data = unwrapData(result);
       return Array.isArray(data) ? data : [];
-    } catch (error) {
-      console.error("Categories fetch error:", error);
+    } catch {
       return [];
     }
   }
-
 }
-
-
-
 
 export const courseService = new CourseService();

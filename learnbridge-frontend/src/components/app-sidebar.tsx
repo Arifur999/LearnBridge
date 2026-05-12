@@ -3,9 +3,6 @@
 import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { LogOut, User2 } from "lucide-react";
-
 import {
   Sidebar,
   SidebarContent,
@@ -19,73 +16,62 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-
 import { adminRoutes } from "@/routes/adminRoutes";
 import { tutorRoutes } from "@/routes/tutorRoutes";
 import { studentRoutes } from "@/routes/studentRoutes";
 import { instituteRoutes } from "@/routes/instituteRoutes";
 import { mentorRoutes } from "@/routes/mentorRoutes";
 import { moderatorRoutes } from "@/routes/moderatorRoutes";
-import { Route } from "@/types";
-import { authService } from "@/services/auth.service";
-
-interface SidebarUser {
-  name?: string;
-  email?: string;
-  role?: string;
-}
+import { NavUser } from "@/components/ui/nav-user";
+import { Route, User } from "@/types";
+import { Roles } from "@/constants/roles";
 
 function getRoutes(role: string): Route[] {
-  const r = role.toLowerCase();
-  if (r === "admin") return adminRoutes;
-  if (r === "tutor" || r === "trainer") return tutorRoutes;
-  if (r === "institute") return instituteRoutes;
-  if (r === "mentor") return mentorRoutes;
-  if (r === "moderator") return moderatorRoutes;
-  return studentRoutes;
+  const r = role.toUpperCase();
+  switch (r) {
+    case Roles.admin:     return adminRoutes;
+    case Roles.tutor:     return tutorRoutes;
+    case Roles.institute: return instituteRoutes;
+    case Roles.mentor:    return mentorRoutes;
+    case Roles.moderator: return moderatorRoutes;
+    default:              return studentRoutes;
+  }
 }
 
 export function AppSidebar({
   user,
   ...props
-}: React.ComponentProps<typeof Sidebar> & { user?: SidebarUser | null }) {
-  const pathname = usePathname();
+}: React.ComponentProps<typeof Sidebar> & { user?: User | null }) {
   const role = user?.role ?? "student";
   const routes = getRoutes(role);
-  const nameLabel = user?.name ?? "User";
-  const roleLabel = role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
 
-  const handleLogout = () => {
-    authService.logout();
+  const sidebarUser: User = {
+    id: user?.id ?? "",
+    name: user?.name ?? "User",
+    email: user?.email ?? "",
+    role: user?.role ?? "student",
+    image: user?.image,
   };
 
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <Link href="/">
-                <div className="flex aspect-square size-8 items-center justify-center overflow-hidden rounded-lg bg-background">
-                  <Image
-                    src="/logo.png"
-                    alt="LearnBridge"
-                    width={32}
-                    height={32}
-                    className="size-8 object-contain"
-                  />
-                </div>
-                <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-semibold">LearnBridge</span>
-                  <span className="text-xs text-muted-foreground">Dashboard</span>
-                </div>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <Link href="/" className="flex items-center gap-2 mb-1.5 p-1">
+          <div className="flex aspect-square size-8 items-center justify-center overflow-hidden rounded-lg bg-background">
+            <Image
+              src="/logo.png"
+              alt="LearnBridge"
+              width={32}
+              height={32}
+              className="size-8 object-contain"
+              onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+            />
+          </div>
+          <span className="text-lg font-semibold tracking-wide">LearnBridge</span>
+        </Link>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="gap-4">
         {routes.map((group) => (
           <SidebarGroup key={group.title}>
             <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
@@ -93,12 +79,11 @@ export function AppSidebar({
               <SidebarMenu>
                 {group.items.map((item) => {
                   const Icon = item.icon;
-                  const isActive = pathname === item.url;
                   return (
-                    <SidebarMenuItem key={item.url}>
-                      <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}>
-                        <Link href={item.url}>
-                          {Icon && <Icon />}
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild tooltip={item.title}>
+                        <Link href={item.url} className="flex items-center gap-2">
+                          {Icon && <Icon className="size-4" />}
                           <span>{item.title}</span>
                         </Link>
                       </SidebarMenuButton>
@@ -112,24 +97,7 @@ export function AppSidebar({
       </SidebarContent>
 
       <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              size="lg"
-              onClick={handleLogout}
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">
-                {nameLabel.charAt(0).toUpperCase()}
-              </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{nameLabel}</span>
-                <span className="truncate text-xs text-muted-foreground">{roleLabel}</span>
-              </div>
-              <LogOut className="ml-auto size-4" />
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <NavUser user={sidebarUser} />
       </SidebarFooter>
 
       <SidebarRail />

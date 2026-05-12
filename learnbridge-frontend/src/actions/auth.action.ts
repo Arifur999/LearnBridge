@@ -292,8 +292,6 @@ export const signupAction = async (
     const rawRole = formData.get("role");
     const role = normalizeRegisterRole(rawRole);
 
-    console.log("[signupAction] rawRole from FormData:", rawRole, "→ sending to API:", role);
-
     if (!name || !email || !password || !confirmPassword) {
       return { success: false, message: "All fields are required" };
     }
@@ -308,11 +306,7 @@ export const signupAction = async (
       password: password.toString(),
       role,
     };
-    console.log("[signupAction] sending payload:", JSON.stringify(signupPayload));
-
     const result = await authService.signup(signupPayload);
-
-    console.log("[signupAction] API response:", JSON.stringify(result?.data).slice(0, 400));
 
     const accessToken = extractAccessToken(result?.data, result?.setCookie);
     let user =

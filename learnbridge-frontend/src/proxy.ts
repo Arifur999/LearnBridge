@@ -49,9 +49,11 @@ export function proxy(request: NextRequest) {
     const prefixMap: [string, string[]][] = [
       ["/admin",      ["ADMIN"]],
       ["/tutor",      ["TUTOR", "TRAINER"]],
+      ["/trainer",    ["TUTOR", "TRAINER"]],
       ["/institute",  ["INSTITUTE"]],
       ["/mentor",     ["MENTOR"]],
       ["/moderator",  ["MODERATOR"]],
+      ["/student",    ["STUDENT"]],
       ["/dashboard",  ["STUDENT"]],
     ];
 
@@ -71,9 +73,11 @@ export const config = {
   matcher: [
     "/admin/:path*",
     "/tutor/:path*",
+    "/trainer/:path*",
     "/institute/:path*",
     "/mentor/:path*",
     "/moderator/:path*",
+    "/student/:path*",
     "/dashboard",
     "/dashboard/:path*",
     "/login",

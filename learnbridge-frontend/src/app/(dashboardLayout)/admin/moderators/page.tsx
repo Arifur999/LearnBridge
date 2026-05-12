@@ -1,37 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import DashPageHeader from "@/components/layout/DashPageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { UserPlus } from "lucide-react";
+import { UserPlus, Loader2 } from "lucide-react";
+import { inviteModeratorAction } from "@/actions/admin.action";
 
 export default function AdminModeratorsPage() {
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
-  const handleInvite = async () => {
-    if (!email.trim()) return;
-    setLoading(true);
-    try {
-      const res = await fetch("/api/admin/invite-moderator", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      if (res.ok) {
-        toast.success(`Invitation sent to ${email}`);
+  const handleInvite = () => {
+    const trimmed = email.trim();
+    if (!trimmed) return;
+    startTransition(async () => {
+      const res = await inviteModeratorAction(trimmed);
+      if (res.success) {
+        toast.success(`Invitation sent to ${trimmed}`);
         setEmail("");
       } else {
-        const data = await res.json();
-        toast.error(data?.message ?? "Failed to send invitation");
+        toast.error(res.message ?? "Failed to send invitation");
       }
-    } catch {
-      toast.error("Something went wrong");
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
   return (
@@ -48,8 +40,8 @@ export default function AdminModeratorsPage() {
             onChange={(e) => setEmail(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleInvite()}
           />
-          <Button onClick={handleInvite} disabled={loading || !email.trim()}>
-            <UserPlus className="mr-2 size-4" />
+          <Button onClick={handleInvite} disabled={isPending || !email.trim()}>
+            {isPending ? <Loader2 className="mr-2 size-4 animate-spin" /> : <UserPlus className="mr-2 size-4" />}
             Invite
           </Button>
         </div>

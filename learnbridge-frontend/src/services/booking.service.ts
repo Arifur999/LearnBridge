@@ -54,6 +54,68 @@ class BookingService {
   }
 
 
+  async getAllBookings() {
+    try {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_V1_URL}/bookings`, {
+        headers,
+        cache: "no-store",
+      });
+      if (!res.ok) return { data: null, error: { message: "Failed" } };
+      const data = await res.json();
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error: { message: error instanceof Error ? error.message : "Failed" } };
+    }
+  }
+
+  async createBooking(payload: {
+    availabilityId: string;
+    tutorId: string;
+    subjectId?: string;
+  }) {
+    const headers = await getAuthHeaders();
+    const res = await fetch(`${API_V1_URL}/bookings`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+      cache: "no-store",
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.message || "Booking failed");
+    return { data, error: null };
+  }
+
+  async getBookingById(bookingId: string) {
+    try {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_V1_URL}/bookings/${bookingId}`, {
+        headers,
+        cache: "no-store",
+      });
+      if (!res.ok) return { data: null, error: { message: "Not found" } };
+      const data = await res.json();
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error: { message: error instanceof Error ? error.message : "Failed" } };
+    }
+  }
+
+  async getAllBookingsAdmin() {
+    try {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_V1_URL}/admin/bookings`, {
+        headers,
+        cache: "no-store",
+      });
+      if (!res.ok) return { data: null, error: { message: "Failed" } };
+      const data = await res.json();
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error: { message: error instanceof Error ? error.message : "Failed" } };
+    }
+  }
+
   async bookSlot(payload: string | BookSessionPayload) {
     const headers = await getAuthHeaders(); 
 

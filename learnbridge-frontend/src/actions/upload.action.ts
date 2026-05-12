@@ -3,7 +3,7 @@
 import { API_V1_URL } from "@/lib/config";
 import { getAuthHeaders } from "@/services/auth.server";
 
-export async function uploadCourseImageAction(
+export async function uploadImageAction(
   formData: FormData
 ): Promise<{ success: boolean; url?: string; message?: string }> {
   try {
@@ -27,11 +27,30 @@ export async function uploadCourseImageAction(
       body,
     });
 
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
+
     if (!res.ok) {
       return { success: false, message: data?.message ?? "Upload failed" };
     }
-    return { success: true, url: data.url };
+
+    // Try every common URL key returned by different backends / Cloudinary
+    const url =
+      data?.url ??
+      data?.data?.url ??
+      data?.imageUrl ??
+      data?.data?.imageUrl ??
+      data?.secure_url ??
+      data?.data?.secure_url ??
+      data?.fileUrl ??
+      data?.data?.fileUrl ??
+      data?.link ??
+      data?.data?.link;
+
+    if (!url) {
+      return { success: false, message: "Upload succeeded but no URL returned" };
+    }
+
+    return { success: true, url };
   } catch (err) {
     return {
       success: false,

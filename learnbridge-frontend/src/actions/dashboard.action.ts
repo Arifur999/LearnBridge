@@ -163,3 +163,59 @@ export const deleteCategoryAction = async (categoryId: string) => {
     };
   }
 };
+
+export const getAdminCoursesAction = async () => {
+  return await dashboardService.getAdminCourses();
+};
+
+export const getAdminPendingCoursesAction = async () => {
+  return await dashboardService.getAdminPendingCourses();
+};
+
+export const approveCourseAction = async (courseId: string) => {
+  try {
+    await dashboardService.approveCourse(courseId);
+    revalidatePath("/admin/courses");
+    return { success: true, message: "Course approved" };
+  } catch (error) {
+    return { success: false, message: error instanceof Error ? error.message : "Failed" };
+  }
+};
+
+export const rejectCourseAction = async (courseId: string) => {
+  try {
+    await dashboardService.rejectCourse(courseId);
+    revalidatePath("/admin/courses");
+    return { success: true, message: "Course rejected" };
+  } catch (error) {
+    return { success: false, message: error instanceof Error ? error.message : "Failed" };
+  }
+};
+
+export const updateUserProfileAction = async (payload: {
+  name?: string;
+  image?: string;
+}): Promise<{ success: boolean; message: string }> => {
+  try {
+    const headers = await import("@/services/auth.server").then((m) =>
+      m.getAuthHeaders()
+    );
+    const { API_V1_URL } = await import("@/lib/config");
+    const res = await fetch(`${API_V1_URL}/auth/profile`, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify(payload),
+      cache: "no-store",
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.message || "Update failed");
+    revalidatePath("/dashboard/profile");
+    revalidatePath("/tutor/profile");
+    return { success: true, message: "Profile updated successfully" };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to update profile",
+    };
+  }
+};

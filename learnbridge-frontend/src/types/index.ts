@@ -50,3 +50,42 @@ export interface MenuItem {
   icon?: import("lucide-react").LucideIcon;
   items?: MenuItem[];
 }
+
+export interface Mentor {
+  id: string;
+  user: {
+    name: string;
+    image: string | null;
+  };
+}
+
+export interface ListUserPaginationProps {
+  page?: number;
+  limit?: number;
+  search?: string;
+  role?: string;
+  status?: string;
+}
+
+export interface ServiceOptions {
+  cache?: RequestCache;
+  revalidate?: number;
+}
+
+export enum BookingStatus {
+  PENDING = "PENDING",
+  CONFIRMED = "CONFIRMED",
+  COMPLETED = "COMPLETED",
+  CANCELLED = "CANCELLED",
+}
+
+export interface Payment {
+  id: string;
+  amount: number;
+  status: string;
+  createdAt: string;
+  bookingId?: string;
+  courseId?: string;
+  userId: string;
+  user?: { name: string; email: string };
+}

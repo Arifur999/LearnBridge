@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { updateTutorProfileAction } from "@/actions/dashboard.action";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2, Save } from "lucide-react";
+import ImageUpload from "@/components/ui/ImageUpload";
 
 interface Profile {
   bio: string;
@@ -37,6 +38,7 @@ const initialState = { success: false, message: "" };
 
 export default function TutorProfileForm({ profile, categories }: Props) {
   const [state, formAction, isPending] = useActionState(updateTutorProfileAction, initialState);
+  const [profileImage, setProfileImage] = useState(profile?.profileImage ?? "");
 
   useEffect(() => {
     if (state.message) {
@@ -47,6 +49,13 @@ export default function TutorProfileForm({ profile, categories }: Props) {
 
   return (
     <form action={formAction} className="space-y-5 rounded-2xl border p-6">
+      {/* Profile Image Upload */}
+      <div className="space-y-2">
+        <Label>Profile Photo</Label>
+        <ImageUpload value={profileImage} onChange={setProfileImage} />
+        <input type="hidden" name="profileImage" value={profileImage} />
+      </div>
+
       {/* Category */}
       <div className="space-y-2">
         <Label htmlFor="category">Category</Label>
@@ -108,18 +117,6 @@ export default function TutorProfileForm({ profile, categories }: Props) {
           placeholder="Tell students about your experience and teaching style..."
           defaultValue={profile?.bio ?? ""}
           className="w-full rounded-lg border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-        />
-      </div>
-
-      {/* Profile image */}
-      <div className="space-y-2">
-        <Label htmlFor="profileImage">Profile Image URL (optional)</Label>
-        <Input
-          id="profileImage"
-          name="profileImage"
-          type="url"
-          placeholder="https://example.com/your-photo.jpg"
-          defaultValue={profile?.profileImage ?? ""}
         />
       </div>
 

@@ -4,7 +4,7 @@ import { useRef, useState, useTransition } from "react";
 import Image from "next/image";
 import { ImagePlus, X, Loader2, Upload } from "lucide-react";
 import { toast } from "sonner";
-import { uploadCourseImageAction } from "@/actions/upload.action";
+import { uploadImageAction } from "@/actions/upload.action";
 
 interface ImageUploadProps {
   value: string;
@@ -30,7 +30,7 @@ export default function ImageUpload({ value, onChange, fallbackSrc }: ImageUploa
     startTransition(async () => {
       const fd = new FormData();
       fd.append("image", file);
-      const res = await uploadCourseImageAction(fd);
+      const res = await uploadImageAction(fd);
       if (!res.success) {
         toast.error(res.message ?? "Upload failed");
       } else {

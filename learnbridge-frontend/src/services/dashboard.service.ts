@@ -200,6 +200,30 @@ class DashboardService {
       method: "DELETE",
     });
   }
+
+  async getAdminCourses() {
+    try {
+      return toArray(await safeFetch("/admin/courses"));
+    } catch {
+      return [];
+    }
+  }
+
+  async getAdminPendingCourses() {
+    try {
+      return toArray(await safeFetch("/admin/courses/pending"));
+    } catch {
+      return [];
+    }
+  }
+
+  async approveCourse(courseId: string) {
+    return await safeFetch(`/admin/courses/${courseId}/approve`, { method: "PATCH" });
+  }
+
+  async rejectCourse(courseId: string) {
+    return await safeFetch(`/admin/courses/${courseId}/reject`, { method: "PATCH" });
+  }
 }
 
 export const dashboardService = new DashboardService();
