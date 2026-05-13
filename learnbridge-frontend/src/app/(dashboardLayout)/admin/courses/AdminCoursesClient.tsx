@@ -134,7 +134,7 @@ export default function AdminCoursesClient({ initialCourses }: { initialCourses:
               <div key={c.id} className="rounded-2xl border bg-card overflow-hidden flex flex-col">
                 {/* Thumbnail */}
                 <div className="relative h-36 bg-muted shrink-0">
-                  <Image src={getImg(c)} alt={c.title} fill className="object-cover" />
+                  <Image src={getImg(c)} alt={c.title} fill sizes="(max-width: 768px) 100vw, 400px" className="object-cover" />
                   <span className={`absolute top-2 right-2 rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusClass}`}>
                     {statusKey.charAt(0) + statusKey.slice(1).toLowerCase()}
                   </span>

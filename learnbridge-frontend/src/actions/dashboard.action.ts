@@ -38,13 +38,26 @@ export const updateTutorProfileAction = async (
   formData: FormData
 ): Promise<{ success: boolean; message: string }> => {
   try {
-    const payload = {
+    const rawSubjects = formData.get("subjects")?.toString().trim() ?? "";
+    // Backend expects an array of subject strings
+    const subjectsArray = rawSubjects
+      ? rawSubjects.split(",").map((s) => s.trim()).filter(Boolean)
+      : [];
+
+    const categoryRaw = formData.get("category")?.toString() ?? "";
+    const categoryIdRaw = formData.get("categoryId")?.toString() ?? "";
+    const profileImage = formData.get("profileImage")?.toString() || undefined;
+
+    const payload: Record<string, unknown> = {
       bio: formData.get("bio")?.toString() ?? "",
-      subjects: formData.get("subjects")?.toString().trim() ?? "",
+      subjects: subjectsArray,
       hourlyRate: Number(formData.get("hourlyRate") || 0),
-      category: formData.get("category")?.toString() ?? "",
-      profileImage: formData.get("profileImage")?.toString() ?? undefined,
     };
+
+    // Send both category name and ID — backend uses whichever it expects
+    if (categoryIdRaw) payload.categoryId = categoryIdRaw;
+    if (categoryRaw) payload.category = categoryRaw;
+    if (profileImage) payload.profileImage = profileImage;
 
     await dashboardService.updateTutorProfile(payload);
     revalidatePath("/tutor/profile");

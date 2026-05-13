@@ -40,33 +40,51 @@ export default function TutorProfileForm({ profile, categories }: Props) {
   const [state, formAction, isPending] = useActionState(updateTutorProfileAction, initialState);
   const [profileImage, setProfileImage] = useState(profile?.profileImage ?? "");
 
+  // selectedCategory holds { id, name } so we can submit both
+  const defaultCat = categories.find((c) => c.name === profile?.category) ?? categories[0] ?? null;
+  const [selectedCatId, setSelectedCatId] = useState(defaultCat?.id ?? "");
+  const [selectedCatName, setSelectedCatName] = useState(defaultCat?.name ?? profile?.category ?? "");
+
+  // Use a counter from useActionState to detect every new submission result
   useEffect(() => {
-    if (state.message) {
-      if (state.success) toast.success(state.message);
-      else toast.error(state.message);
+    if (!state.message) return;
+    if (state.success) {
+      toast.success(state.message);
+    } else {
+      toast.error(state.message);
     }
   }, [state.success, state.message]);
 
+  const handleCategoryChange = (value: string) => {
+    const cat = categories.find((c) => c.id === value);
+    setSelectedCatId(value);
+    setSelectedCatName(cat?.name ?? "");
+  };
+
   return (
     <form action={formAction} className="space-y-5 rounded-2xl border p-6">
+      {/* Hidden fields for image and category */}
+      <input type="hidden" name="profileImage" value={profileImage} />
+      <input type="hidden" name="categoryId" value={selectedCatId} />
+      <input type="hidden" name="category" value={selectedCatName} />
+
       {/* Profile Image Upload */}
       <div className="space-y-2">
         <Label>Profile Photo</Label>
         <ImageUpload value={profileImage} onChange={setProfileImage} />
-        <input type="hidden" name="profileImage" value={profileImage} />
       </div>
 
       {/* Category */}
       <div className="space-y-2">
-        <Label htmlFor="category">Category</Label>
+        <Label>Category</Label>
         {categories.length > 0 ? (
-          <Select name="category" defaultValue={profile?.category ?? ""}>
+          <Select value={selectedCatId} onValueChange={handleCategoryChange}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select a category" />
             </SelectTrigger>
             <SelectContent>
               {categories.map((cat) => (
-                <SelectItem key={cat.id} value={cat.name}>
+                <SelectItem key={cat.id} value={cat.id}>
                   {cat.name}
                 </SelectItem>
               ))}
@@ -74,7 +92,6 @@ export default function TutorProfileForm({ profile, categories }: Props) {
           </Select>
         ) : (
           <Input
-            id="category"
             name="category"
             placeholder="e.g. Programming, Math, English"
             defaultValue={profile?.category ?? ""}

@@ -19,33 +19,61 @@ function getDashboardUrl(role: string): string {
   }
 }
 
+function getRoleFromToken(raw: string | undefined): string {
+  if (!raw) return "";
+  const token = raw.startsWith("Bearer ") ? raw.slice(7) : raw;
+  try {
+    const decoded = jwtDecode<DecodedToken>(token);
+    return (decoded.role ?? "").toUpperCase();
+  } catch {
+    return "";
+  }
+}
+
+function getRoleFromAuthUser(raw: string | undefined): string {
+  if (!raw) return "";
+  const attempts = [raw, decodeURIComponent(raw)];
+  for (const attempt of attempts) {
+    try {
+      const parsed = JSON.parse(attempt);
+      if (parsed?.role && typeof parsed.role === "string") {
+        return parsed.role.toUpperCase();
+      }
+    } catch {
+      // try next
+    }
+  }
+  return "";
+}
+
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const token = request.cookies.get("accessToken")?.value;
 
+  const rawToken  = request.cookies.get("accessToken")?.value;
+  const rawUser   = request.cookies.get("authUser")?.value;
+
+  // Derive role — JWT is authoritative, authUser cookie is fallback
+  const role = getRoleFromToken(rawToken) || getRoleFromAuthUser(rawUser);
+
+  const isAuthenticated = !!(rawToken || rawUser);
+
+  // --- /login and /register: redirect already-logged-in users to their dashboard ---
   if (pathname === "/login" || pathname === "/register") {
-    if (token) {
-      try {
-        const decoded = jwtDecode<DecodedToken>(token);
-        const role = (decoded.role ?? "").toUpperCase();
-        return NextResponse.redirect(new URL(getDashboardUrl(role), request.url));
-      } catch {
-        return NextResponse.next();
-      }
+    if (role) {
+      return NextResponse.redirect(new URL(getDashboardUrl(role), request.url));
     }
     return NextResponse.next();
   }
 
-  if (!token) {
+  // --- Protected routes: require authentication ---
+  if (!isAuthenticated) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("returnUrl", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  try {
-    const decoded = jwtDecode<DecodedToken>(token);
-    const role = (decoded.role ?? "").toUpperCase();
-
+  // --- Role-based access control ---
+  if (role) {
     const prefixMap: [string, string[]][] = [
       ["/admin",      ["ADMIN"]],
       ["/tutor",      ["TUTOR", "TRAINER"]],
@@ -62,8 +90,6 @@ export function proxy(request: NextRequest) {
         return NextResponse.redirect(new URL(getDashboardUrl(role), request.url));
       }
     }
-  } catch {
-    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return NextResponse.next();

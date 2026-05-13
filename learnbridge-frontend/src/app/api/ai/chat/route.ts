@@ -6,13 +6,14 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const cookieStore = await cookies();
-    const token = cookieStore.get("accessToken")?.value;
+    const rawToken = cookieStore.get("accessToken")?.value;
+    const token = rawToken?.startsWith("Bearer ") ? rawToken : rawToken ? `Bearer ${rawToken}` : undefined;
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
     if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
+      headers["Authorization"] = token;
     }
 
     const res = await fetch(`${API_V1_URL}/ai/chat`, {

@@ -91,17 +91,34 @@ class UserService {
     return data;
   }
 
-  async inviteModerator(email: string) {
+  async inviteModerator(email: string, name?: string) {
     const headers = await getAuthHeaders();
-    const res = await fetch(`${API_V1_URL}/admin/invite-moderator`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ email }),
-      cache: "no-store",
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.message || "Invite failed");
-    return data;
+
+    // Try primary endpoint first, fall back to alternate paths
+    const endpoints = [
+      `${API_V1_URL}/admin/invite-moderator`,
+      `${API_V1_URL}/admin/moderators/invite`,
+      `${API_V1_URL}/admin/invite`,
+    ];
+
+    const payload: Record<string, string> = { email, role: "MODERATOR" };
+    if (name) payload.name = name;
+
+    let lastError = "Invite failed";
+    for (const url of endpoints) {
+      const res = await fetch(url, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(payload),
+        cache: "no-store",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) return data;
+      if (res.status === 404) continue; // try next endpoint
+      lastError = data?.message || `Request failed (${res.status})`;
+      throw new Error(lastError);
+    }
+    throw new Error(lastError);
   }
 
   async listModerators() {

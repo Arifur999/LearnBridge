@@ -100,10 +100,26 @@ class DashboardService {
   }
 
   async updateTutorProfile(payload: ApiRecord) {
-    return await safeFetch("/tutors/profile/me", {
-      method: "PUT",
-      body: JSON.stringify(payload),
-    });
+    // Try PUT first (update existing), fall back to PATCH, then POST (create)
+    const methods = ["PUT", "PATCH", "POST"] as const;
+    let lastError = "Failed to save profile";
+    for (const method of methods) {
+      try {
+        return await safeFetch("/tutors/profile/me", {
+          method,
+          body: JSON.stringify(payload),
+        });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "";
+        // Only retry on 405 Method Not Allowed or 404 Not Found
+        if (msg.includes("405") || msg.includes("404") || msg.includes("not found") || msg.includes("Method Not Allowed")) {
+          lastError = msg;
+          continue;
+        }
+        throw err; // real error — surface it immediately
+      }
+    }
+    throw new Error(lastError);
   }
 
   async getTutorProfile() {

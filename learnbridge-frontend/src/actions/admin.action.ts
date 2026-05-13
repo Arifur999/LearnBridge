@@ -97,9 +97,9 @@ export const updateFeaturedTutorAction = async (
   }
 };
 
-export const inviteModeratorAction = async (email: string, _name?: string) => {
+export const inviteModeratorAction = async (email: string, name?: string) => {
   try {
-    const res = await userService.inviteModerator(email);
+    const res = await userService.inviteModerator(email, name);
     return { success: true, data: res, message: "Invitation sent" };
   } catch (error) {
     return { success: false, message: error instanceof Error ? error.message : "Failed to invite moderator" };

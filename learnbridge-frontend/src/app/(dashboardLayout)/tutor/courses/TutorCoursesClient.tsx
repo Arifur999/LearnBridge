@@ -216,7 +216,7 @@ export default function TutorCoursesClient({ initialCourses }: { initialCourses:
             return (
               <Card key={c.id} className="group overflow-hidden">
                 <div className="relative h-36 w-full bg-muted">
-                  <Image src={imgSrc} alt={c.title} fill className="object-cover" />
+                  <Image src={imgSrc} alt={c.title} fill sizes="(max-width: 768px) 100vw, 400px" className="object-cover" />
                   <div className="absolute inset-0 bg-black/10" />
                   <span className={`absolute top-2 right-2 rounded-full px-2 py-0.5 text-xs font-medium ${statusClass}`}>
                     {statusKey.charAt(0) + statusKey.slice(1).toLowerCase()}

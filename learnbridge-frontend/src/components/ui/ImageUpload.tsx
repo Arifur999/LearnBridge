@@ -67,7 +67,7 @@ export default function ImageUpload({ value, onChange, fallbackSrc }: ImageUploa
 
       {preview ? (
         <div className="relative overflow-hidden rounded-lg border h-44 w-full bg-muted group">
-          <Image src={preview} alt="Course image" fill className="object-cover" />
+          <Image src={preview} alt="Course image" fill sizes="(max-width: 768px) 100vw, 600px" className="object-cover" />
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
             <button
               type="button"

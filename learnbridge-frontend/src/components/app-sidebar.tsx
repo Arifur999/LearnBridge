@@ -30,7 +30,8 @@ function getRoutes(role: string): Route[] {
   const r = role.toUpperCase();
   switch (r) {
     case Roles.admin:     return adminRoutes;
-    case Roles.tutor:     return tutorRoutes;
+    case Roles.tutor:
+    case "TRAINER":       return tutorRoutes;
     case Roles.institute: return instituteRoutes;
     case Roles.mentor:    return mentorRoutes;
     case Roles.moderator: return moderatorRoutes;
