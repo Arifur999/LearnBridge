@@ -1,16 +1,18 @@
 import { Suspense } from "react";
 import { getAllCourses, getCategories } from "@/actions/course.action";
-import CourseCard from "../courses/CourseCard";
+import TutorCard from "./TutorCard";
 import CoursesFilter from "../courses/CoursesFilter";
 import Pagination from "../courses/Pagination";
-import { Loader2 } from "lucide-react";
 
-interface Course {
+interface Tutor {
   id: string;
   title: string;
   description: string;
   price?: number;
   category?: string;
+  rating?: number;
+  subjects?: string[];
+  profileImage?: string;
 }
 
 interface PaginationMeta {
@@ -56,7 +58,7 @@ export default async function TutorsPage({
     getCategories(),
   ]);
 
-  const courses: Course[] = result?.data ?? [];
+  const tutors: Tutor[] = (result?.data ?? []) as Tutor[];
   const meta = isPaginationMeta(result?.meta) ? result.meta : null;
 
   return (
@@ -64,34 +66,44 @@ export default async function TutorsPage({
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Browse Tutors</h1>
         <p className="mt-2 text-muted-foreground">
-          Find expert tutors by subject, category, and hourly price.
+          Find expert tutors by subject, category, and hourly price. Login required to view profiles.
         </p>
       </div>
 
       <Suspense fallback={<div className="mb-10 h-20 animate-pulse rounded-xl bg-muted" />}>
-        <CoursesFilter categories={categories} />
+        <CoursesFilter categories={categories} basePath="/tutors" />
       </Suspense>
 
-      {courses.length === 0 && (
+      {tutors.length === 0 && (
         <p className="text-muted-foreground">No tutors found.</p>
       )}
 
-      {courses.length > 0 && (
+      {tutors.length > 0 && (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {courses.map((course) => (
-            <CourseCard
-              key={course.id}
-              id={course.id}
-              title={course.title}
-              description={course.description}
-              price={course.price}
-              category={course.category}
+          {tutors.map((tutor) => (
+            <TutorCard
+              key={tutor.id}
+              id={tutor.id}
+              title={tutor.title}
+              description={tutor.description}
+              price={tutor.price}
+              category={tutor.category}
+              rating={tutor.rating}
+              subjects={tutor.subjects}
+              profileImage={tutor.profileImage}
             />
           ))}
         </div>
       )}
 
-      {meta && <Pagination page={meta.page} limit={meta.limit} total={meta.total} />}
+      {meta && (
+        <Pagination
+          page={meta.page}
+          limit={meta.limit}
+          total={meta.total}
+          basePath="/tutors"
+        />
+      )}
     </section>
   );
 }

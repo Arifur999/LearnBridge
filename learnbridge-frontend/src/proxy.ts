@@ -75,14 +75,14 @@ export function proxy(request: NextRequest) {
   // --- Role-based access control ---
   if (role) {
     const prefixMap: [string, string[]][] = [
-      ["/admin",      ["ADMIN"]],
-      ["/tutor",      ["TUTOR", "TRAINER"]],
-      ["/trainer",    ["TUTOR", "TRAINER"]],
-      ["/institute",  ["INSTITUTE"]],
-      ["/mentor",     ["MENTOR"]],
-      ["/moderator",  ["MODERATOR"]],
-      ["/student",    ["STUDENT"]],
-      ["/dashboard",  ["STUDENT"]],
+      ["/admin/",      ["ADMIN"]],
+      ["/tutor/",      ["TUTOR", "TRAINER"]],
+      ["/trainer/",    ["TUTOR", "TRAINER"]],
+      ["/institute/",  ["INSTITUTE"]],
+      ["/mentor/",     ["MENTOR"]],
+      ["/moderator/",  ["MODERATOR"]],
+      ["/student/",    ["STUDENT"]],
+      ["/dashboard",   ["STUDENT"]],
     ];
 
     for (const [prefix, allowed] of prefixMap) {
@@ -106,6 +106,8 @@ export const config = {
     "/student/:path*",
     "/dashboard",
     "/dashboard/:path*",
+    "/tutors/:path+",
+    "/payments/:path*",
     "/login",
     "/register",
   ],

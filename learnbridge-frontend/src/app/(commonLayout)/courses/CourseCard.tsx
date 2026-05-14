@@ -8,6 +8,7 @@ interface CourseCardProps {
   price?: number;
   category?: string;
   rating?: number;
+  basePath?: string;
 }
 
 const StarRating = ({ rating }: { rating: number }) => (
@@ -26,10 +27,10 @@ const StarRating = ({ rating }: { rating: number }) => (
   </div>
 );
 
-const CourseCard = ({ id, title, description, price, category, rating }: CourseCardProps) => {
+const CourseCard = ({ id, title, description, price, category, rating, basePath = "/courses" }: CourseCardProps) => {
   return (
     <Link
-      href={`/tutors/${id}`}
+      href={`${basePath}/${id}`}
       className="group flex flex-col rounded-2xl border bg-background shadow-sm transition-all hover:shadow-md hover:border-primary/40"
     >
       <div className="flex h-40 items-center justify-center rounded-t-2xl bg-linear-to-br from-primary/10 to-violet-100">

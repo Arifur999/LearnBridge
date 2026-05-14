@@ -22,8 +22,10 @@ interface Category {
 
 export default function CoursesFilter({
   categories = [],
+  basePath = "/courses",
 }: {
   categories?: Category[];
+  basePath?: string;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -62,11 +64,11 @@ export default function CoursesFilter({
       }
 
       params.delete("page");
-      router.push(`/tutors?${params.toString()}`);
+      router.push(`${basePath}?${params.toString()}`);
     }, 400);
 
     return () => clearTimeout(timeout);
-  }, [search, category, minPrice, maxPrice, router, searchParams]);
+  }, [search, category, minPrice, maxPrice, router, searchParams, basePath]);
 
   return (
     <div className="mb-10 rounded-xl border bg-background p-4 shadow-sm">

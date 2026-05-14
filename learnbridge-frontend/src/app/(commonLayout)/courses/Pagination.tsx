@@ -13,7 +13,8 @@ export default function Pagination({
   page,
   total,
   limit,
-}: PaginationProps) {
+  basePath = "/courses",
+}: PaginationProps & { basePath?: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -24,7 +25,7 @@ export default function Pagination({
   const goToPage = (p: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", p.toString());
-    router.push(`/tutors?${params.toString()}`);
+    router.push(`${basePath}?${params.toString()}`);
   };
 
   return (

@@ -73,18 +73,18 @@ export default async function CoursesPage({
   return (
     <section className="mx-auto max-w-7xl px-4 py-16">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">Browse Tutors</h1>
+        <h1 className="text-3xl font-bold">Browse Courses</h1>
         <p className="mt-2 text-muted-foreground">
-          Find expert tutors by subject, category, and hourly price.
+          Explore available courses by subject, category, and price.
         </p>
       </div>
 
       <Suspense fallback={<div className="mb-10 h-20 animate-pulse rounded-xl bg-muted" />}>
-        <CoursesFilter categories={categories} />
+        <CoursesFilter categories={categories} basePath="/courses" />
       </Suspense>
 
       {courses.length === 0 && (
-        <p className="text-muted-foreground">No tutors found.</p>
+        <p className="text-muted-foreground">No courses found.</p>
       )}
 
       {courses.length > 0 && (
@@ -97,6 +97,7 @@ export default async function CoursesPage({
               description={course.description}
               price={course.price}
               category={course.category}
+              basePath="/courses"
             />
           ))}
         </div>
@@ -107,6 +108,7 @@ export default async function CoursesPage({
           page={meta.page}
           limit={meta.limit}
           total={meta.total}
+          basePath="/courses"
         />
       )}
     </section>
