@@ -61,6 +61,8 @@ const normalizeTutor = (value: unknown) => {
   return {
     ...item,
     id,
+    status: asString(item.status),
+    createdAt: asString(item.createdAt),
     title: asString(item.title) ?? name,
     description:
       asString(item.description) ??
@@ -124,14 +126,15 @@ class CourseService {
   }
 
   async getAllCourses(query = "") {
-    // Try /courses (approved trainer courses) first, then /tutors (tutor profiles)
-    const coursesQuery = query.includes("?")
-      ? query + "&status=APPROVED"
-      : query
-        ? query + "&status=APPROVED"
-        : "?status=APPROVED";
+    const sep = query.includes("?") ? "&" : "?";
 
-    for (const path of [`/courses${coursesQuery}`, `/courses${query}`, `/tutors${query}`]) {
+    // 1. Try public /courses variants
+    const publicPaths = [
+      `/courses${query}${sep}status=APPROVED&sortBy=createdAt&sortOrder=desc`,
+      `/courses${query}${sep}status=APPROVED`,
+      `/courses${query}`,
+    ];
+    for (const path of publicPaths) {
       try {
         const res = await fetch(`${API_V1_URL}${path}`, { cache: "no-store" });
         if (!res.ok) continue;
@@ -140,6 +143,75 @@ class CourseService {
         if (normalized.data.length > 0) return normalized;
       } catch { /* try next */ }
     }
+
+    // 2. Try with auth headers — backend may require auth for /courses
+    try {
+      const headers = await getAuthHeaders();
+      for (const path of publicPaths) {
+        try {
+          const res = await fetch(`${API_V1_URL}${path}`, { headers, cache: "no-store" });
+          if (!res.ok) continue;
+          const result = await res.json();
+          const normalized = normalizeTutorListResponse(result);
+          if (normalized.data.length > 0) return normalized;
+        } catch { /* try next */ }
+      }
+
+      // 3. Admin endpoint — use same extraction logic as dashboard.service.ts (guaranteed to work)
+      const adminRes = await fetch(`${API_V1_URL}/admin/courses`, { headers, cache: "no-store" });
+      if (adminRes.ok) {
+        const raw = await adminRes.json();
+
+        // Mirror dashboard.service.ts unwrapData + toArray exactly
+        const unwrap = (v: unknown): unknown => {
+          if (!v || typeof v !== "object" || Array.isArray(v)) return v;
+          const r = v as Record<string, unknown>;
+          if (r.data && typeof r.data === "object" && !Array.isArray(r.data) && "data" in (r.data as object))
+            return (r.data as Record<string, unknown>).data;
+          return r.data ?? v;
+        };
+        const toArr = (v: unknown): unknown[] => {
+          const d = unwrap(v);
+          if (Array.isArray(d)) return d;
+          if (d && typeof d === "object" && !Array.isArray(d)) {
+            const r = d as Record<string, unknown>;
+            if (Array.isArray(r.items)) return r.items;
+            if (Array.isArray(r.result)) return r.result;
+            if (Array.isArray(r.courses)) return r.courses;
+            if (Array.isArray(r.data)) return r.data;
+          }
+          return [];
+        };
+
+        const list = toArr(raw)
+          .filter((c) => c && typeof c === "object")
+          .filter((c) => {
+            const s = (c as Record<string, unknown>).status;
+            return !s || s === "APPROVED";
+          })
+          .sort((a, b) => {
+            const da = new Date(String((a as Record<string, unknown>).createdAt ?? 0)).getTime();
+            const db = new Date(String((b as Record<string, unknown>).createdAt ?? 0)).getTime();
+            return db - da;
+          });
+
+        if (list.length > 0) {
+          return { data: list.map(normalizeTutor), meta: null };
+        }
+      }
+    } catch { /* ignore auth errors */ }
+
+    // 4. Last resort: tutor profiles
+    for (const path of [`/tutors${query}`, `/tutors`]) {
+      try {
+        const res = await fetch(`${API_V1_URL}${path}`, { cache: "no-store" });
+        if (!res.ok) continue;
+        const result = await res.json();
+        const normalized = normalizeTutorListResponse(result);
+        if (normalized.data.length > 0) return normalized;
+      } catch { /* try next */ }
+    }
+
     return { data: [], meta: null };
   }
 

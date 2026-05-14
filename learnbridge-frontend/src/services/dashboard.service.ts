@@ -38,11 +38,15 @@ const safeFetch = async (path: string, init?: RequestInit) => {
   const data = await res.json().catch(() => null);
 
   if (!res.ok) {
-    throw new Error(
-      isRecord(data) && typeof data.message === "string"
-        ? data.message
-        : "Request failed"
-    );
+    let errMsg = "Request failed";
+    if (isRecord(data)) {
+      if (typeof data.message === "string") errMsg = data.message;
+      else if (typeof data.error === "string") errMsg = data.error;
+      else if (typeof data.msg === "string") errMsg = data.msg;
+      else if (Array.isArray(data.errors) && isRecord(data.errors[0]) && typeof data.errors[0].message === "string")
+        errMsg = data.errors[0].message;
+    }
+    throw new Error(errMsg);
   }
 
   return data;
@@ -100,23 +104,21 @@ class DashboardService {
   }
 
   async updateTutorProfile(payload: ApiRecord) {
-    // Try PUT first (update existing), fall back to PATCH, then POST (create)
-    const methods = ["PUT", "PATCH", "POST"] as const;
+    const attempts: { method: "PATCH" | "PUT" | "POST"; path: string }[] = [
+      { method: "PATCH", path: "/tutor/profile" },
+      { method: "POST",  path: "/tutor/profile" },
+      { method: "PUT",   path: "/tutor/profile" },
+      { method: "PATCH", path: "/tutors/profile/me" },
+      { method: "PUT",   path: "/tutors/profile/me" },
+      { method: "POST",  path: "/tutors/profile" },
+    ];
     let lastError = "Failed to save profile";
-    for (const method of methods) {
+    for (const { method, path } of attempts) {
       try {
-        return await safeFetch("/tutors/profile/me", {
-          method,
-          body: JSON.stringify(payload),
-        });
+        return await safeFetch(path, { method, body: JSON.stringify(payload) });
       } catch (err) {
-        const msg = err instanceof Error ? err.message : "";
-        // Only retry on 405 Method Not Allowed or 404 Not Found
-        if (msg.includes("405") || msg.includes("404") || msg.includes("not found") || msg.includes("Method Not Allowed")) {
-          lastError = msg;
-          continue;
-        }
-        throw err; // real error — surface it immediately
+        // Always try the next endpoint — surface error only after all attempts
+        lastError = err instanceof Error ? err.message : "Failed to save profile";
       }
     }
     throw new Error(lastError);

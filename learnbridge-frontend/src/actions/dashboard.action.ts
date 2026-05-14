@@ -48,16 +48,22 @@ export const updateTutorProfileAction = async (
     const categoryIdRaw = formData.get("categoryId")?.toString() ?? "";
     const profileImage = formData.get("profileImage")?.toString() || undefined;
 
-    const payload: Record<string, unknown> = {
-      bio: formData.get("bio")?.toString() ?? "",
-      subjects: subjectsArray,
-      hourlyRate: Number(formData.get("hourlyRate") || 0),
-    };
+    const hourlyRate = Number(formData.get("hourlyRate") || 0);
+    const bio = formData.get("bio")?.toString().trim() ?? "";
 
-    // Send both category name and ID — backend uses whichever it expects
+    const payload: Record<string, unknown> = {};
+
+    // Only send non-empty values to avoid backend validation errors
+    if (bio) payload.bio = bio;
+    if (hourlyRate > 0) payload.hourlyRate = hourlyRate;
+    if (subjectsArray.length > 0) payload.subjects = subjectsArray;
     if (categoryIdRaw) payload.categoryId = categoryIdRaw;
     if (categoryRaw) payload.category = categoryRaw;
-    if (profileImage) payload.profileImage = profileImage;
+    // backend may use "image" or "profileImage" — send both
+    if (profileImage) {
+      payload.image = profileImage;
+      payload.profileImage = profileImage;
+    }
 
     await dashboardService.updateTutorProfile(payload);
     revalidatePath("/tutor/profile");
