@@ -8,6 +8,7 @@ interface CourseCardProps {
   price?: number;
   category?: string;
   rating?: number;
+  image?: string;
   basePath?: string;
 }
 
@@ -27,14 +28,25 @@ const StarRating = ({ rating }: { rating: number }) => (
   </div>
 );
 
-const CourseCard = ({ id, title, description, price, category, rating, basePath = "/courses" }: CourseCardProps) => {
+const CourseCard = ({ id, title, description, price, category, rating, image, basePath = "/courses" }: CourseCardProps) => {
   return (
     <Link
       href={`${basePath}/${id}`}
       className="group flex flex-col rounded-2xl border bg-background shadow-sm transition-all hover:shadow-md hover:border-primary/40"
     >
-      <div className="flex h-40 items-center justify-center rounded-t-2xl bg-linear-to-br from-primary/10 to-violet-100">
-        <BookOpen className="size-12 text-primary/35 transition-transform group-hover:scale-110" />
+      <div className="relative h-40 overflow-hidden rounded-t-2xl bg-linear-to-br from-primary/10 to-violet-100">
+        {image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={image}
+            alt={title}
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <BookOpen className="size-12 text-primary/35 transition-transform group-hover:scale-110" />
+          </div>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col p-5">

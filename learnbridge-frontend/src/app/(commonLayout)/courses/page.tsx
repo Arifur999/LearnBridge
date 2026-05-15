@@ -10,6 +10,7 @@ interface Course {
   description: string;
   price?: number;
   category?: string;
+  image?: string;
 }
 
 interface PaginationMeta {
@@ -97,6 +98,7 @@ export default async function CoursesPage({
               description={course.description}
               price={course.price}
               category={course.category}
+              image={course.image}
               basePath="/courses"
             />
           ))}
