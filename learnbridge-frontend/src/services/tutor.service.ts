@@ -9,12 +9,21 @@ class TutorService {
       });
       if (!res.ok) return { data: [], meta: null };
       const result = await res.json();
-      const raw = result?.data ?? result;
-      const list = Array.isArray(raw) ? raw : Array.isArray(raw?.data) ? raw.data : [];
-      return {
-        data: list,
-        meta: result?.meta ?? raw?.meta ?? null,
-      };
+      const dataField = result?.data;
+      const isObj = dataField && typeof dataField === "object" && !Array.isArray(dataField);
+      const list = Array.isArray(dataField)
+        ? dataField
+        : isObj && Array.isArray(dataField.tutors)
+          ? dataField.tutors
+          : isObj && Array.isArray(dataField.data)
+            ? dataField.data
+            : Array.isArray(result)
+              ? result
+              : [];
+      const meta = isObj
+        ? (dataField.pagination ?? dataField.meta ?? null)
+        : (result?.meta ?? null);
+      return { data: list, meta };
     } catch {
       return { data: [], meta: null };
     }
@@ -170,21 +179,28 @@ class TutorService {
   }
 
   async getMyBookings(page = 1, limit = 20) {
-    try {
-      const headers = await getAuthHeaders();
-      const res = await fetch(
-        `${API_V1_URL}/tutor/bookings?page=${page}&limit=${limit}`,
-        { headers, cache: "no-store" }
-      );
-      if (!res.ok) return { data: [], meta: null };
-      const result = await res.json();
-      return {
-        data: result?.data?.data ?? result?.data ?? [],
-        meta: result?.data?.meta ?? result?.meta ?? null,
-      };
-    } catch {
-      return { data: [], meta: null };
+    const paths = [
+      `/trainer/bookings?page=${page}&limit=${limit}`,
+      `/tutor/bookings?page=${page}&limit=${limit}`,
+      `/tutors/sessions/mine?page=${page}&limit=${limit}`,
+    ];
+    for (const path of paths) {
+      try {
+        const headers = await getAuthHeaders();
+        const res = await fetch(`${API_V1_URL}${path}`, { headers, cache: "no-store" });
+        if (!res.ok) continue;
+        const result = await res.json();
+        const data = result?.data?.data ?? result?.data ?? result ?? [];
+        const list = Array.isArray(data) ? data : [];
+        if (list.length > 0 || path === paths[paths.length - 1]) {
+          return {
+            data: list,
+            meta: result?.data?.meta ?? result?.meta ?? null,
+          };
+        }
+      } catch { /* try next */ }
     }
+    return { data: [], meta: null };
   }
 }
 

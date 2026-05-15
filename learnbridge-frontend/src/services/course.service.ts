@@ -112,8 +112,7 @@ const normalizeTutorListResponse = (result: unknown) => {
 
 class CourseService {
   async getPopularCourses(limit = 3) {
-    // Try approved courses first, fall back to tutor profiles
-    for (const path of [`/courses?limit=${limit}&status=APPROVED`, `/tutors?limit=${limit}`]) {
+    for (const path of [`/student/courses?limit=${limit}`, `/courses/search?limit=${limit}`]) {
       try {
         const res = await fetch(`${API_V1_URL}${path}`, { cache: "no-store" });
         if (!res.ok) continue;
@@ -126,83 +125,14 @@ class CourseService {
   }
 
   async getAllCourses(query = "") {
-    const sep = query.includes("?") ? "&" : "?";
+    // /student/courses — includes description, APPROVED only, supports page+limit
+    // /courses/search  — supports all filters (search/category/price), APPROVED only
+    const hasFilters = /[?&](search|category|minPrice|maxPrice)=/.test(query);
+    const orderedPaths = hasFilters
+      ? [`/courses/search${query}`, `/student/courses${query}`]
+      : [`/student/courses${query}`, `/courses/search${query}`];
 
-    // 1. Try public /courses variants
-    const publicPaths = [
-      `/courses${query}${sep}status=APPROVED&sortBy=createdAt&sortOrder=desc`,
-      `/courses${query}${sep}status=APPROVED`,
-      `/courses${query}`,
-    ];
-    for (const path of publicPaths) {
-      try {
-        const res = await fetch(`${API_V1_URL}${path}`, { cache: "no-store" });
-        if (!res.ok) continue;
-        const result = await res.json();
-        const normalized = normalizeTutorListResponse(result);
-        if (normalized.data.length > 0) return normalized;
-      } catch { /* try next */ }
-    }
-
-    // 2. Try with auth headers — backend may require auth for /courses
-    try {
-      const headers = await getAuthHeaders();
-      for (const path of publicPaths) {
-        try {
-          const res = await fetch(`${API_V1_URL}${path}`, { headers, cache: "no-store" });
-          if (!res.ok) continue;
-          const result = await res.json();
-          const normalized = normalizeTutorListResponse(result);
-          if (normalized.data.length > 0) return normalized;
-        } catch { /* try next */ }
-      }
-
-      // 3. Admin endpoint — use same extraction logic as dashboard.service.ts (guaranteed to work)
-      const adminRes = await fetch(`${API_V1_URL}/admin/courses`, { headers, cache: "no-store" });
-      if (adminRes.ok) {
-        const raw = await adminRes.json();
-
-        // Mirror dashboard.service.ts unwrapData + toArray exactly
-        const unwrap = (v: unknown): unknown => {
-          if (!v || typeof v !== "object" || Array.isArray(v)) return v;
-          const r = v as Record<string, unknown>;
-          if (r.data && typeof r.data === "object" && !Array.isArray(r.data) && "data" in (r.data as object))
-            return (r.data as Record<string, unknown>).data;
-          return r.data ?? v;
-        };
-        const toArr = (v: unknown): unknown[] => {
-          const d = unwrap(v);
-          if (Array.isArray(d)) return d;
-          if (d && typeof d === "object" && !Array.isArray(d)) {
-            const r = d as Record<string, unknown>;
-            if (Array.isArray(r.items)) return r.items;
-            if (Array.isArray(r.result)) return r.result;
-            if (Array.isArray(r.courses)) return r.courses;
-            if (Array.isArray(r.data)) return r.data;
-          }
-          return [];
-        };
-
-        const list = toArr(raw)
-          .filter((c) => c && typeof c === "object")
-          .filter((c) => {
-            const s = (c as Record<string, unknown>).status;
-            return !s || s === "APPROVED";
-          })
-          .sort((a, b) => {
-            const da = new Date(String((a as Record<string, unknown>).createdAt ?? 0)).getTime();
-            const db = new Date(String((b as Record<string, unknown>).createdAt ?? 0)).getTime();
-            return db - da;
-          });
-
-        if (list.length > 0) {
-          return { data: list.map(normalizeTutor), meta: null };
-        }
-      }
-    } catch { /* ignore auth errors */ }
-
-    // 4. Last resort: tutor profiles
-    for (const path of [`/tutors${query}`, `/tutors`]) {
+    for (const path of orderedPaths) {
       try {
         const res = await fetch(`${API_V1_URL}${path}`, { cache: "no-store" });
         if (!res.ok) continue;
@@ -215,9 +145,45 @@ class CourseService {
     return { data: [], meta: null };
   }
 
+  async getAllTutors(query = "") {
+    const paths = [`/tutors${query}`, `/tutors`];
+
+    for (const path of paths) {
+      try {
+        const res = await fetch(`${API_V1_URL}${path}`, { cache: "no-store" });
+        if (!res.ok) continue;
+        const result = await res.json();
+        const root = asRecord(result);
+        const dataField = asRecord(root.data);
+        const list = Array.isArray(dataField.tutors) ? dataField.tutors : [];
+        const pagination = asRecord(dataField.pagination);
+
+        if (list.length > 0) {
+          return {
+            data: list.map((t) => {
+              const tutor = asRecord(t);
+              return {
+                id: asString(tutor.id) ?? "",
+                title: asString(tutor.name) ?? "Tutor",
+                description: asString(tutor.bio) ?? asString(tutor.about) ?? "Expert tutor",
+                price: asNumber(tutor.hourlyRate) ?? asNumber(tutor.sessionFee),
+                category: asString(tutor.subject) ?? asString(tutor.specialty) ?? "",
+                rating: typeof tutor.avgRating === "number" ? tutor.avgRating : undefined,
+                subjects: Array.isArray(tutor.subjects) ? (tutor.subjects as string[]) : [],
+                profileImage: asString(tutor.profileImage) ?? asString(tutor.image),
+              };
+            }),
+            meta: pagination,
+          };
+        }
+      } catch { /* try next */ }
+    }
+
+    return { data: [], meta: null };
+  }
+
   async getCourseById(id: string) {
-    // Try /courses/:id first (trainer course), then /tutors/:id (tutor profile)
-    for (const path of [`/courses/${id}`, `/tutors/${id}`]) {
+    for (const path of [`/trainer/${id}`, `/tutors/${id}`]) {
       try {
         const res = await fetch(`${API_V1_URL}${path}`, { cache: "no-store" });
         if (!res.ok) continue;

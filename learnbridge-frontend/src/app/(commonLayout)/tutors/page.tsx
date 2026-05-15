@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { getAllCourses, getCategories } from "@/actions/course.action";
+import { getAllTutors, getCategories } from "@/actions/course.action";
 import TutorCard from "./TutorCard";
 import CoursesFilter from "../courses/CoursesFilter";
 import Pagination from "../courses/Pagination";
@@ -54,7 +54,7 @@ export default async function TutorsPage({
   if (maxPrice) params.set("maxPrice", maxPrice);
 
   const [result, categories] = await Promise.all([
-    getAllCourses(`?${params.toString()}`),
+    getAllTutors(`?${params.toString()}`),
     getCategories(),
   ]);
 

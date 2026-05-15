@@ -104,34 +104,39 @@ class DashboardService {
   }
 
   async updateTutorProfile(payload: ApiRecord) {
+    // Backend uses "TRAINER" role → routes are /trainer/*, not /tutor/*
     const attempts: { method: "PATCH" | "PUT" | "POST"; path: string }[] = [
+      { method: "PATCH", path: "/trainer/profile" },
+      { method: "PUT",   path: "/trainer/profile" },
+      { method: "POST",  path: "/trainer/profile" },
       { method: "PATCH", path: "/tutor/profile" },
-      { method: "POST",  path: "/tutor/profile" },
       { method: "PUT",   path: "/tutor/profile" },
+      { method: "POST",  path: "/tutor/profile" },
       { method: "PATCH", path: "/tutors/profile/me" },
-      { method: "PUT",   path: "/tutors/profile/me" },
       { method: "POST",  path: "/tutors/profile" },
     ];
-    let lastError = "Failed to save profile";
+    const errors: string[] = [];
     for (const { method, path } of attempts) {
       try {
         return await safeFetch(path, { method, body: JSON.stringify(payload) });
       } catch (err) {
-        // Always try the next endpoint — surface error only after all attempts
-        lastError = err instanceof Error ? err.message : "Failed to save profile";
+        errors.push(`${method} ${path}: ${err instanceof Error ? err.message : "failed"}`);
       }
     }
-    throw new Error(lastError);
+    // Surface the first meaningful error, not the generic fallback
+    const meaningful = errors.find((e) => !e.includes("Request failed") && !e.includes("Cannot"));
+    throw new Error(meaningful ?? errors[0] ?? "Failed to save profile");
   }
 
   async getTutorProfile() {
-    try {
-      const data = await safeFetch("/tutors/profile/me");
-      const raw = unwrapData(data);
-      return isRecord(raw) ? raw : null;
-    } catch {
-      return null;
+    for (const path of ["/trainer/profile", "/tutor/profile", "/tutors/profile/me"]) {
+      try {
+        const data = await safeFetch(path);
+        const raw = unwrapData(data);
+        if (isRecord(raw)) return raw;
+      } catch { /* try next */ }
     }
+    return null;
   }
 
   async updateTutorAvailability(payload: ApiRecord) {

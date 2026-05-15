@@ -38,7 +38,7 @@ export default async function StudentDashboardPage() {
   return (
     <div className="space-y-8">
       <DashPageHeader
-        title={`Welcome back, ${user.name ?? "Student"} 👋`}
+        title={`Welcome back, ${user.name ?? "Student"} `}
         description="Here's an overview of your learning activity."
       />
 

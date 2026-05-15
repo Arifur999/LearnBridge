@@ -10,6 +10,10 @@ export const getAllCourses = async (query?: string) => {
   return await courseService.getAllCourses(query);
 };
 
+export const getAllTutors = async (query?: string) => {
+  return await courseService.getAllTutors(query);
+};
+
 export const getCourseById = async (id: string) => {
   return await courseService.getCourseById(id);
 };
