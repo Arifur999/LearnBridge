@@ -75,7 +75,7 @@ const normalizeTutor = (value: unknown) => {
       asNumber(item.rate) ??
       asNumber(item.sessionFee),
     category,
-    image: asString(item.image) ?? asString(item.thumbnail) ?? asString(item.coverImage),
+    image: asString(item.image) ?? asString(item.thumbnail) ?? asString(item.coverImage) ?? asString(item.imageUrl) ?? asString(item.cover) ?? asString(item.photo),
     trainer: { id: trainerId, name: trainerName },
   };
 };

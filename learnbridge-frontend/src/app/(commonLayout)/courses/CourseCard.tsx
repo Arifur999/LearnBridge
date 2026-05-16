@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Star, BookOpen, ArrowRight } from "lucide-react";
+import { Star, ArrowRight } from "lucide-react";
 
 interface CourseCardProps {
   id: string;
@@ -10,6 +10,23 @@ interface CourseCardProps {
   rating?: number;
   image?: string;
   basePath?: string;
+}
+
+const CATEGORY_IMAGES: Record<string, string> = {
+  Programming: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&q=80",
+  Design:      "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&q=80",
+  Mathematics: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&q=80",
+  Science:     "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
+  Language:    "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=400&q=80",
+  Business:    "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&q=80",
+  Music:       "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&q=80",
+  Art:         "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=400&q=80",
+  default:     "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=400&q=80",
+};
+
+function getCourseImage(image?: string, category?: string): string {
+  if (image) return image;
+  return CATEGORY_IMAGES[category ?? ""] ?? CATEGORY_IMAGES.default;
 }
 
 const StarRating = ({ rating }: { rating: number }) => (
@@ -29,24 +46,20 @@ const StarRating = ({ rating }: { rating: number }) => (
 );
 
 const CourseCard = ({ id, title, description, price, category, rating, image, basePath = "/courses" }: CourseCardProps) => {
+  const cardImage = getCourseImage(image, category);
+
   return (
     <Link
       href={`${basePath}/${id}`}
       className="group flex flex-col rounded-2xl border bg-background shadow-sm transition-all hover:shadow-md hover:border-primary/40"
     >
-      <div className="relative h-40 overflow-hidden rounded-t-2xl bg-linear-to-br from-primary/10 to-violet-100">
-        {image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={image}
-            alt={title}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center">
-            <BookOpen className="size-12 text-primary/35 transition-transform group-hover:scale-110" />
-          </div>
-        )}
+      <div className="relative h-40 overflow-hidden rounded-t-2xl">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={cardImage}
+          alt={title}
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+        />
       </div>
 
       <div className="flex flex-1 flex-col p-5">
