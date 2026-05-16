@@ -2,6 +2,7 @@ import { Star, CheckCircle, User } from "lucide-react";
 import { getCourseById } from "@/actions/course.action";
 import { getTutorReviewsAction } from "@/actions/review.action";
 import { BookingModal } from "@/components/booking-modal";
+import { getCurrentUserFromServer } from "@/lib/auth";
 
 interface TutorProfile {
   id: string;
@@ -43,9 +44,10 @@ export default async function TutorDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [tutor, reviews] = await Promise.all([
+  const [tutor, reviews, currentUser] = await Promise.all([
     getCourseById(id) as Promise<TutorProfile | null>,
     getTutorReviewsAction(id),
+    getCurrentUserFromServer(),
   ]);
 
   if (!tutor) {
@@ -197,7 +199,7 @@ export default async function TutorDetailPage({
             </div>
           )}
 
-          <BookingModal trainerId={tutorId} trainerName={tutorName} price={tutor.price ?? 0} />
+          <BookingModal trainerId={tutorId} trainerName={tutorName} price={tutor.price ?? 0} userRole={currentUser?.role} />
 
           <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
             <li className="flex items-center gap-2">
