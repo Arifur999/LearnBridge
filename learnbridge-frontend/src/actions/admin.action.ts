@@ -127,3 +127,34 @@ export const getAdminAnalyticsAction = async () => {
     return { data: null, error: error instanceof Error ? error.message : "Failed" };
   }
 };
+
+export const getAllTutorsAdminAction = async () => {
+  try {
+    const res = await tutorService.getAllTutors();
+    return { data: res.data ?? [], error: null };
+  } catch (error) {
+    return { data: [], error: error instanceof Error ? error.message : "Failed" };
+  }
+};
+
+export const addFeaturedTutorAction = async (tutorId: string) => {
+  try {
+    await tutorService.updateFeaturedTutor(tutorId, true);
+    revalidatePath("/admin/tutors");
+    revalidatePath("/admin/featured");
+    return { success: true, message: "Tutor added to featured" };
+  } catch (error) {
+    return { success: false, message: error instanceof Error ? error.message : "Failed" };
+  }
+};
+
+export const deleteTutorAction = async (tutorId: string) => {
+  try {
+    await tutorService.deleteTutor(tutorId);
+    revalidatePath("/admin/tutors");
+    revalidatePath("/admin/users");
+    return { success: true, message: "Tutor deleted successfully" };
+  } catch (error) {
+    return { success: false, message: error instanceof Error ? error.message : "Failed" };
+  }
+};

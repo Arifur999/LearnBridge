@@ -104,6 +104,21 @@ class TutorService {
     return data;
   }
 
+  async deleteTutor(tutorId: string) {
+    const headers = await getAuthHeaders();
+    for (const url of [
+      `${API_V1_URL}/admin/users/${tutorId}`,
+      `${API_V1_URL}/admin/tutors/${tutorId}`,
+    ]) {
+      const res = await fetch(url, { method: "DELETE", headers, cache: "no-store" });
+      if (res.status === 404) continue;
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.message || "Delete failed");
+      return data;
+    }
+    throw new Error("Delete endpoint not found");
+  }
+
   private async safeJson(res: Response) {
     const text = await res.text();
     if (text.trimStart().startsWith("<")) {
