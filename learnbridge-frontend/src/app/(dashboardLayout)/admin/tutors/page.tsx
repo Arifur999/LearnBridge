@@ -38,11 +38,16 @@ export default async function AdminTutorsPage() {
     tutorService.getFeaturedTutors(),
   ]);
 
-  const featuredIds = new Set(
-    (Array.isArray(featuredRaw) ? featuredRaw : []).map(
-      (t) => str(rec(t).id) ?? ""
-    )
-  );
+  // collect both profile IDs and user IDs of featured tutors
+  const featuredIds = new Set<string>();
+  const featuredUserIds = new Set<string>();
+  for (const t of (Array.isArray(featuredRaw) ? featuredRaw : [])) {
+    const tr = rec(t);
+    const pid = str(tr.id) ?? "";
+    const uid = str(tr.userId ?? rec(tr.user).id) ?? "";
+    if (pid) featuredIds.add(pid);
+    if (uid) featuredUserIds.add(uid);
+  }
 
   // Build email → user record map from admin/users (for userId lookup)
   const emailToUser = new Map<string, R>();
@@ -72,9 +77,11 @@ export default async function AdminTutorsPage() {
     const email = str(raw.email ?? user.email ?? "") ;
 
     // Try to find matching admin user to get userId
-    const matchedUser = (userId && idToUser.get(userId))
-      ?? (email && emailToUser.get(email.toLowerCase()))
-      ?? {};
+    const matchedUser: R = rec(
+      (userId && idToUser.get(userId)) ??
+      (email && emailToUser.get(email.toLowerCase())) ??
+      {}
+    );
 
     const resolvedUserId = userId || str(matchedUser.id ?? matchedUser._id) || profileId;
 
@@ -95,7 +102,7 @@ export default async function AdminTutorsPage() {
       subjects: Array.isArray(raw.subjects) ? (raw.subjects as string[]) : [],
       profileImage: str(raw.profileImage ?? raw.image ?? user.profileImage ?? user.image),
       bio: str(raw.bio ?? raw.about ?? raw.description),
-      isFeatured: featuredIds.has(profileId),
+      isFeatured: featuredIds.has(profileId) || featuredUserIds.has(resolvedUserId),
     });
   }
 
@@ -119,7 +126,7 @@ export default async function AdminTutorsPage() {
       userId: uid,
       name: str(u.name) ?? "Tutor",
       email: email || undefined,
-      isFeatured: false,
+      isFeatured: featuredIds.has(uid) || featuredUserIds.has(uid),
     });
   }
 
