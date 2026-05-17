@@ -82,7 +82,17 @@ class DashboardService {
 
   async getAdminUsers() {
     try {
-      return toArray(await safeFetch("/admin/users"));
+      const raw = await safeFetch("/admin/users");
+      const root = isRecord(raw) ? raw : {};
+      const inner = isRecord(root.data) ? root.data : root;
+      // handle: { data: [...] }, { data: { data: [...] } }, { data: { users: [...] } }, etc.
+      for (const key of ["data", "users", "items", "result", "list"]) {
+        if (Array.isArray((inner as Record<string, unknown>)[key])) {
+          return ((inner as Record<string, unknown>)[key] as unknown[]).filter(isRecord);
+        }
+      }
+      if (Array.isArray(inner)) return (inner as unknown[]).filter(isRecord);
+      return toArray(raw);
     } catch {
       return [];
     }
@@ -97,10 +107,16 @@ class DashboardService {
   }
 
   async updateUserStatus(userId: string, status: string) {
-    return await safeFetch(`/admin/users/${userId}`, {
-      method: "PATCH",
-      body: JSON.stringify({ status }),
-    });
+    const paths = [`/admin/users/${userId}/status`, `/admin/users/${userId}`];
+    let lastErr: unknown;
+    for (const path of paths) {
+      try {
+        return await safeFetch(path, { method: "PATCH", body: JSON.stringify({ status }) });
+      } catch (err) {
+        lastErr = err;
+      }
+    }
+    throw lastErr;
   }
 
   async updateTutorProfile(payload: ApiRecord) {

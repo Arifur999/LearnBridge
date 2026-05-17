@@ -21,7 +21,8 @@ import {
 import { addFeaturedTutorAction, deleteTutorAction } from "@/actions/admin.action";
 
 export interface AdminTutor {
-  id: string;
+  id: string;        // tutor profile id (for featured)
+  userId?: string;   // user account id (for delete/ban)
   name: string;
   email?: string;
   category?: string;
@@ -157,7 +158,8 @@ function TutorRow({ tutor, onDeleted }: { tutor: AdminTutor; onDeleted: (id: str
 
   const handleDelete = () => {
     startTransition(async () => {
-      const res = await deleteTutorAction(tutor.id);
+      // use userId (user account id) for delete; fallback to profile id
+      const res = await deleteTutorAction(tutor.userId ?? tutor.id);
       if (res.success) {
         toast.success(`${tutor.name} deleted`);
         setDeleteOpen(false);

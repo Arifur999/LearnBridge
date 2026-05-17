@@ -85,7 +85,8 @@ class TutorService {
       });
       if (!res.ok) return [];
       const data = await res.json();
-      return data?.data ?? data ?? [];
+      const list = data?.data ?? data ?? [];
+      return Array.isArray(list) ? list : [];
     } catch {
       return [];
     }
@@ -93,30 +94,39 @@ class TutorService {
 
   async updateFeaturedTutor(tutorId: string, isFeatured: boolean) {
     const headers = await getAuthHeaders();
-    const res = await fetch(`${API_V1_URL}/admin/featured-tutors/${tutorId}`, {
-      method: "PATCH",
-      headers,
-      body: JSON.stringify({ isFeatured }),
-      cache: "no-store",
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.message || "Update failed");
-    return data;
+    if (isFeatured) {
+      // POST /admin/featured-tutors/:tutorId
+      const res = await fetch(`${API_V1_URL}/admin/featured-tutors/${tutorId}`, {
+        method: "POST",
+        headers,
+        cache: "no-store",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error((data as Record<string, unknown>)?.message as string || "Failed to add featured");
+      return data;
+    } else {
+      // DELETE /admin/featured-tutors/:tutorId
+      const res = await fetch(`${API_V1_URL}/admin/featured-tutors/${tutorId}`, {
+        method: "DELETE",
+        headers,
+        cache: "no-store",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error((data as Record<string, unknown>)?.message as string || "Failed to remove featured");
+      return data;
+    }
   }
 
   async deleteTutor(tutorId: string) {
     const headers = await getAuthHeaders();
-    for (const url of [
-      `${API_V1_URL}/admin/users/${tutorId}`,
-      `${API_V1_URL}/admin/tutors/${tutorId}`,
-    ]) {
-      const res = await fetch(url, { method: "DELETE", headers, cache: "no-store" });
-      if (res.status === 404) continue;
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data?.message || "Delete failed");
-      return data;
-    }
-    throw new Error("Delete endpoint not found");
+    const res = await fetch(`${API_V1_URL}/admin/users/${tutorId}`, {
+      method: "DELETE",
+      headers,
+      cache: "no-store",
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error((data as Record<string, unknown>)?.message as string || "Delete failed");
+    return data;
   }
 
   private async safeJson(res: Response) {

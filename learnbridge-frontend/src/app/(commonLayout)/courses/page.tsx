@@ -67,6 +67,7 @@ export default async function CoursesPage({
     getAllCourses(`?${params.toString()}`),
     getCategories(),
   ]);
+  
 
   const courses: Course[] = result?.data ?? [];
   const meta = isPaginationMeta(result?.meta) ? result.meta : null;
