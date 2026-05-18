@@ -37,11 +37,11 @@ export default async function CoursesPage({
     category?: string;
     minPrice?: string;
     maxPrice?: string;
+    sort?: string;
     page?: string;
   }>;
 }) {
- 
-  const { search, category, minPrice, maxPrice, page: pageQuery } = await searchParams;
+  const { search, category, minPrice, maxPrice, sort, page: pageQuery } = await searchParams;
 
   const page = Number(pageQuery) || 1;
   const limit = 9;
@@ -61,6 +61,9 @@ export default async function CoursesPage({
   }
   if (maxPrice) {
     params.set("maxPrice", maxPrice);
+  }
+  if (sort) {
+    params.set("sort", sort);
   }
 
   const [result, categories] = await Promise.all([

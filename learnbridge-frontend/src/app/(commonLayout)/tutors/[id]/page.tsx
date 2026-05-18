@@ -3,6 +3,8 @@ import { getCourseById } from "@/actions/course.action";
 import { getTutorReviewsAction } from "@/actions/review.action";
 import { BookingModal } from "@/components/booking-modal";
 import { getCurrentUserFromServer } from "@/lib/auth";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface TutorProfile {
   id: string;
@@ -64,7 +66,8 @@ export default async function TutorDetailPage({
   const tutorId   = tutor.trainer?.id ?? tutor.id;
   const subjects  = Array.isArray(tutor.subjects) ? tutor.subjects : [];
   const userRole  = (currentUser?.role ?? "").toLowerCase();
-  const isStudent = userRole === "student" || userRole === "";
+  const isLoggedIn = !!currentUser;
+  const isStudent = isLoggedIn && userRole === "student";
   const avgRating =
     typeof tutor.rating === "number"
       ? tutor.rating
@@ -187,8 +190,8 @@ export default async function TutorDetailPage({
           </div>
         </div>
 
-        {/* RIGHT: Booking card — students only */}
-        {isStudent && (
+        {/* RIGHT: Booking card — students only; sign-in prompt for guests */}
+        {isStudent ? (
           <div className="h-fit rounded-2xl border bg-background p-6 lg:sticky lg:top-24">
             <p className="mb-1 text-3xl font-bold text-primary">
               {tutor.price ? `BDT ${tutor.price}` : "Free"}
@@ -216,7 +219,20 @@ export default async function TutorDetailPage({
               </li>
             </ul>
           </div>
-        )}
+        ) : !isLoggedIn ? (
+          <div className="h-fit rounded-2xl border bg-background p-6 lg:sticky lg:top-24 text-center">
+            <p className="mb-1 text-3xl font-bold text-primary">
+              {tutor.price ? `BDT ${tutor.price}` : "Free"}
+            </p>
+            <p className="mb-4 text-sm text-muted-foreground">per session</p>
+            <p className="mb-4 text-sm text-muted-foreground">
+              Sign in as a student to book a session with this tutor.
+            </p>
+            <Button asChild size="lg" className="w-full">
+              <Link href={`/login?returnUrl=/tutors/${tutor.id}`}>Sign In to Book</Link>
+            </Button>
+          </div>
+        ) : null}
       </div>
     </section>
   );

@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowUpDown, Search } from "lucide-react";
-
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -34,58 +33,53 @@ export default function CoursesFilter({
   const [category, setCategory] = useState(searchParams.get("category") || "all");
   const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") || "");
   const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "");
+  const [sort, setSort] = useState(searchParams.get("sort") || "newest");
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      const params = new URLSearchParams(searchParams.toString());
+      const params = new URLSearchParams();
 
-      if (search.trim()) {
-        params.set("search", search.trim());
-      } else {
-        params.delete("search");
-      }
+      if (search.trim()) params.set("search", search.trim());
+      if (category && category !== "all") params.set("category", category);
+      if (minPrice.trim()) params.set("minPrice", minPrice.trim());
+      if (maxPrice.trim()) params.set("maxPrice", maxPrice.trim());
+      if (sort && sort !== "newest") params.set("sort", sort);
 
-      if (category && category !== "all") {
-        params.set("category", category);
-      } else {
-        params.delete("category");
-      }
-
-      if (minPrice.trim()) {
-        params.set("minPrice", minPrice.trim());
-      } else {
-        params.delete("minPrice");
-      }
-
-      if (maxPrice.trim()) {
-        params.set("maxPrice", maxPrice.trim());
-      } else {
-        params.delete("maxPrice");
-      }
-
-      params.delete("page");
       router.push(`${basePath}?${params.toString()}`);
     }, 400);
 
     return () => clearTimeout(timeout);
-  }, [search, category, minPrice, maxPrice, router, searchParams, basePath]);
+  }, [search, category, minPrice, maxPrice, sort, router, basePath]);
 
   return (
     <div className="mb-10 rounded-xl border bg-background p-4 shadow-sm">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        {/* Search */}
         <div className="relative w-full md:max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search tutors or subjects..."
+            placeholder="Search by title or description..."
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
           />
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <ArrowUpDown className="hidden h-4 w-4 text-muted-foreground sm:block" />
+          {/* Sort */}
+          <Select value={sort} onValueChange={setSort}>
+            <SelectTrigger className="w-full sm:w-[160px]">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="newest">Newest</SelectItem>
+              <SelectItem value="oldest">Oldest</SelectItem>
+              <SelectItem value="price-asc">Price: Low → High</SelectItem>
+              <SelectItem value="price-desc">Price: High → Low</SelectItem>
+            </SelectContent>
+          </Select>
 
+          {/* Category */}
           <Select value={category} onValueChange={setCategory}>
             <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Category" />
@@ -94,9 +88,8 @@ export default function CoursesFilter({
               <SelectItem value="all">All categories</SelectItem>
               {categories.map((item) => {
                 const label = item.name ?? item.title ?? "Category";
-                const value = item.id ?? item._id ?? label;
                 return (
-                  <SelectItem key={value} value={value}>
+                  <SelectItem key={item.id ?? item._id ?? label} value={label}>
                     {label}
                   </SelectItem>
                 );
@@ -104,21 +97,21 @@ export default function CoursesFilter({
             </SelectContent>
           </Select>
 
+          {/* Price range */}
           <Input
             type="number"
             min="0"
             placeholder="Min price"
             value={minPrice}
-            onChange={(event) => setMinPrice(event.target.value)}
+            onChange={(e) => setMinPrice(e.target.value)}
             className="w-full sm:w-28"
           />
-
           <Input
             type="number"
             min="0"
             placeholder="Max price"
             value={maxPrice}
-            onChange={(event) => setMaxPrice(event.target.value)}
+            onChange={(e) => setMaxPrice(e.target.value)}
             className="w-full sm:w-28"
           />
         </div>
