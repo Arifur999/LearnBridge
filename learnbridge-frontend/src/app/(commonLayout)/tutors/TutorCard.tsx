@@ -99,7 +99,7 @@ const TutorCard = ({
         {/* Price + CTA */}
         <div className="flex items-center justify-between">
           <span className="text-sm font-bold text-primary">
-            {price ? `BDT ${price}/session` : "Free"}
+            {price != null && price > 0 ? `BDT ${price}/session` : price === 0 ? "Free" : ""}
           </span>
           <span className="flex items-center gap-1 text-xs font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
             <GraduationCap className="size-3.5" />
