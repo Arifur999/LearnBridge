@@ -63,6 +63,8 @@ export default async function TutorDetailPage({
   const tutorName = tutor.trainer?.name ?? tutor.title;
   const tutorId   = tutor.trainer?.id ?? tutor.id;
   const subjects  = Array.isArray(tutor.subjects) ? tutor.subjects : [];
+  const userRole  = (currentUser?.role ?? "").toLowerCase();
+  const isStudent = userRole === "student" || userRole === "";
   const avgRating =
     typeof tutor.rating === "number"
       ? tutor.rating
@@ -185,34 +187,36 @@ export default async function TutorDetailPage({
           </div>
         </div>
 
-        {/* RIGHT: Booking card */}
-        <div className="h-fit rounded-2xl border bg-background p-6 lg:sticky lg:top-24">
-          <p className="mb-1 text-3xl font-bold text-primary">
-            {tutor.price ? `BDT ${tutor.price}` : "Free"}
-          </p>
-          <p className="mb-4 text-sm text-muted-foreground">per session</p>
+        {/* RIGHT: Booking card — students only */}
+        {isStudent && (
+          <div className="h-fit rounded-2xl border bg-background p-6 lg:sticky lg:top-24">
+            <p className="mb-1 text-3xl font-bold text-primary">
+              {tutor.price ? `BDT ${tutor.price}` : "Free"}
+            </p>
+            <p className="mb-4 text-sm text-muted-foreground">per session</p>
 
-          {avgRating !== null && (
-            <div className="mb-4 flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-2">
-              <StarDisplay rating={avgRating} />
-              <span className="text-sm font-medium text-amber-700">{avgRating.toFixed(1)}/5.0</span>
-            </div>
-          )}
+            {avgRating !== null && (
+              <div className="mb-4 flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-2">
+                <StarDisplay rating={avgRating} />
+                <span className="text-sm font-medium text-amber-700">{avgRating.toFixed(1)}/5.0</span>
+              </div>
+            )}
 
-          <BookingModal trainerId={tutorId} trainerName={tutorName} price={tutor.price ?? 0} userRole={currentUser?.role} />
+            <BookingModal trainerId={tutorId} trainerName={tutorName} price={tutor.price ?? 0} />
 
-          <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
-            <li className="flex items-center gap-2">
-              <CheckCircle className="size-4 text-primary" /> Confirmed instantly
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle className="size-4 text-primary" /> Manage from dashboard
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle className="size-4 text-primary" /> Leave a review after session
-            </li>
-          </ul>
-        </div>
+            <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
+              <li className="flex items-center gap-2">
+                <CheckCircle className="size-4 text-primary" /> Confirmed instantly
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle className="size-4 text-primary" /> Manage from dashboard
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle className="size-4 text-primary" /> Leave a review after session
+              </li>
+            </ul>
+          </div>
+        )}
       </div>
     </section>
   );

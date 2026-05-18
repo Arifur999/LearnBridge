@@ -27,18 +27,14 @@ interface BookingModalProps {
   trainerId: string;
   trainerName: string;
   price?: number;
-  userRole?: string;
 }
 
-export function BookingModal({ trainerId, trainerName, price = 0, userRole }: BookingModalProps) {
+export function BookingModal({ trainerId, trainerName, price = 0 }: BookingModalProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [slots, setSlots] = useState<Slot[]>([]);
   const [loading, setLoading] = useState(false);
   const [redirectingSlot, setRedirectingSlot] = useState<string | null>(null);
-
-  const role = (userRole ?? "").toLowerCase();
-  const isRestricted = role === "admin" || role === "tutor" || role === "trainer";
 
   useEffect(() => {
     if (isOpen && trainerId) {
@@ -65,21 +61,6 @@ export function BookingModal({ trainerId, trainerName, price = 0, userRole }: Bo
 
     router.push(`/payments/checkout?${params.toString()}`);
   };
-
-  if (isRestricted) {
-    return (
-      <div className="group relative w-full mt-2">
-        <Button size="lg" className="w-full gap-2 cursor-not-allowed opacity-50" disabled>
-          <CreditCard className="size-4" />
-          Book Session with {trainerName}
-        </Button>
-        <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-foreground px-3 py-1.5 text-xs text-background opacity-0 shadow-md transition-opacity group-hover:opacity-100">
-          Only students can book sessions
-          <div className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-foreground" />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
