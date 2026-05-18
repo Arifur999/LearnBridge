@@ -162,14 +162,20 @@ class CourseService {
           return {
             data: list.map((t) => {
               const tutor = asRecord(t);
+              const subjectsRaw = tutor.subjects;
+              const subjectsArr = Array.isArray(subjectsRaw)
+                ? (subjectsRaw as string[])
+                : typeof subjectsRaw === "string" && subjectsRaw.trim()
+                  ? subjectsRaw.split(",").map((s) => s.trim()).filter(Boolean)
+                  : [];
               return {
                 id: asString(tutor.id) ?? "",
                 title: asString(tutor.name) ?? "Tutor",
                 description: asString(tutor.bio) ?? asString(tutor.about) ?? "Expert tutor",
                 price: asNumber(tutor.hourlyRate) ?? asNumber(tutor.sessionFee),
-                category: asString(tutor.subject) ?? asString(tutor.specialty) ?? "",
+                category: asString(tutor.subjects)?.split(",")[0]?.trim() ?? asString(tutor.subject) ?? asString(tutor.specialty) ?? "",
                 rating: typeof tutor.avgRating === "number" ? tutor.avgRating : undefined,
-                subjects: Array.isArray(tutor.subjects) ? (tutor.subjects as string[]) : [],
+                subjects: subjectsArr,
                 profileImage: asString(tutor.profileImage) ?? asString(tutor.image),
               };
             }),
