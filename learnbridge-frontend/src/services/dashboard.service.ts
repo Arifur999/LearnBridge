@@ -122,14 +122,10 @@ class DashboardService {
   async updateTutorProfile(payload: ApiRecord) {
     // Backend uses "TRAINER" role → routes are /trainer/*, not /tutor/*
     const attempts: { method: "PATCH" | "PUT" | "POST"; path: string }[] = [
-      { method: "PATCH", path: "/trainer/profile" },
-      { method: "PUT",   path: "/trainer/profile" },
-      { method: "POST",  path: "/trainer/profile" },
-      { method: "PATCH", path: "/tutor/profile" },
-      { method: "PUT",   path: "/tutor/profile" },
-      { method: "POST",  path: "/tutor/profile" },
+      { method: "PUT",   path: "/tutors/profile/me" },
       { method: "PATCH", path: "/tutors/profile/me" },
-      { method: "POST",  path: "/tutors/profile" },
+      { method: "PUT",   path: "/tutor/profile/me" },
+      { method: "PATCH", path: "/tutor/profile/me" },
     ];
     const errors: string[] = [];
     for (const { method, path } of attempts) {

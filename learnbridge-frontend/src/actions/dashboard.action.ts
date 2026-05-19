@@ -39,13 +39,11 @@ export const updateTutorProfileAction = async (
 ): Promise<{ success: boolean; message: string }> => {
   try {
     const rawSubjects = formData.get("subjects")?.toString().trim() ?? "";
-    // Backend expects an array of subject strings
-    const subjectsArray = rawSubjects
-      ? rawSubjects.split(",").map((s) => s.trim()).filter(Boolean)
-      : [];
+    // Backend stores subjects as a comma-separated string
+    const subjectsStr = rawSubjects
+      .split(",").map((s) => s.trim()).filter(Boolean).join(", ");
 
     const categoryRaw = formData.get("category")?.toString() ?? "";
-    const categoryIdRaw = formData.get("categoryId")?.toString() ?? "";
     const profileImage = formData.get("profileImage")?.toString() || undefined;
 
     const hourlyRate = Number(formData.get("hourlyRate") || 0);
@@ -53,17 +51,11 @@ export const updateTutorProfileAction = async (
 
     const payload: Record<string, unknown> = {};
 
-    // Only send non-empty values to avoid backend validation errors
     if (bio) payload.bio = bio;
     if (hourlyRate > 0) payload.hourlyRate = hourlyRate;
-    if (subjectsArray.length > 0) payload.subjects = subjectsArray;
-    if (categoryIdRaw) payload.categoryId = categoryIdRaw;
+    if (subjectsStr) payload.subjects = subjectsStr;
     if (categoryRaw) payload.category = categoryRaw;
-    // backend may use "image" or "profileImage" — send both
-    if (profileImage) {
-      payload.image = profileImage;
-      payload.profileImage = profileImage;
-    }
+    if (profileImage) payload.profileImage = profileImage;
 
     await dashboardService.updateTutorProfile(payload);
     revalidatePath("/tutor/profile");
