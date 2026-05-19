@@ -51,8 +51,22 @@ function CheckoutInner() {
   }
 
   const handlePay = () => {
-    if (!name.trim() || cardNumber.replace(/\s/g, "").length < 16 || expiry.length < 5 || cvv.length < 3) {
-      toast.error("Please fill in all card details correctly.");
+    const rawCard = cardNumber.replace(/\s/g, "");
+
+    if (!name.trim()) {
+      toast.error("Please enter the name on card.");
+      return;
+    }
+    if (rawCard.length < 16) {
+      toast.error("Card number must be 16 digits.");
+      return;
+    }
+    if (expiry.length < 5) {
+      toast.error("Please enter a valid expiry date (MM/YY).");
+      return;
+    }
+    if (cvv.length < 3) {
+      toast.error("CVV must be at least 3 digits.");
       return;
     }
 
@@ -136,11 +150,6 @@ function CheckoutInner() {
                       disabled={isPending}
                     />
                   </div>
-                </div>
-
-                <div className="rounded-xl border border-dashed bg-muted/30 p-3 text-xs text-muted-foreground">
-                  <p className="font-medium text-foreground">Test Card Details</p>
-                  <p>Card: 4242 4242 4242 4242 &nbsp;·&nbsp; Expiry: 12/28 &nbsp;·&nbsp; CVV: 123</p>
                 </div>
 
                 <Button
