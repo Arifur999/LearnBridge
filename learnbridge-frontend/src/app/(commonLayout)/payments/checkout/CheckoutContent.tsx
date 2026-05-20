@@ -8,7 +8,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { bookSlotAction } from "@/actions/booking.action";
+import { chargeCardAction, bookAndPayAction } from "@/actions/booking.action";
 
 const formatCardNumber = (value: string) =>
   value
@@ -38,6 +38,9 @@ function CheckoutInner() {
   const [cvv, setCvv] = useState("");
   const [name, setName] = useState("");
   const [isPending, startTransition] = useTransition();
+  const [isStripeLoading, setIsStripeLoading] = useState(false);
+
+  const priceNum = parseFloat(price);
 
   if (!slotId) {
     return (
@@ -49,6 +52,31 @@ function CheckoutInner() {
       </div>
     );
   }
+
+  if (priceNum <= 0) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-center">
+        <p className="text-lg font-semibold text-destructive">Session price not set</p>
+        <p className="text-sm text-muted-foreground">
+          This tutor has not set their hourly rate yet. Please contact them or choose another tutor.
+        </p>
+        <Button asChild variant="outline">
+          <Link href="/tutors">Back to Tutors</Link>
+        </Button>
+      </div>
+    );
+  }
+
+  const handleStripePay = async () => {
+    setIsStripeLoading(true);
+    const result = await bookAndPayAction(slotId);
+    if (!result.success) {
+      toast.error(result.message ?? "Payment setup failed.");
+      setIsStripeLoading(false);
+      return;
+    }
+    window.location.href = result.stripeUrl;
+  };
 
   const handlePay = () => {
     const rawCard = cardNumber.replace(/\s/g, "");
@@ -70,8 +98,20 @@ function CheckoutInner() {
       return;
     }
 
+    // Parse expiry MM/YY
+    const [expMonthStr, expYearStr] = expiry.split("/");
+    const expMonth = Number(expMonthStr);
+    const expYear = 2000 + Number(expYearStr);
+
     startTransition(async () => {
-      const result = await bookSlotAction(slotId);
+      const result = await chargeCardAction({
+        slotId,
+        cardNumber: rawCard,
+        expMonth,
+        expYear,
+        cvc: cvv,
+      });
+
       if (result.success) {
         router.push(
           `/payments/success?tutorName=${encodeURIComponent(tutorName)}&price=${price}&date=${encodeURIComponent(date)}&startTime=${encodeURIComponent(startTime)}&endTime=${encodeURIComponent(endTime)}`
@@ -173,6 +213,31 @@ function CheckoutInner() {
 
                 <Button size="lg" variant="ghost" className="w-full" asChild disabled={isPending}>
                   <Link href="/payments/cancel">Cancel</Link>
+                </Button>
+
+                <div className="relative flex items-center gap-3 py-1">
+                  <div className="flex-1 border-t" />
+                  <span className="text-xs text-muted-foreground">or</span>
+                  <div className="flex-1 border-t" />
+                </div>
+
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full gap-2 border-[#635bff] text-[#635bff] hover:bg-[#635bff]/5"
+                  onClick={handleStripePay}
+                  disabled={isPending || isStripeLoading}
+                  type="button"
+                >
+                  {isStripeLoading ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <svg className="size-4" viewBox="0 0 28 28" fill="none">
+                      <path d="M13.986 0C6.262 0 0 6.262 0 13.986c0 7.725 6.262 13.987 13.986 13.987 7.725 0 13.987-6.262 13.987-13.987C27.973 6.262 21.711 0 13.986 0z" fill="#635bff"/>
+                      <path d="M12.508 11.26c0-.682.56-1.036 1.398-1.036.73 0 1.42.17 2.07.456V8.37a7.87 7.87 0 00-2.07-.271c-2.134 0-3.554 1.116-3.554 2.98 0 2.91 4.004 2.444 4.004 3.696 0 .806-.7 1.064-1.584 1.064-.9 0-1.756-.234-2.538-.62v2.36c.838.362 1.684.51 2.538.51 2.194 0 3.698-1.084 3.698-2.974 0-3.138-4.018-2.58-4.018-3.856h.056z" fill="#fff"/>
+                    </svg>
+                  )}
+                  Pay with Stripe
                 </Button>
               </div>
             </div>

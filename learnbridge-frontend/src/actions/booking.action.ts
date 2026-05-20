@@ -22,6 +22,30 @@ export const bookSlotAction = async (payload: string | BookSessionPayload) => {
   }
 };
 
+// Pay with custom card form — Stripe validates card server-side
+export const chargeCardAction = async (payload: {
+  slotId: string;
+  cardNumber: string;
+  expMonth: number;
+  expYear: number;
+  cvc: string;
+}): Promise<{ success: true; bookingId: string } | { success: false; message: string }> => {
+  try {
+    const headers = await getAuthHeaders();
+    const res = await fetch(`${API_V1_URL}/payments/pay`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+      cache: "no-store",
+    });
+    const data = await res.json();
+    if (!res.ok) return { success: false, message: data?.message ?? "Payment failed" };
+    return { success: true, bookingId: data?.data?.bookingId ?? "" };
+  } catch (err) {
+    return { success: false, message: err instanceof Error ? err.message : "Payment failed" };
+  }
+};
+
 // Book slot then create Stripe checkout session — returns Stripe payment URL
 export const bookAndPayAction = async (slotId: string): Promise<
   { success: true; stripeUrl: string } | { success: false; message: string }

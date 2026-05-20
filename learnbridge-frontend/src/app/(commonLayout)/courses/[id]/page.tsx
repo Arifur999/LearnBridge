@@ -188,46 +188,45 @@ export default async function CourseDetailsPage({
           </div>
         </div>
 
-        {/* RIGHT: Booking card — students only */}
-        {isStudent ? (
-          <div className="h-fit rounded-2xl border bg-background p-6 lg:sticky lg:top-24">
-            <p className="mb-1 text-3xl font-bold text-primary">
-              {tutor.price ? `BDT ${tutor.price}` : "Free"}
-            </p>
-            <p className="mb-4 text-sm text-muted-foreground">per session</p>
+        {/* RIGHT: Booking card */}
+        <div className="h-fit rounded-2xl border bg-background p-6 lg:sticky lg:top-24">
+          <p className="mb-1 text-3xl font-bold text-primary">
+            {tutor.price ? `BDT ${tutor.price}` : "Free"}
+          </p>
+          <p className="mb-4 text-sm text-muted-foreground">per session</p>
 
-            {avgRating !== null && (
-              <div className="mb-4 flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-2">
-                <StarDisplay rating={avgRating} />
-                <span className="text-sm font-medium text-amber-700">{avgRating.toFixed(1)}/5.0</span>
-              </div>
-            )}
+          {avgRating !== null && isStudent && (
+            <div className="mb-4 flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-2">
+              <StarDisplay rating={avgRating} />
+              <span className="text-sm font-medium text-amber-700">{avgRating.toFixed(1)}/5.0</span>
+            </div>
+          )}
 
-            <BookingModal trainerId={tutorId} trainerName={tutorName} price={tutor.price ?? 0} />
-
-            <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-center gap-2">
-                <CheckCircle className="size-4 text-primary" /> Confirmed instantly
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle className="size-4 text-primary" /> Manage from dashboard
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle className="size-4 text-primary" /> Leave a review after session
-              </li>
-            </ul>
-          </div>
-        ) : (
-          <div className="h-fit rounded-2xl border bg-background p-6 lg:sticky lg:top-24">
-            <p className="mb-1 text-3xl font-bold text-primary">
-              {tutor.price ? `BDT ${tutor.price}` : "Free"}
+          {isStudent ? (
+            <>
+              <BookingModal trainerId={tutorId} trainerName={tutorName} price={tutor.price ?? 0} />
+              <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="size-4 text-primary" /> Confirmed instantly
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="size-4 text-primary" /> Manage from dashboard
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="size-4 text-primary" /> Leave a review after session
+                </li>
+              </ul>
+            </>
+          ) : (
+            <p className="mt-2 rounded-xl bg-muted/50 px-4 py-3 text-sm text-muted-foreground">
+              {userRole === "trainer" || userRole === "tutor"
+                ? "Tutors cannot book sessions."
+                : userRole === "admin"
+                  ? "Admins cannot book sessions."
+                  : "Sign in as a student to book a session."}
             </p>
-            <p className="mb-4 text-sm text-muted-foreground">per session</p>
-            <p className="text-sm text-muted-foreground">
-              Only students can book a session.
-            </p>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </section>
   );

@@ -13,7 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { getTrainerSlots, bookAndPayAction } from "@/actions/booking.action";
+import { getTrainerSlots } from "@/actions/booking.action";
 
 interface Slot {
   id: string;
@@ -46,20 +46,20 @@ export function BookingModal({ trainerId, trainerName, price = 0 }: BookingModal
     }
   }, [isOpen, trainerId]);
 
-  const handleBook = async (slot: Slot) => {
+  const handleBook = (slot: Slot) => {
     setRedirectingSlot(slot.id);
-    toast.info("Setting up secure payment…");
+    toast.info("Redirecting to payment…");
 
-    const result = await bookAndPayAction(slot.id);
+    const params = new URLSearchParams({
+      slotId: slot.id,
+      tutorName: trainerName,
+      price: String(price),
+      date: slot.date,
+      startTime: slot.startTime,
+      endTime: slot.endTime,
+    });
 
-    if (!result.success) {
-      toast.error(result.message ?? "Payment setup failed.");
-      setRedirectingSlot(null);
-      return;
-    }
-
-    // Redirect to Stripe's hosted payment page
-    window.location.href = result.stripeUrl;
+    router.push(`/payments/checkout?${params.toString()}`);
   };
 
   return (
