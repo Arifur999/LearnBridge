@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import CancelBookingButton from "@/components/cancel-booking-button";
 import DashPageHeader from "@/components/layout/DashPageHeader";
-import { formatTime, formatDay } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import ReviewForm from "@/components/review-form";
 
 const statusVariant: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
   CONFIRMED: "default",
@@ -46,18 +46,22 @@ export default async function DashboardBookingsPage() {
       ) : (
         <div className="space-y-3">
           {list.map((booking, idx) => {
-            const id = String((booking as Record<string, unknown>)?.id ?? (booking as Record<string, unknown>)?._id ?? idx);
             const b = booking as Record<string, unknown>;
-            const tutor = b?.tutor as Record<string, unknown> | undefined;
-            const tutorUser = tutor?.user as Record<string, unknown> | undefined;
-            const tutorName = String(tutorUser?.name ?? tutor?.name ?? b?.tutorName ?? "Tutor");
-            const avail = b?.availability as Record<string, unknown> | undefined;
-            const day = avail?.day ? formatDay(String(avail.day)) : "";
-            const start = avail?.startTime ? formatTime(String(avail.startTime)) : "";
-            const end = avail?.endTime ? formatTime(String(avail.endTime)) : "";
+            const id = String(b?.id ?? b?._id ?? idx);
             const status = String(b?.status ?? "PENDING").toUpperCase();
             const isCancelled = status === "CANCELLED";
-            const isCompleted = status === "COMPLETED";
+
+            // Backend returns: booking.slot.trainer (not booking.tutor)
+            const slot = b?.slot as Record<string, unknown> | undefined;
+            const trainer = slot?.trainer as Record<string, unknown> | undefined;
+            const tutorId = String(trainer?.id ?? "");
+            const tutorName = String(trainer?.name ?? "Tutor");
+            const date = slot?.date ? new Date(String(slot.date)).toDateString() : "";
+            const startTime = String(slot?.startTime ?? "");
+            const endTime = String(slot?.endTime ?? "");
+
+            const hasReview = !!(b?.review);
+            const canReview = !isCancelled && tutorId && !hasReview;
 
             return (
               <div key={id} className="rounded-2xl border bg-background p-5 shadow-sm">
@@ -69,20 +73,28 @@ export default async function DashboardBookingsPage() {
                         {status}
                       </Badge>
                     </div>
-                    {day && (
+                    {date && (
                       <p className="text-sm text-muted-foreground">
-                        {day}{start ? ` • ${start}${end ? ` – ${end}` : ""}` : ""}
+                        {date}{startTime ? ` • ${startTime}${endTime ? ` – ${endTime}` : ""}` : ""}
                       </p>
                     )}
                     {b?.price != null && (
-                      <p className="text-sm font-medium">${String(b.price)}</p>
+                      <p className="text-sm font-medium">BDT {String(b.price)}</p>
                     )}
                   </div>
-                  <div className="flex gap-2">
+
+                  <div className="flex flex-wrap gap-2">
                     <Button asChild size="sm" variant="outline">
                       <Link href={`/dashboard/bookings/${id}`}>View Details</Link>
                     </Button>
-                    {!isCompleted && !isCancelled && (
+                    {canReview && (
+                      <ReviewForm
+                        tutorId={tutorId}
+                        tutorName={tutorName}
+                        bookingId={id}
+                      />
+                    )}
+                    {!isCancelled && (
                       <CancelBookingButton bookingId={id} />
                     )}
                   </div>

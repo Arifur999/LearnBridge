@@ -93,15 +93,27 @@ function CheckoutInner() {
       toast.error("Please enter a valid expiry date (MM/YY).");
       return;
     }
+
+    // Parse and validate expiry MM/YY
+    const [expMonthStr, expYearStr] = expiry.split("/");
+    const expMonth = Number(expMonthStr);
+    const expYear = 2000 + Number(expYearStr);
+
+    if (expMonth < 1 || expMonth > 12) {
+      toast.error("Invalid expiry month.");
+      return;
+    }
+    const now = new Date();
+    const cardExpiry = new Date(expYear, expMonth - 1 + 1, 0); // last day of expiry month
+    if (cardExpiry < now) {
+      toast.error("Your card has expired. Please use a card with a future expiry date.");
+      return;
+    }
+
     if (cvv.length < 3) {
       toast.error("CVV must be at least 3 digits.");
       return;
     }
-
-    // Parse expiry MM/YY
-    const [expMonthStr, expYearStr] = expiry.split("/");
-    const expMonth = Number(expMonthStr);
-    const expYear = 2000 + Number(expYearStr);
 
     startTransition(async () => {
       const result = await chargeCardAction({
