@@ -1,26 +1,27 @@
+import Image from "next/image";
 import { UserCheck, Briefcase, Calendar, Target } from "lucide-react";
 import SectionHeader from "./SectionHeader";
 
 const features = [
   {
     icon: UserCheck,
-    title: "Tailored Study Paths",
-    description: "Personalized learning journeys designed to meet your specific goals.",
+    title: "Tutors with context",
+    description: "Profiles, subjects, rates, and reviews help you choose with fewer guesses.",
   },
   {
     icon: Briefcase,
-    title: "Top 3% Professionals",
-    description: "All tutors are vetted industry experts with proven track records.",
+    title: "Focused sessions",
+    description: "Use a live session when a course or video leaves a question hanging.",
   },
   {
     icon: Calendar,
-    title: "Any Timezone",
-    description: "Book sessions that fit your schedule, anywhere in the world.",
+    title: "Flexible booking",
+    description: "See available slots and book around your actual week.",
   },
   {
     icon: Target,
-    title: "Practical Skills",
-    description: "Focus on real-world skills that accelerate your career growth.",
+    title: "Courses beside tutoring",
+    description: "Move between structured courses and one-to-one help when you need both.",
   },
 ];
 
@@ -29,28 +30,31 @@ export default function WhyChooseUs() {
     <section className="py-20 bg-muted/30">
       <div className="mx-auto max-w-7xl px-4">
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-          {/* Left image */}
-          <div className="relative h-80 overflow-hidden rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 shadow-xl lg:h-[480px]">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center px-8">
-                <div className="mb-4 text-6xl font-bold text-primary">3%</div>
-                <p className="text-lg font-semibold text-foreground">
-                  Only the top 3% of tutor applicants are selected
-                </p>
-                <p className="mt-2 text-muted-foreground">
-                  Rigorous vetting ensures you learn from the best
-                </p>
-              </div>
+          <div className="relative min-h-80 overflow-hidden rounded-2xl shadow-xl lg:min-h-[480px]">
+            <Image
+              src="/book-with-green-board-background_1150-3837.jpg"
+              alt="Books and study tools ready for a learning session"
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-linear-to-t from-zinc-950/82 via-zinc-950/25 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-8">
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-100">
+                Learning in practice
+              </p>
+              <p className="mt-3 max-w-sm text-2xl font-semibold leading-tight">
+                A short session can unblock a week of studying.
+              </p>
             </div>
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-primary/10 to-transparent" />
           </div>
 
           {/* Right content */}
           <div>
             <SectionHeader
               label="Our Advantage"
-              title="Why Students Choose LearnBridge"
-              description="We combine top-tier tutors with a seamless booking experience to deliver results."
+              title="The parts that make learning feel manageable"
+              description="LearnBridge is useful when you want enough structure to move forward and enough human help to get unstuck."
             />
             <div className="grid gap-4 sm:grid-cols-2">
               {features.map(({ icon: Icon, title, description }) => (

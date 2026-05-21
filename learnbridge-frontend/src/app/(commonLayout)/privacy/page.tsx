@@ -46,7 +46,7 @@ export default function PrivacyPage() {
       {/* Hero Banner */}
       <div className="relative mb-16 min-h-[40vh] overflow-hidden rounded-2xl">
         <Image
-          src="/ed-3.jpg"
+          src="/front-view-stacked-books-earth-globe-with-graduation-cap-education-day_742418-47637.jpg"
           alt="Privacy Policy"
           fill
           className="object-cover object-center"

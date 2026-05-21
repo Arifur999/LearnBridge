@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Mail, MapPin, Phone, Clock, Send } from "lucide-react";
+import { BookOpen, Clock, GraduationCap, Mail, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,26 +9,26 @@ const contactInfo = [
   {
     icon: Mail,
     label: "Email",
-    value: "support@skillbridge.com",
-    color: "bg-indigo-50 text-indigo-600",
+    value: "support@learnbridge.com",
+    color: "bg-indigo-50 text-indigo-600 dark:bg-indigo-950/45 dark:text-indigo-300",
   },
   {
-    icon: Phone,
-    label: "Phone",
-    value: "+1 (555) 123-4567",
-    color: "bg-violet-50 text-violet-600",
+    icon: BookOpen,
+    label: "Student Help",
+    value: "Bookings, payments, and session questions",
+    color: "bg-violet-50 text-violet-600 dark:bg-violet-950/45 dark:text-violet-300",
   },
   {
-    icon: MapPin,
-    label: "Address",
-    value: "123 Learning Ave, San Francisco, CA 94102",
-    color: "bg-blue-50 text-blue-600",
+    icon: GraduationCap,
+    label: "Tutor Help",
+    value: "Profiles, courses, and availability setup",
+    color: "bg-blue-50 text-blue-600 dark:bg-blue-950/45 dark:text-blue-300",
   },
   {
     icon: Clock,
     label: "Support Hours",
-    value: "Mon–Fri, 9 AM – 6 PM (PST)",
-    color: "bg-emerald-50 text-emerald-600",
+    value: "Messages are reviewed on working days",
+    color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/45 dark:text-emerald-300",
   },
 ];
 
@@ -38,7 +38,7 @@ export default function ContactPage() {
       {/* Hero */}
       <section className="relative min-h-[56vh] overflow-hidden">
         <Image
-          src="/ed-1.jpg"
+          src="/book-with-green-board-background_1150-3837.jpg"
           alt="Contact Us"
           fill
           sizes="(max-width: 768px) 100vw, 1280px"
@@ -54,7 +54,7 @@ export default function ContactPage() {
             Contact Us
           </h1>
           <p className="mx-auto max-w-xl text-lg text-indigo-100 drop-shadow">
-            Have a question or need help? Our team is ready to assist you — reach out any time.
+            Have a question or need help? Send the details and our team can follow the thread.
           </p>
         </div>
       </section>
@@ -68,7 +68,7 @@ export default function ContactPage() {
                 <h2 className="mb-3 text-2xl font-bold">We&apos;d love to hear from you</h2>
                 <p className="text-muted-foreground">
                   Whether you&apos;re a student looking for help, a tutor wanting to join our
-                  platform, or just have a general question — we&apos;re here for you.
+                  platform, or just have a general question, write what you need and we will route it.
                 </p>
               </div>
 
@@ -78,7 +78,7 @@ export default function ContactPage() {
                   return (
                     <div
                       key={item.label}
-                      className="flex items-start gap-4 rounded-2xl border bg-background p-5 shadow-sm"
+                      className="flex items-start gap-4 border bg-card/90 p-5 shadow-sm dark:bg-card"
                     >
                       <div className={`rounded-xl p-2.5 ${item.color}`}>
                         <Icon className="size-5" />
@@ -94,16 +94,17 @@ export default function ContactPage() {
                 })}
               </div>
 
-              {/* Map placeholder */}
-              <div className="overflow-hidden rounded-2xl border bg-gradient-to-br from-indigo-50 to-violet-50 p-8 text-center">
-                <MapPin className="mx-auto mb-3 size-10 text-indigo-400" />
-                <p className="font-semibold text-indigo-700">San Francisco, CA</p>
-                <p className="mt-1 text-sm text-muted-foreground">123 Learning Avenue</p>
+              <div className="overflow-hidden border bg-muted/35 p-8">
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">Helpful note</p>
+                <p className="mt-3 text-xl font-semibold">A little context gets a better answer.</p>
+                <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
+                  Include the page, booking, course, or tutor name connected to your question when you message support.
+                </p>
               </div>
             </div>
 
             {/* Right — Contact Form */}
-            <div className="rounded-2xl border bg-background p-8 shadow-sm">
+            <div className="border bg-card/90 p-8 shadow-sm dark:bg-card">
               <h2 className="mb-6 text-xl font-bold">Send us a message</h2>
               <form className="space-y-5">
                 <div className="grid gap-4 sm:grid-cols-2">

@@ -1,6 +1,15 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import {
+  ArrowRight,
+  BookOpen,
+  CalendarClock,
+  GraduationCap,
+  Rocket,
+  ShieldCheck,
+} from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -9,8 +18,6 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { BookOpen, GraduationCap, Rocket } from "lucide-react";
 
 interface Slide {
   title: string;
@@ -25,106 +32,142 @@ interface Slide {
 
 const slides: Slide[] = [
   {
-    title: "Learn Skills. Build Your Future.",
+    title: "LearnBridge tutoring for your next breakthrough",
     description:
-      "Join SkillBridge and book sessions with verified expert tutors across all subjects.",
+      "Book focused sessions with expert tutors, compare courses, and keep learning moving with confidence.",
     cta: "Browse Tutors",
     ctaHref: "/tutors",
-    overlay: "bg-indigo-900/55",
-    image: "/ed-1.jpg",
+    overlay: "bg-indigo-950/52",
+    image: "/book-with-green-board-background_1150-3837.jpg",
     icon: BookOpen,
     badge: "10,000+ Students",
   },
   {
-    title: "Teach. Inspire. Earn.",
+    title: "Teach with clarity. Grow with LearnBridge.",
     description:
-      "Become a tutor on SkillBridge — share your expertise with motivated learners and grow your income.",
+      "Share your expertise with motivated learners, manage availability, and build a tutoring profile students trust.",
     cta: "Become a Tutor",
     ctaHref: "/register",
-    overlay: "bg-violet-900/55",
-    image: "/ed-2.jpg",
+    overlay: "bg-cyan-950/52",
+    image: "/front-view-academic-cap-with-books-pencils_23-2148756619.jpg",
     icon: GraduationCap,
     badge: "120+ Expert Tutors",
   },
   {
-    title: "Upgrade Your Career",
+    title: "Courses and sessions for real progress",
     description:
-      "Find the right subject expert and book a confirmed session instantly. Zero hassle, maximum learning.",
+      "Move from a difficult topic to a clear next step with learning support designed around your goals.",
     cta: "Get Started",
     ctaHref: "/register",
-    overlay: "bg-blue-900/55",
-    image: "/ed-3.jpg",
+    overlay: "bg-slate-950/48",
+    image: "/front-view-stacked-books-earth-globe-with-graduation-cap-education-day_742418-47637.jpg",
     icon: Rocket,
     badge: "95% Success Rate",
   },
 ];
 
+const proofItems = [
+  {
+    icon: ShieldCheck,
+    title: "Trusted profiles",
+    description: "Compare tutors before you book.",
+    color: "text-emerald-200",
+  },
+  {
+    icon: CalendarClock,
+    title: "Clear scheduling",
+    description: "Pick learning time that fits.",
+    color: "text-amber-200",
+  },
+  {
+    icon: BookOpen,
+    title: "Course discovery",
+    description: "Keep subjects within reach.",
+    color: "text-cyan-200",
+  },
+];
+
 export default function Hero() {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-10">
-      <Carousel className="w-full overflow-hidden rounded-2xl">
+    <section className="bg-slate-950 text-white">
+      <Carousel className="w-full overflow-hidden">
         <CarouselContent>
           {slides.map((slide, index) => {
             const Icon = slide.icon;
+
             return (
-              <CarouselItem key={index}>
-                {/* min-h-[56vh] matches original banner height */}
-                <div className="relative min-h-[56vh] w-full overflow-hidden rounded-2xl">
+              <CarouselItem key={slide.title}>
+                <div className="relative min-h-[72svh] w-full overflow-hidden md:min-h-[76svh]">
                   <Image
                     src={slide.image}
                     alt={slide.title}
                     fill
-                    sizes="(max-width: 768px) 100vw, 1280px"
+                    sizes="100vw"
                     className="object-cover object-center"
                     priority={index === 0}
                   />
 
-                  {/* overlay */}
                   <div className={`absolute inset-0 ${slide.overlay}`} />
+                  <div className="absolute inset-0 bg-linear-to-r from-black/88 via-black/56 to-black/18" />
 
-                  {/* content */}
-                  <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 py-16 text-center text-white">
-                    <div className="mb-5 inline-flex items-center rounded-full bg-white/20 px-4 py-1.5 text-sm font-medium backdrop-blur-sm">
-                      <Icon className="mr-2 size-4" />
-                      {slide.badge}
+                  <div className="relative z-10 mx-auto flex min-h-[72svh] max-w-7xl flex-col justify-between px-4 py-12 sm:px-6 md:min-h-[76svh] md:py-16">
+                    <div className="max-w-3xl">
+                      <div className="mb-5 inline-flex items-center border-l-2 border-cyan-300 pl-3 text-sm font-semibold uppercase tracking-[0.18em] text-cyan-100">
+                        <Icon className="mr-2 size-4" />
+                        {slide.badge}
+                      </div>
+
+                      <h1 className="max-w-4xl text-4xl font-black leading-tight text-white drop-shadow-sm sm:text-5xl lg:text-6xl">
+                        {slide.title}
+                      </h1>
+                      <p className="mt-5 max-w-2xl text-base leading-7 text-white/86 sm:text-lg">
+                        {slide.description}
+                      </p>
+
+                      <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row">
+                        <Button
+                          asChild
+                          size="lg"
+                          className="bg-white px-7 font-semibold text-slate-950 hover:bg-white/90"
+                        >
+                          <Link href={slide.ctaHref}>
+                            {slide.cta}
+                            <ArrowRight className="size-4" />
+                          </Link>
+                        </Button>
+                        <Button
+                          asChild
+                          size="lg"
+                          variant="outline"
+                          className="border-white/35 bg-black/10 text-white hover:bg-white/10 hover:text-white"
+                        >
+                          <Link href="/courses">Explore Courses</Link>
+                        </Button>
+                      </div>
                     </div>
 
-                    <h1 className="mb-4 max-w-3xl text-3xl font-extrabold leading-tight drop-shadow-lg md:text-5xl">
-                      {slide.title}
-                    </h1>
-                    <p className="mb-8 max-w-2xl text-base text-white/90 drop-shadow md:text-lg">
-                      {slide.description}
-                    </p>
+                    <div className="mt-10 grid gap-px overflow-hidden border border-white/18 bg-white/18 sm:grid-cols-3">
+                      {proofItems.map((item) => {
+                        const ProofIcon = item.icon;
 
-                    <div className="flex flex-col items-center gap-3 sm:flex-row">
-                      <Button
-                        asChild
-                        size="lg"
-                        className="bg-white px-8 font-semibold text-indigo-700 hover:bg-white/90"
-                      >
-                        <Link href={slide.ctaHref}>{slide.cta}</Link>
-                      </Button>
-                      <Button
-                        asChild
-                        size="lg"
-                        variant="outline"
-                        className="border-white/50 bg-transparent text-white hover:bg-white/10"
-                      >
-                        <Link href="/login">Sign In</Link>
-                      </Button>
+                        return (
+                          <div key={item.title} className="bg-black/35 px-4 py-4 backdrop-blur-sm sm:px-5">
+                            <ProofIcon className={`mb-3 size-5 ${item.color}`} />
+                            <p className="font-semibold">{item.title}</p>
+                            <p className="mt-1 text-sm text-white/70">{item.description}</p>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
-
-                  {/* decorative blobs */}
-                  <div className="pointer-events-none absolute -right-16 -top-16 size-64 rounded-full bg-white/5" />
-                  <div className="pointer-events-none absolute -bottom-10 -left-10 size-48 rounded-full bg-white/5" />
                 </div>
               </CarouselItem>
             );
           })}
         </CarouselContent>
-        <CarouselPrevious className="left-4 border-white/30 bg-white/20 text-white hover:bg-white/30" />
-        <CarouselNext className="right-4 border-white/30 bg-white/20 text-white hover:bg-white/30" />
+
+        <CarouselPrevious className="left-4 top-auto bottom-6 border-white/30 bg-black/35 text-white hover:bg-black/55 md:bottom-auto md:top-1/2" />
+        <CarouselNext className="right-4 top-auto bottom-6 border-white/30 bg-black/35 text-white hover:bg-black/55 md:bottom-auto md:top-1/2" />
       </Carousel>
     </section>
   );

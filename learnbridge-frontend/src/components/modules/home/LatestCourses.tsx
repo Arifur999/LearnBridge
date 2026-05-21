@@ -1,8 +1,8 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Clock, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import SectionHeader from "./SectionHeader";
 import { API_V1_URL } from "@/lib/config";
 
@@ -36,8 +36,8 @@ export default async function LatestCourses() {
         <div className="flex items-end justify-between mb-12">
           <SectionHeader
             label="Courses"
-            title="Latest Courses"
-            description="Structured programs from top institutes and mentors."
+            title="Fresh courses to keep moving"
+            description="Browse recent courses when you want a structured path beside your tutoring sessions."
             className="mb-0"
           />
           <Button variant="outline" asChild className="hidden sm:flex shrink-0">
@@ -57,13 +57,19 @@ export default async function LatestCourses() {
             const category = (course.category as Record<string, unknown>)?.name as string | undefined;
             const count = (course._count as Record<string, unknown>)?.enrollments as number | undefined;
             const duration = course.duration as number | undefined;
+            const image = course.image as string | undefined;
 
             return (
               <Card key={id} className="overflow-hidden hover:shadow-lg transition-shadow group">
-                <div className="h-36 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
-                  <span className="text-4xl font-bold text-primary/30">
-                    {title?.charAt(0) || "C"}
-                  </span>
+                <div className="relative h-40 overflow-hidden bg-muted">
+                  <Image
+                    src={image || "/education-learn-study-world-graduated-student-studying-abroad-international-idea_488220-56721.jpg"}
+                    alt={title}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/45 via-transparent to-transparent" />
                 </div>
                 <CardContent className="p-5">
                   <div className="flex items-center gap-2 mb-2">
@@ -94,7 +100,7 @@ export default async function LatestCourses() {
                   </div>
                   <div className="mt-4 flex items-center justify-between">
                     {price != null && (
-                      <span className="font-semibold text-sm">${price}</span>
+                      <span className="font-semibold text-sm">BDT {price}</span>
                     )}
                     <Button asChild size="sm" className="ml-auto">
                       <Link href={`/courses/${id}`}>View Course</Link>

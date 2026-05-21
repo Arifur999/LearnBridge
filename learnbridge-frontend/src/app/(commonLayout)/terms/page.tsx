@@ -46,7 +46,7 @@ export default function TermsPage() {
       {/* Hero Banner */}
       <div className="relative mb-16 min-h-[40vh] overflow-hidden rounded-2xl">
         <Image
-          src="/ed-2.jpg"
+          src="/education-learn-study-world-graduated-student-studying-abroad-international-idea_488220-56721.jpg"
           alt="Terms of Service"
           fill
           className="object-cover object-center"

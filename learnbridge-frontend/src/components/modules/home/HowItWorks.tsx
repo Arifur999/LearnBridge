@@ -5,25 +5,25 @@ const steps = [
   {
     number: "01",
     icon: Search,
-    title: "Find Your Tutor",
+    title: "Choose a tutor",
     description:
-      "Browse and filter tutors by subject, rating, price, and availability. Read reviews from other students.",
+      "Filter by subject, rate, and profile details until someone feels right for the question you have.",
     color: "bg-primary/10 text-primary",
   },
   {
     number: "02",
     icon: Calendar,
-    title: "Book a Session",
+    title: "Pick a slot",
     description:
-      "Select an available time slot that fits your schedule. Get instant booking confirmation.",
+      "Choose a time that fits your schedule and keep the booking details in one place.",
     color: "bg-violet-100 text-violet-600 dark:bg-violet-900/30 dark:text-violet-400",
   },
   {
     number: "03",
     icon: BookOpen,
-    title: "Start Learning",
+    title: "Learn and follow up",
     description:
-      "Attend your session and gain practical skills. Leave a review to help other students.",
+      "Use the session, course material, and reviews to shape what comes next.",
     color: "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400",
   },
 ];
@@ -34,8 +34,8 @@ export default function HowItWorks() {
       <div className="mx-auto max-w-7xl px-4">
         <SectionHeader
           label="How It Works"
-          title="Get Started in 3 Simple Steps"
-          description="Finding the right tutor and booking a session has never been easier."
+          title="From question to session"
+          description="The flow is simple, but the choice stays yours."
           centered
         />
 

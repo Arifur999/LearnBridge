@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { HelpCircle, ChevronDown } from "lucide-react";
+import { ChevronDown, MessageCircleQuestion, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -12,7 +12,7 @@ import {
 const faqs = [
   {
     category: "For Students",
-    color: "bg-indigo-50 text-indigo-700 border-indigo-100",
+    color: "bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-950/45 dark:text-indigo-200 dark:border-indigo-900",
     items: [
       {
         q: "How do I book a session with a tutor?",
@@ -28,7 +28,7 @@ const faqs = [
       },
       {
         q: "Is my payment information secure?",
-        a: "Absolutely. SkillBridge uses industry-standard encryption and does not store any payment card details on our servers.",
+        a: "Payments are handled through the platform payment flow. LearnBridge does not ask you to share card details in chat.",
       },
       {
         q: "How do I find a tutor for a specific subject?",
@@ -38,10 +38,10 @@ const faqs = [
   },
   {
     category: "For Tutors",
-    color: "bg-violet-50 text-violet-700 border-violet-100",
+    color: "bg-violet-50 text-violet-700 border-violet-100 dark:bg-violet-950/45 dark:text-violet-200 dark:border-violet-900",
     items: [
       {
-        q: "How do I become a tutor on SkillBridge?",
+        q: "How do I become a tutor on LearnBridge?",
         a: "Register an account and select 'Tutor' as your role. Once your profile is reviewed and approved by our admin team, you can start creating availability slots and accepting bookings.",
       },
       {
@@ -60,10 +60,10 @@ const faqs = [
   },
   {
     category: "Platform & General",
-    color: "bg-blue-50 text-blue-700 border-blue-100",
+    color: "bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-950/45 dark:text-blue-200 dark:border-blue-900",
     items: [
       {
-        q: "Is SkillBridge free to join?",
+        q: "Is LearnBridge free to join?",
         a: "Yes — signing up as a student or tutor is completely free. Students pay per session at the tutor's listed rate.",
       },
       {
@@ -85,35 +85,61 @@ const faqs = [
 export default function FAQPage() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero */}
-      <section className="relative min-h-[56vh] overflow-hidden">
+      <section className="relative isolate overflow-hidden border-b bg-slate-900 text-white">
         <Image
-          src="/ed-3.jpg"
-          alt="FAQ"
+          src="/front-view-stacked-books-earth-globe-with-graduation-cap-education-day_742418-47637.jpg"
+          alt="A globe and graduation cap above an open book"
           fill
-          sizes="(max-width: 768px) 100vw, 1280px"
+          sizes="100vw"
           className="object-cover object-center"
           priority
         />
-        <div className="absolute inset-0 bg-violet-900/60" />
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 py-16 text-center text-white">
-          <div className="mx-auto mb-4 inline-flex items-center justify-center rounded-full bg-white/20 p-3 backdrop-blur-sm">
-            <HelpCircle className="size-8" />
+        <div className="absolute inset-0 bg-slate-950/64" />
+        <div className="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-950/55 to-slate-950/35" />
+
+        <div className="relative mx-auto flex min-h-[48svh] max-w-5xl flex-col items-center justify-center px-4 py-14 text-center sm:px-6">
+          <div className="mb-5 flex size-14 items-center justify-center border border-white/35 bg-black/20 backdrop-blur-sm">
+            <MessageCircleQuestion className="size-7 text-cyan-100" />
           </div>
-          <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-indigo-200">
+          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.26em] text-cyan-100">
             Help Center
           </p>
-          <h1 className="mb-4 max-w-3xl text-4xl font-extrabold drop-shadow-lg md:text-5xl">
-            Frequently Asked Questions
+          <h1 className="text-4xl font-black leading-tight sm:text-5xl">
+            Answers before your next learning step
           </h1>
-          <p className="mx-auto max-w-xl text-lg text-indigo-100 drop-shadow">
-            Find quick answers to the most common questions about SkillBridge.
+          <p className="mt-4 max-w-2xl text-base leading-7 text-white/80 sm:text-lg">
+            Get quick guidance for booking, tutoring, payments, and account questions.
           </p>
+          <div className="mt-7 flex flex-wrap justify-center gap-3">
+            <Button asChild size="lg" className="bg-cyan-100 text-slate-950 hover:bg-white">
+              <Link href="#faq-answers">
+                <Search className="size-4" />
+                See answers
+              </Link>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="border-white/35 bg-transparent text-white hover:bg-white/10 hover:text-white"
+            >
+              <Link href="/contact">Contact support</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b bg-muted/25">
+        <div className="mx-auto flex max-w-5xl flex-wrap justify-center gap-x-8 gap-y-3 px-4 py-5 text-sm font-medium text-muted-foreground">
+          <p>Student bookings</p>
+          <p>Tutor profiles</p>
+          <p>Payments and reviews</p>
+          <p>Platform support</p>
         </div>
       </section>
 
       {/* FAQ Sections */}
-      <section className="py-20">
+      <section id="faq-answers" className="scroll-mt-24 py-20">
         <div className="mx-auto max-w-4xl px-4 space-y-14">
           {faqs.map((section) => (
             <div key={section.category}>
@@ -127,7 +153,7 @@ export default function FAQPage() {
                   <AccordionItem
                     key={i}
                     value={`${section.category}-${i}`}
-                    className="rounded-2xl border bg-background px-5 shadow-sm"
+                  className="border bg-card/90 px-5 shadow-sm data-[state=open]:border-primary/25 dark:bg-card"
                   >
                     <AccordionTrigger className="py-5 text-left text-sm font-semibold hover:no-underline">
                       {item.q}
@@ -146,6 +172,9 @@ export default function FAQPage() {
       {/* CTA */}
       <section className="border-t bg-muted/30 py-16">
         <div className="mx-auto max-w-2xl px-4 text-center">
+          <div className="mx-auto mb-5 flex size-12 items-center justify-center rounded-lg border bg-background">
+            <MessageCircleQuestion className="size-6 text-primary" />
+          </div>
           <h2 className="mb-3 text-2xl font-bold">Still have questions?</h2>
           <p className="mb-6 text-muted-foreground">
             Our support team is happy to help. Reach out and we&apos;ll get back to you within 24 hours.

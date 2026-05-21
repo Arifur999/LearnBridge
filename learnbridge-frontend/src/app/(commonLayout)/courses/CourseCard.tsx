@@ -51,9 +51,9 @@ const CourseCard = ({ id, title, description, price, category, rating, image, ba
   return (
     <Link
       href={`${basePath}/${id}`}
-      className="group flex flex-col rounded-2xl border bg-background shadow-sm transition-all hover:shadow-md hover:border-primary/40"
+      className="group flex flex-col overflow-hidden border bg-card/90 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-lg dark:bg-card"
     >
-      <div className="relative h-40 overflow-hidden rounded-t-2xl">
+      <div className="relative h-44 overflow-hidden bg-muted">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={cardImage}
@@ -72,7 +72,7 @@ const CourseCard = ({ id, title, description, price, category, rating, image, ba
           {typeof rating === "number" && <StarRating rating={rating} />}
         </div>
 
-        <h3 className="mb-1.5 line-clamp-1 font-semibold leading-snug group-hover:text-primary transition-colors">
+        <h3 className="mb-1.5 line-clamp-2 min-h-11 font-semibold leading-snug transition-colors group-hover:text-primary">
           {title}
         </h3>
         <p className="mb-4 line-clamp-2 flex-1 text-sm text-muted-foreground">{description}</p>
@@ -81,8 +81,8 @@ const CourseCard = ({ id, title, description, price, category, rating, image, ba
           <span className="text-sm font-bold text-primary">
             {price ? `BDT ${price}/session` : "Free"}
           </span>
-          <span className="flex items-center gap-1 text-xs font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
-            View Profile <ArrowRight className="size-3" />
+          <span className="flex items-center gap-1 text-xs font-medium text-primary transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
+            View Course <ArrowRight className="size-3" />
           </span>
         </div>
       </div>

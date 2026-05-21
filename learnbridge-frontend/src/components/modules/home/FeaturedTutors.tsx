@@ -9,7 +9,8 @@ import SectionHeader from "./SectionHeader";
 import { getInitials } from "@/lib/utils";
 
 export default async function FeaturedTutors() {
-  const tutors = await courseService.getPopularCourses(3);
+  const result = await courseService.getAllTutors("?limit=3");
+  const tutors = result.data;
 
   if (!tutors?.length) return null;
 
@@ -18,9 +19,9 @@ export default async function FeaturedTutors() {
       <div className="mx-auto max-w-7xl px-4">
         <div className="flex items-end justify-between mb-12">
           <SectionHeader
-            label="Top Rated"
-            title="Featured Tutors"
-            description="Learn from our highest-rated and most in-demand educators."
+            label="Tutors"
+            title="A few tutors students are finding now"
+            description="Start with real profiles, subjects, and rates before you decide who fits your learning style."
             className="mb-0"
           />
           <Button variant="outline" asChild className="hidden sm:flex shrink-0">
@@ -37,6 +38,8 @@ export default async function FeaturedTutors() {
             const bio = tutor.description as string;
             const category = tutor.category as string;
             const price = tutor.price as number | undefined;
+            const profileImage = tutor.profileImage as string | undefined;
+            const rating = tutor.rating as number | undefined;
 
             return (
               <Card
@@ -46,14 +49,14 @@ export default async function FeaturedTutors() {
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <Avatar className="size-14">
-                      <AvatarImage src={undefined} />
+                      <AvatarImage src={profileImage} alt={name} />
                       <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
                         {getInitials(name)}
                       </AvatarFallback>
                     </Avatar>
                     <Badge variant="secondary" className="flex items-center gap-1">
                       <Star className="size-3 fill-yellow-400 text-yellow-400" />
-                      Featured
+                      {rating != null && rating > 0 ? rating.toFixed(1) : "Tutor"}
                     </Badge>
                   </div>
                   <h3 className="font-semibold text-lg leading-tight">{name}</h3>
@@ -66,7 +69,7 @@ export default async function FeaturedTutors() {
                   <div className="mt-4 flex items-center justify-between">
                     {price != null && (
                       <span className="text-sm font-semibold">
-                        ${price}
+                        BDT {price}
                         <span className="font-normal text-muted-foreground">/hr</span>
                       </span>
                     )}

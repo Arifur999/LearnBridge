@@ -27,11 +27,12 @@ const TutorCard = ({
   return (
     <Link
       href={`/tutors/${id}`}
-      className="group flex flex-col rounded-2xl border bg-background shadow-sm transition-all hover:shadow-md hover:border-primary/40"
+      className="group flex flex-col overflow-hidden border bg-card/90 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-lg dark:bg-card"
     >
       {/* Avatar area */}
-      <div className="flex h-40 items-center justify-center rounded-t-2xl bg-linear-to-br from-primary/10 to-violet-100">
+      <div className="flex h-40 items-center justify-center bg-linear-to-br from-primary/12 via-background to-emerald-100 dark:from-primary/15 dark:via-card dark:to-emerald-950/35">
         {profileImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={profileImage}
             alt={title}
@@ -53,7 +54,7 @@ const TutorCard = ({
         )}
 
         {/* Name */}
-        <h3 className="mb-1 line-clamp-1 font-semibold leading-snug transition-colors group-hover:text-primary">
+        <h3 className="mb-1 line-clamp-2 min-h-10 font-semibold leading-snug transition-colors group-hover:text-primary">
           {title}
         </h3>
 
@@ -101,7 +102,7 @@ const TutorCard = ({
           <span className="text-sm font-bold text-primary">
             {price != null && price > 0 ? `BDT ${price}/session` : price === 0 ? "Free" : ""}
           </span>
-          <span className="flex items-center gap-1 text-xs font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
+          <span className="flex items-center gap-1 text-xs font-medium text-primary transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
             <GraduationCap className="size-3.5" />
             View Profile
             <ArrowRight className="size-3" />

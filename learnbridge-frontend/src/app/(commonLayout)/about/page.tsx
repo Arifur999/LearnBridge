@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Target, Heart, Globe, Award, Users, BookOpen } from "lucide-react";
+import { Target, Heart, Globe, Award, Users, BookOpen, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const values = [
@@ -8,32 +8,32 @@ const values = [
     icon: Target,
     title: "Mission-Driven",
     desc: "We exist to make quality education accessible to every learner, everywhere.",
-    color: "bg-indigo-50 text-indigo-600",
+    color: "bg-indigo-50 text-indigo-600 dark:bg-indigo-950/45 dark:text-indigo-300",
   },
   {
     icon: Heart,
     title: "Student First",
     desc: "Every feature we build starts with a simple question: does this help the student succeed?",
-    color: "bg-rose-50 text-rose-600",
+    color: "bg-rose-50 text-rose-600 dark:bg-rose-950/45 dark:text-rose-300",
   },
   {
     icon: Globe,
     title: "Inclusive Learning",
     desc: "We celebrate diverse backgrounds, subjects, and teaching styles on our platform.",
-    color: "bg-emerald-50 text-emerald-600",
+    color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/45 dark:text-emerald-300",
   },
   {
     icon: Award,
     title: "Quality Assured",
-    desc: "Every tutor is vetted and every review is real — no shortcuts on trust.",
-    color: "bg-amber-50 text-amber-600",
+    desc: "Clear profile details and reviews help learners make careful choices.",
+    color: "bg-amber-50 text-amber-600 dark:bg-amber-950/45 dark:text-amber-300",
   },
 ];
 
 const team = [
-  { name: "Sarah Chen", role: "Co-Founder & CEO", img: "/ed-1.jpg" },
-  { name: "Marcus Patel", role: "Co-Founder & CTO", img: "/ed-2.jpg" },
-  { name: "Amira Hassan", role: "Head of Education", img: "/ed-3.jpg" },
+  { name: "Sarah Chen", role: "Co-Founder & CEO", img: "/book-with-green-board-background_1150-3837.jpg" },
+  { name: "Marcus Patel", role: "Co-Founder & CTO", img: "/education-learn-study-world-graduated-student-studying-abroad-international-idea_488220-56721.jpg" },
+  { name: "Amira Hassan", role: "Head of Education", img: "/front-view-stacked-books-earth-globe-with-graduation-cap-education-day_742418-47637.jpg" },
 ];
 
 const stats = [
@@ -46,32 +46,47 @@ const stats = [
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero */}
-      <section className="relative min-h-[56vh] overflow-hidden">
+      <section className="relative isolate overflow-hidden border-b bg-zinc-950 text-white">
         <Image
-          src="/ed-2.jpg"
-          alt="About SkillBridge"
+          src="/graduation-cap-with-earth-globe-concept-global-business-study-abroad-educational-back-school-education-global-world-study-abroad-business-universities-worldwide-language-study_721781-2163.jpg"
+          alt="A graduation cap, books, and a globe"
           fill
-          sizes="(max-width: 768px) 100vw, 1280px"
+          sizes="100vw"
           className="object-cover object-center"
           priority
         />
-        <div className="absolute inset-0 bg-indigo-900/60" />
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 py-16 text-center text-white">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-indigo-200">
-            Our Story
-          </p>
-          <h1 className="mb-5 max-w-3xl text-4xl font-extrabold leading-tight drop-shadow-lg md:text-5xl">
-            Bridging Knowledge Gaps,<br />One Session at a Time
-          </h1>
-          <p className="mx-auto max-w-2xl text-lg text-indigo-100 drop-shadow">
-            SkillBridge was founded with a single belief: every student deserves access to
-            a great teacher. We connect motivated learners with verified expert tutors — simply,
-            reliably, and affordably.
-          </p>
+        <div className="absolute inset-0 bg-zinc-950/50" />
+        <div className="absolute inset-0 bg-linear-to-r from-zinc-950/88 via-zinc-950/60 to-transparent" />
+
+        <div className="relative mx-auto flex min-h-[64svh] max-w-7xl items-center px-4 py-14 sm:px-6">
+          <div className="max-w-2xl border-l border-white/30 pl-5 sm:pl-8">
+            <p className="mb-5 text-sm font-semibold uppercase tracking-[0.26em] text-rose-100">
+              Our Story
+            </p>
+            <h1 className="text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">
+              Education feels closer when the right teacher is within reach
+            </h1>
+            <p className="mt-6 text-base leading-7 text-white/82 sm:text-lg">
+              LearnBridge was built to connect motivated learners with tutors who can turn a difficult subject into a clear next step.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button asChild size="lg" className="bg-rose-100 text-zinc-950 hover:bg-white">
+                <Link href="/tutors">
+                  Explore tutors <ArrowRight className="size-4" />
+                </Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="border-white/35 bg-transparent text-white hover:bg-white/10 hover:text-white"
+              >
+                <Link href="/contact">Talk to us</Link>
+              </Button>
+            </div>
+          </div>
         </div>
       </section>
-
       {/* Stats */}
       <section className="border-b bg-muted/20 py-14">
         <div className="mx-auto max-w-7xl px-4">
@@ -81,12 +96,12 @@ export default function AboutPage() {
               return (
                 <div
                   key={item.label}
-                  className="flex flex-col items-center gap-2 rounded-2xl border bg-background p-6 text-center shadow-sm"
+                  className="flex flex-col items-center gap-2 border bg-card/90 p-6 text-center shadow-sm dark:bg-card"
                 >
-                  <div className="rounded-xl bg-indigo-50 p-3">
-                    <Icon className="size-6 text-indigo-600" />
+                  <div className="bg-indigo-50 p-3 dark:bg-indigo-950/45">
+                    <Icon className="size-6 text-indigo-600 dark:text-indigo-300" />
                   </div>
-                  <h3 className="text-3xl font-extrabold tracking-tight text-indigo-700">{item.value}</h3>
+                  <h3 className="text-3xl font-extrabold tracking-tight text-primary">{item.value}</h3>
                   <p className="text-sm text-muted-foreground">{item.label}</p>
                 </div>
               );
@@ -108,8 +123,8 @@ export default function AboutPage() {
               </h2>
               <div className="space-y-4 text-muted-foreground">
                 <p>
-                  SkillBridge began in 2022 when our founders — frustrated by the lack of
-                  reliable, affordable tutoring options — decided to build something better.
+                  LearnBridge began when our team felt tutoring should be easier to compare,
+                  easier to book, and easier to revisit after a session.
                   They wanted a platform where finding a qualified tutor was as easy as a
                   few taps.
                 </p>
@@ -119,9 +134,8 @@ export default function AboutPage() {
                   can focus on teaching and students can focus on learning.
                 </p>
                 <p>
-                  We are continuously expanding our subject catalogue, improving our matching
-                  algorithms, and listening to our community — because the best product is one
-                  that grows with its users.
+                  We keep expanding subjects, listening to learner questions, and improving
+                  the booking experience so the platform grows from real study habits.
                 </p>
               </div>
               <Button asChild size="lg" className="mt-8">
@@ -132,7 +146,7 @@ export default function AboutPage() {
             <div className="relative">
               <div className="overflow-hidden rounded-2xl shadow-xl">
                 <Image
-                  src="/ed-1.jpg"
+                  src="/book-with-green-board-background_1150-3837.jpg"
                   alt="Students learning"
                   width={600}
                   height={420}
@@ -141,7 +155,7 @@ export default function AboutPage() {
               </div>
               <div className="absolute -bottom-5 -left-5 overflow-hidden rounded-2xl border-4 border-background shadow-lg">
                 <Image
-                  src="/ed-3.jpg"
+                  src="/front-view-academic-cap-with-books-pencils_23-2148756619.jpg"
                   alt="Tutoring session"
                   width={180}
                   height={140}
@@ -169,7 +183,7 @@ export default function AboutPage() {
               return (
                 <div
                   key={v.title}
-                  className="rounded-2xl border bg-background p-6 shadow-sm"
+                  className="border bg-card/90 p-6 shadow-sm dark:bg-card"
                 >
                   <div className={`mb-4 inline-flex rounded-xl p-3 ${v.color}`}>
                     <Icon className="size-6" />
@@ -188,7 +202,7 @@ export default function AboutPage() {
         <div className="mx-auto max-w-7xl px-4">
           <div className="mb-12 text-center">
             <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-primary">
-              The People Behind SkillBridge
+              The People Behind LearnBridge
             </p>
             <h2 className="text-3xl font-bold md:text-4xl">Meet Our Team</h2>
           </div>
@@ -196,7 +210,7 @@ export default function AboutPage() {
           <div className="flex flex-wrap justify-center gap-8">
             {team.map((member) => (
               <div key={member.name} className="flex flex-col items-center text-center">
-                <div className="mb-4 size-28 overflow-hidden rounded-full border-4 border-indigo-100 shadow-md">
+                <div className="mb-4 size-28 overflow-hidden rounded-full border-4 border-indigo-100 shadow-md dark:border-indigo-950">
                   <Image
                     src={member.img}
                     alt={member.name}
@@ -214,11 +228,11 @@ export default function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="border-t bg-linear-to-br from-indigo-600 to-violet-700 py-16 text-white">
+      <section className="border-t bg-zinc-950 py-16 text-white">
         <div className="mx-auto max-w-2xl px-4 text-center">
           <h2 className="mb-3 text-2xl font-bold">Ready to start learning?</h2>
           <p className="mb-6 text-indigo-100">
-            Join thousands of students already growing with SkillBridge.
+            Start with a tutor, a course, or the question already on your desk.
           </p>
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Button asChild size="lg" className="bg-white text-indigo-700 hover:bg-white/90">

@@ -52,7 +52,7 @@ export default function CoursesFilter({
   }, [search, category, minPrice, maxPrice, sort, router, basePath]);
 
   return (
-    <div className="mb-10 rounded-xl border bg-background p-4 shadow-sm">
+    <div className="mb-10 border bg-card/80 p-4 shadow-sm backdrop-blur-sm dark:bg-card">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         {/* Search */}
         <div className="relative w-full md:max-w-md">
@@ -61,14 +61,14 @@ export default function CoursesFilter({
             placeholder="Search by title or description..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
+            className="bg-background pl-9"
           />
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           {/* Sort */}
           <Select value={sort} onValueChange={setSort}>
-            <SelectTrigger className="w-full sm:w-[160px]">
+            <SelectTrigger className="w-full bg-background sm:w-[160px]">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
@@ -81,7 +81,7 @@ export default function CoursesFilter({
 
           {/* Category */}
           <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectTrigger className="w-full bg-background sm:w-[180px]">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
@@ -104,7 +104,7 @@ export default function CoursesFilter({
             placeholder="Min price"
             value={minPrice}
             onChange={(e) => setMinPrice(e.target.value)}
-            className="w-full sm:w-28"
+            className="w-full bg-background sm:w-28"
           />
           <Input
             type="number"
@@ -112,7 +112,7 @@ export default function CoursesFilter({
             placeholder="Max price"
             value={maxPrice}
             onChange={(e) => setMaxPrice(e.target.value)}
-            className="w-full sm:w-28"
+            className="w-full bg-background sm:w-28"
           />
         </div>
       </div>

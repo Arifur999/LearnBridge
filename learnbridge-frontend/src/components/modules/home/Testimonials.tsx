@@ -7,45 +7,45 @@ import { getInitials } from "@/lib/utils";
 const testimonials = [
   {
     name: "Sarah Johnson",
-    role: "Software Engineer",
+    role: "Learning Python",
     rating: 5,
     quote:
-      "LearnBridge matched me with the perfect Python tutor. Within 3 months I landed my first dev job. The quality of tutors is truly exceptional.",
+      "I used a session after getting stuck on Python loops for days. The explanation was calm, specific, and I could finish the exercise that night.",
   },
   {
     name: "Marcus Lee",
-    role: "Data Science Student",
+    role: "Data science student",
     rating: 5,
     quote:
-      "Having access to industry experts at any time feels like having senior dev mentorship on demand — absolutely invaluable.",
+      "The tutor did not rush through formulas. We worked through one example slowly and that helped the next chapter make sense.",
   },
   {
     name: "Priya Sharma",
-    role: "UX Designer",
+    role: "Design learner",
     rating: 5,
     quote:
-      "The booking process is seamless and the tutors are incredibly knowledgeable. I improved my design skills dramatically in just weeks.",
+      "I liked being able to read the profile first and book only when I knew what feedback I needed on my design work.",
   },
   {
     name: "James Carter",
-    role: "Marketing Manager",
+    role: "Upskilling after work",
     rating: 4,
     quote:
-      "I booked sessions to learn data analytics and the tutor tailored every session to my pace. Highly recommend to any professional upskilling.",
+      "The evening slots made it realistic for me. We kept each session focused on a small analytics question instead of covering too much.",
   },
   {
     name: "Aisha Okafor",
-    role: "High School Student",
+    role: "School student",
     rating: 5,
     quote:
-      "My SAT scores went up 200 points after just 8 sessions. The tutors here are patient, knowledgeable, and genuinely care about your progress.",
+      "I asked the questions I usually skip in class. That changed how confident I felt before the next test.",
   },
   {
     name: "Tom Williams",
-    role: "Startup Founder",
+    role: "Business basics",
     rating: 5,
     quote:
-      "Found a brilliant finance tutor who helped me understand startup accounting. Worth every penny and more.",
+      "A finance tutor helped me separate the terms I kept mixing up. It was practical and easy to revisit afterward.",
   },
 ];
 
@@ -70,8 +70,8 @@ export default function Testimonials() {
       <div className="mx-auto max-w-7xl px-4">
         <SectionHeader
           label="Testimonials"
-          title="What Our Students Say"
-          description="Real feedback from learners who transformed their skills on LearnBridge."
+          title="Small wins learners remember"
+          description="The useful moments are often simple: a clear answer, a better example, or a slot that fits the week."
           centered
         />
 
@@ -79,11 +79,11 @@ export default function Testimonials() {
           {testimonials.map((t) => (
             <Card
               key={t.name}
-              className="hover:-translate-y-1 hover:shadow-lg transition-all duration-300"
+              className="border-border/80 bg-card/80 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/25 hover:shadow-lg dark:bg-card"
             >
               <CardContent className="p-6">
                 <StarRating rating={t.rating} />
-                <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+                <p className="mt-4 min-h-24 text-sm leading-7 text-muted-foreground">
                   &ldquo;{t.quote}&rdquo;
                 </p>
                 <div className="mt-5 flex items-center gap-3">
