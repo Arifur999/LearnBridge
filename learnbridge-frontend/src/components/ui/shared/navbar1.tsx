@@ -165,11 +165,21 @@ const Navbar = ({
                 </SheetTitle>
               </SheetHeader>
               <div className="mt-8 flex flex-col gap-5">
-                {menu.map((item) => (
-                  <Link key={item.title} href={item.url} className="text-base font-medium hover:text-primary transition-colors">
-                    {item.title}
-                  </Link>
-                ))}
+                {menu.map((item) => {
+                  const isActive = pathname === item.url || (item.url !== "/" && pathname.startsWith(item.url));
+                  return (
+                    <Link
+                      key={item.title}
+                      href={item.url}
+                      className={cn(
+                        "text-base font-medium transition-colors hover:text-foreground",
+                        isActive ? "text-foreground font-semibold" : "text-muted-foreground"
+                      )}
+                    >
+                      {item.title}
+                    </Link>
+                  );
+                })}
                 <div className="mt-4 flex flex-col gap-3">
                   {user ? (
                     <>

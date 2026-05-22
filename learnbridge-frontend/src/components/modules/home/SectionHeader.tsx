@@ -18,10 +18,7 @@ export default function SectionHeader({
   return (
     <div className={cn("mb-12", centered && "flex flex-col text-center items-center", className)}>
       {label && (
-        <span className={cn(
-          "mb-4 inline-flex border-l-2 border-primary pl-3 text-xs font-bold uppercase tracking-[0.2em] text-primary",
-          centered && "mx-auto"
-        )}>
+        <span className="mb-4 inline-flex border-l-2 border-primary pl-3 text-xs font-bold uppercase tracking-[0.2em] text-primary">
           {label}
         </span>
       )}
@@ -29,7 +26,7 @@ export default function SectionHeader({
         {title}
       </h2>
       {description && (
-        <p className={cn("mt-4 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg", centered && "mx-auto")}>
+        <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
           {description}
         </p>
       )}

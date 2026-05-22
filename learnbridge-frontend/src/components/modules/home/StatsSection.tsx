@@ -58,7 +58,7 @@ export default function StatsSection() {
           {stats.map(({ icon: Icon, value, suffix, label, color }) => (
             <div
               key={label}
-              className="relative flex flex-col items-center gap-4 overflow-hidden rounded-2xl bg-background p-8 shadow-sm ring-1 ring-border hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
+              className="relative flex flex-col items-center gap-4 overflow-hidden rounded-2xl bg-background p-8 shadow-sm ring-1 ring-border hover:shadow-md hover:-translate-y-0.5 transition-[box-shadow,transform] duration-300"
             >
               <div className="absolute inset-x-0 top-0 h-1 bg-primary/20 rounded-t-2xl" />
               <div className={`flex size-14 items-center justify-center rounded-full ${color}`}>

@@ -40,8 +40,7 @@ export default function HowItWorks() {
         />
 
         <div className="relative grid gap-8 md:grid-cols-3">
-          {/* connector line between steps on desktop */}
-          <div className="absolute top-10 left-1/6 right-1/6 hidden h-px bg-border md:block" />
+          <div className="absolute top-10 left-[16.667%] right-[16.667%] hidden h-px bg-border md:block" />
 
           {steps.map(({ number, icon: Icon, title, description, color }, i) => (
             <div key={i} className="flex flex-col items-center text-center">
