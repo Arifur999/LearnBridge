@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,9 +11,23 @@ import {
   Tooltip,
   type ChartOptions,
   type TooltipItem,
+  type ScriptableContext,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip);
 
@@ -26,105 +40,89 @@ interface Props {
   bookings: BookingRecord[];
 }
 
-const SERIES = [
-  { key: "all", label: "Total Sessions" },
-  { key: "completed", label: "Completed" },
-] as const;
-
-type SeriesKey = (typeof SERIES)[number]["key"];
-
 const RANGES = [
-  { key: 3, label: "3 months" },
-  { key: 6, label: "6 months" },
+  { value: "30", label: "Last 30 days" },
+  { value: "90", label: "Last 3 months" },
+  { value: "180", label: "Last 6 months" },
 ] as const;
 
-type RangeKey = (typeof RANGES)[number]["key"];
+type RangeValue = (typeof RANGES)[number]["value"];
 
-function getMonthBuckets(monthCount: number) {
-  const buckets: { label: string; year: number; month: number }[] = [];
+function getDayBuckets(days: number) {
   const now = new Date();
-  for (let i = monthCount - 1; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    buckets.push({
-      label: d.toLocaleString("default", { month: "short" }),
-      year: d.getFullYear(),
-      month: d.getMonth(),
-    });
-  }
-  return buckets;
+  return Array.from({ length: days }, (_, i) => {
+    const d = new Date(now);
+    d.setDate(now.getDate() - (days - 1 - i));
+    d.setHours(0, 0, 0, 0);
+    return d;
+  });
 }
 
-function bucketBookings(
-  bookings: BookingRecord[],
-  buckets: { year: number; month: number }[],
-  filterCompleted: boolean
-) {
-  return buckets.map(({ year, month }) =>
-    bookings.filter((b) => {
+function formatAxisLabel(date: Date, totalDays: number): string {
+  if (totalDays <= 30) {
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  }
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+function bucketByDay(bookings: BookingRecord[], buckets: Date[]) {
+  return buckets.map((day) => {
+    const next = new Date(day);
+    next.setDate(day.getDate() + 1);
+    return bookings.filter((b) => {
       if (!b.createdAt) return false;
       const d = new Date(b.createdAt);
-      const matchMonth = d.getFullYear() === year && d.getMonth() === month;
-      if (!matchMonth) return false;
-      if (filterCompleted) return String(b.status ?? "").toUpperCase() === "COMPLETED";
-      return true;
-    }).length
-  );
+      return d >= day && d < next;
+    }).length;
+  });
+}
+
+function makeGradient(
+  ctx: CanvasRenderingContext2D,
+  chartArea: { top: number; bottom: number }
+) {
+  const g = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+  g.addColorStop(0, "rgba(99, 102, 241, 0.28)");
+  g.addColorStop(1, "rgba(99, 102, 241, 0.01)");
+  return g;
 }
 
 export default function StudentBookingChart({ bookings }: Props) {
-  const [activeSeries, setActiveSeries] = useState<SeriesKey>("all");
-  const [range, setRange] = useState<RangeKey>(6);
-  const [primaryColor, setPrimaryColor] = useState("59 130 246");
-  const chartRef = useRef<ChartJS<"line"> | null>(null);
+  const [range, setRange] = useState<RangeValue>("90");
+  const days = Number(range);
 
-  useEffect(() => {
-    const root = document.documentElement;
-    const raw = getComputedStyle(root).getPropertyValue("--primary").trim();
-    if (raw) setPrimaryColor(raw);
-  }, []);
+  const buckets = useMemo(() => getDayBuckets(days), [days]);
+  const counts = useMemo(() => bucketByDay(bookings, buckets), [bookings, buckets]);
 
-  const buckets = useMemo(() => getMonthBuckets(range), [range]);
-  const labels = buckets.map((b) => b.label);
+  const total = counts.reduce((s, v) => s + v, 0);
 
-  const allData = useMemo(
-    () => bucketBookings(bookings, buckets, false),
-    [bookings, buckets]
-  );
-  const completedData = useMemo(
-    () => bucketBookings(bookings, buckets, true),
-    [bookings, buckets]
+  // show every Nth label so x-axis isn't crowded
+  const tickStep = days <= 30 ? 4 : days <= 90 ? 7 : 14;
+  const labels = buckets.map((d, i) =>
+    i % tickStep === 0 || i === buckets.length - 1 ? formatAxisLabel(d, days) : ""
   );
 
-  const activeData = activeSeries === "completed" ? completedData : allData;
-  const total = activeData.reduce((s, v) => s + v, 0);
-  const avg = buckets.length ? (total / buckets.length).toFixed(1) : "0";
-
-  const buildGradient = (ctx: CanvasRenderingContext2D, chartArea: { top: number; bottom: number }) => {
-    const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-    gradient.addColorStop(0, `oklch(${primaryColor} / 0.35)`);
-    gradient.addColorStop(1, `oklch(${primaryColor} / 0.02)`);
-    return gradient;
-  };
+  const selectedLabel = RANGES.find((r) => r.value === range)?.label ?? "";
 
   const data = {
     labels,
     datasets: [
       {
-        data: activeData,
+        data: counts,
         fill: true,
-        tension: 0.45,
-        pointRadius: 4,
-        pointHoverRadius: 6,
-        pointBorderWidth: 2,
+        tension: 0.42,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        pointHoverBorderWidth: 2,
         borderWidth: 2,
-        borderColor: `oklch(${primaryColor})`,
-        pointBackgroundColor: `oklch(${primaryColor})`,
-        pointBorderColor: "white",
-        backgroundColor: (ctx: { chart: ChartJS }) => {
+        borderColor: "rgba(99, 102, 241, 0.9)",
+        pointHoverBackgroundColor: "rgb(99, 102, 241)",
+        pointHoverBorderColor: "#fff",
+        backgroundColor: (ctx: ScriptableContext<"line">) => {
           const chart = ctx.chart;
-          const { chartArea, ctx: canvasCtx } = chart;
-          if (!chartArea) return "transparent";
-          return buildGradient(canvasCtx, chartArea);
+          const { chartArea, ctx: c } = chart;
+          if (!chartArea) return "rgba(99,102,241,0.15)";
+          return makeGradient(c, chartArea);
         },
       },
     ],
@@ -137,18 +135,26 @@ export default function StudentBookingChart({ bookings }: Props) {
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: "hsl(var(--background, 0 0% 100%))",
-        borderColor: "hsl(var(--border, 214 32% 91%))",
+        backgroundColor: "#fff",
+        borderColor: "rgba(0,0,0,0.1)",
         borderWidth: 1,
-        titleColor: "hsl(var(--foreground, 222 84% 5%))",
-        bodyColor: "hsl(var(--muted-foreground, 215 20% 45%))",
+        titleColor: "#111827",
+        bodyColor: "#6b7280",
         padding: 12,
-        cornerRadius: 12,
+        cornerRadius: 10,
         callbacks: {
-          title: (items: TooltipItem<"line">[]) =>
-            items[0]?.label ?? "",
-          label: (item: TooltipItem<"line">) =>
-            ` ${item.parsed.y} ${activeSeries === "completed" ? "completed" : "session"}${item.parsed.y !== 1 ? "s" : ""}`,
+          title: (items: TooltipItem<"line">[]) => {
+            const idx = items[0]?.dataIndex ?? 0;
+            return buckets[idx]?.toLocaleDateString("en-US", {
+              weekday: "short",
+              month: "short",
+              day: "numeric",
+            }) ?? "";
+          },
+          label: (item: TooltipItem<"line">) => {
+            const n = item.parsed.y;
+            return ` ${n} booking${n !== 1 ? "s" : ""}`;
+          },
         },
       },
     },
@@ -157,21 +163,22 @@ export default function StudentBookingChart({ bookings }: Props) {
         grid: { display: false },
         border: { display: false },
         ticks: {
-          color: "hsl(215 20% 55%)",
-          font: { size: 12 },
+          color: "#9ca3af",
+          font: { size: 11 },
+          maxRotation: 0,
+          autoSkip: false,
         },
       },
       y: {
         beginAtZero: true,
-        grid: {
-          color: "hsl(214 32% 91% / 0.5)",
-        },
+        grid: { color: "rgba(0,0,0,0.04)" },
         border: { display: false, dash: [4, 4] },
         ticks: {
-          color: "hsl(215 20% 55%)",
-          font: { size: 12 },
+          color: "#9ca3af",
+          font: { size: 11 },
           stepSize: 1,
           precision: 0,
+          maxTicksLimit: 5,
         },
       },
     },
@@ -179,60 +186,41 @@ export default function StudentBookingChart({ bookings }: Props) {
 
   return (
     <Card>
-      <CardHeader className="pb-4">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <CardTitle className="text-base font-semibold">Booking Activity</CardTitle>
-            <CardDescription className="mt-0.5 text-xs">
-              Your session history over the last {range} months
-            </CardDescription>
-          </div>
-
-          {/* Range toggle */}
-          <div className="flex items-center gap-1 rounded-lg border bg-muted/40 p-1">
-            {RANGES.map(({ key, label }) => (
-              <button
-                key={key}
-                onClick={() => setRange(key)}
-                className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
-                  range === key
-                    ? "bg-background shadow-sm text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+      <CardHeader className="flex flex-col gap-0 space-y-0 border-b pb-5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <CardTitle className="text-base font-semibold">
+            Area Chart - Interactive
+          </CardTitle>
+          <CardDescription className="mt-1 text-sm">
+            Showing total bookings for the {selectedLabel.toLowerCase()}
+          </CardDescription>
         </div>
 
-        {/* Series toggle + stat */}
-        <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
-          <div className="flex gap-2">
-            {SERIES.map(({ key, label }) => (
-              <button
-                key={key}
-                onClick={() => setActiveSeries(key)}
-                className={`rounded-full border px-3.5 py-1 text-xs font-medium transition-all ${
-                  activeSeries === key
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
-                }`}
-              >
+        <Select value={range} onValueChange={(v) => setRange(v as RangeValue)}>
+          <SelectTrigger className="mt-3 h-8 w-[140px] rounded-lg text-xs sm:mt-0">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {RANGES.map(({ value, label }) => (
+              <SelectItem key={value} value={value} className="text-xs">
                 {label}
-              </button>
+              </SelectItem>
             ))}
-          </div>
-          <div className="text-right">
-            <p className="text-2xl font-bold tabular-nums">{total}</p>
-            <p className="text-xs text-muted-foreground">{avg} / month avg</p>
-          </div>
-        </div>
+          </SelectContent>
+        </Select>
       </CardHeader>
 
-      <CardContent>
-        <div className="h-[220px]">
-          <Line ref={chartRef} data={data} options={options} />
+      <CardContent className="px-2 pt-6 sm:px-6">
+        {/* Total stat above chart */}
+        <div className="mb-4 px-2">
+          <p className="text-3xl font-bold tabular-nums">{total.toLocaleString()}</p>
+          <p className="text-xs text-muted-foreground">
+            total bookings in this period
+          </p>
+        </div>
+
+        <div className="h-[240px]">
+          <Line data={data} options={options} />
         </div>
       </CardContent>
     </Card>
