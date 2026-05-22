@@ -36,8 +36,9 @@ export default function TrustedPartners() {
           {doubled.map((subject, i) => (
             <div
               key={`${subject}-${i}`}
-              className="mx-3 inline-flex min-w-[160px] cursor-default items-center justify-center border bg-background/90 px-6 py-4 shadow-sm transition-all hover:border-primary/30 hover:bg-background hover:shadow-md dark:bg-card/80"
+              className="mx-3 inline-flex min-w-fit cursor-default items-center gap-2 rounded-full border bg-background px-6 py-3 shadow-sm transition-all hover:border-primary/40 hover:bg-primary/5 hover:shadow-md dark:bg-card/80"
             >
+              <span className="size-1.5 rounded-full bg-primary/50" />
               <span className="text-sm font-semibold text-foreground">
                 {subject}
               </span>

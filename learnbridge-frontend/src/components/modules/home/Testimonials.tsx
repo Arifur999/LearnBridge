@@ -1,6 +1,5 @@
 import { Star } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Card, CardContent } from "@/components/ui/card";
 import SectionHeader from "./SectionHeader";
 import { getInitials } from "@/lib/utils";
 
@@ -49,14 +48,25 @@ const testimonials = [
   },
 ];
 
+const cardStyles = [
+  { from: "from-primary/5",     avatar: "bg-primary/15 text-primary" },
+  { from: "from-violet-500/5",  avatar: "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400" },
+  { from: "from-emerald-500/5", avatar: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" },
+  { from: "from-amber-500/5",   avatar: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" },
+  { from: "from-cyan-500/5",    avatar: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400" },
+  { from: "from-rose-500/5",    avatar: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400" },
+];
+
 function StarRating({ rating }: { rating: number }) {
   return (
     <div className="flex gap-0.5">
       {Array.from({ length: 5 }).map((_, i) => (
         <Star
           key={i}
-          className={`size-4 ${
-            i < rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/30"
+          className={`size-3.5 ${
+            i < rating
+              ? "fill-amber-400 text-amber-400"
+              : "fill-muted-foreground/20 text-muted-foreground/20"
           }`}
         />
       ))}
@@ -66,7 +76,7 @@ function StarRating({ rating }: { rating: number }) {
 
 export default function Testimonials() {
   return (
-    <section className="py-20">
+    <section className="py-24">
       <div className="mx-auto max-w-7xl px-4">
         <SectionHeader
           label="Testimonials"
@@ -75,20 +85,28 @@ export default function Testimonials() {
           centered
         />
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {testimonials.map((t) => (
-            <Card
-              key={t.name}
-              className="border-border/80 bg-card/80 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/25 hover:shadow-lg dark:bg-card"
-            >
-              <CardContent className="p-6">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {testimonials.map((t, i) => {
+            const style = cardStyles[i];
+            return (
+              <div
+                key={t.name}
+                className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-linear-to-br ${style.from} to-transparent p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:shadow-lg`}
+              >
+                {/* Decorative large quote mark */}
+                <span className="pointer-events-none absolute right-5 top-3 select-none font-serif text-8xl leading-none text-foreground/[0.04]">
+                  &ldquo;
+                </span>
+
                 <StarRating rating={t.rating} />
-                <p className="mt-4 min-h-24 text-sm leading-7 text-muted-foreground">
+
+                <p className="relative mt-4 flex-1 text-sm leading-7 text-muted-foreground">
                   &ldquo;{t.quote}&rdquo;
                 </p>
-                <div className="mt-5 flex items-center gap-3">
-                  <Avatar>
-                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+
+                <div className="mt-5 flex items-center gap-3 border-t border-border/50 pt-4">
+                  <Avatar className="size-9 shrink-0">
+                    <AvatarFallback className={`text-xs font-semibold ${style.avatar}`}>
                       {getInitials(t.name)}
                     </AvatarFallback>
                   </Avatar>
@@ -97,9 +115,9 @@ export default function Testimonials() {
                     <p className="text-xs text-muted-foreground">{t.role}</p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

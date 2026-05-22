@@ -52,7 +52,7 @@ export default function CoursesFilter({
   }, [search, category, minPrice, maxPrice, sort, router, basePath]);
 
   return (
-    <div className="mb-10 border bg-card/80 p-4 shadow-sm backdrop-blur-sm dark:bg-card">
+    <div className="mb-10 rounded-2xl border bg-card/80 p-5 shadow-sm backdrop-blur-sm dark:bg-card">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         {/* Search */}
         <div className="relative w-full md:max-w-md">

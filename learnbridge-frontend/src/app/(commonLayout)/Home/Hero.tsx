@@ -71,19 +71,22 @@ const proofItems = [
     icon: ShieldCheck,
     title: "Trusted profiles",
     description: "Compare tutors before you book.",
-    color: "text-emerald-200",
+    iconColor: "text-emerald-300",
+    borderColor: "border-emerald-400/30",
   },
   {
     icon: CalendarClock,
     title: "Clear scheduling",
     description: "Pick learning time that fits.",
-    color: "text-amber-200",
+    iconColor: "text-amber-300",
+    borderColor: "border-amber-400/30",
   },
   {
     icon: BookOpen,
     title: "Course discovery",
     description: "Keep subjects within reach.",
-    color: "text-cyan-200",
+    iconColor: "text-cyan-300",
+    borderColor: "border-cyan-400/30",
   },
 ];
 
@@ -94,10 +97,9 @@ export default function Hero() {
         <CarouselContent>
           {slides.map((slide, index) => {
             const Icon = slide.icon;
-
             return (
               <CarouselItem key={slide.title}>
-                <div className="relative min-h-[72svh] w-full overflow-hidden md:min-h-[76svh]">
+                <div className="relative min-h-[72svh] w-full overflow-hidden md:min-h-[78svh]">
                   <Image
                     src={slide.image}
                     alt={slide.title}
@@ -106,21 +108,26 @@ export default function Hero() {
                     className="object-cover object-center"
                     priority={index === 0}
                   />
-
                   <div className={`absolute inset-0 ${slide.overlay}`} />
-                  <div className="absolute inset-0 bg-linear-to-r from-black/88 via-black/56 to-black/18" />
+                  <div className="absolute inset-0 bg-linear-to-r from-black/92 via-black/60 to-black/20" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/55 via-transparent to-transparent" />
 
-                  <div className="relative z-10 mx-auto flex min-h-[72svh] max-w-7xl flex-col justify-between px-4 py-12 sm:px-6 md:min-h-[76svh] md:py-16">
+                  <div className="relative z-10 mx-auto flex min-h-[72svh] max-w-7xl flex-col justify-between px-4 py-12 sm:px-6 md:min-h-[78svh] md:py-16">
                     <div className="max-w-3xl">
-                      <div className="mb-5 inline-flex items-center border-l-2 border-cyan-300 pl-3 text-sm font-semibold uppercase tracking-[0.18em] text-cyan-100">
-                        <Icon className="mr-2 size-4" />
+                      {/* Pill badge with pulsing live dot */}
+                      <div className="mb-6 inline-flex items-center gap-2.5 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm ring-1 ring-white/20">
+                        <span className="relative flex h-2 w-2">
+                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-300 opacity-75" />
+                          <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-300" />
+                        </span>
+                        <Icon className="size-3.5 opacity-80" />
                         {slide.badge}
                       </div>
 
-                      <h1 className="max-w-4xl text-4xl font-black leading-tight text-white drop-shadow-sm sm:text-5xl lg:text-6xl">
+                      <h1 className="max-w-4xl text-4xl font-black leading-[1.1] tracking-tight text-white drop-shadow sm:text-5xl lg:text-6xl">
                         {slide.title}
                       </h1>
-                      <p className="mt-5 max-w-2xl text-base leading-7 text-white/86 sm:text-lg">
+                      <p className="mt-5 max-w-2xl text-base leading-7 text-white/80 sm:text-lg">
                         {slide.description}
                       </p>
 
@@ -128,33 +135,36 @@ export default function Hero() {
                         <Button
                           asChild
                           size="lg"
-                          className="bg-white px-7 font-semibold text-slate-950 hover:bg-white/90"
+                          className="group bg-white px-7 font-semibold text-slate-950 hover:bg-white/90"
                         >
                           <Link href={slide.ctaHref}>
                             {slide.cta}
-                            <ArrowRight className="size-4" />
+                            <ArrowRight className="ml-1 size-4 transition-transform group-hover:translate-x-0.5" />
                           </Link>
                         </Button>
                         <Button
                           asChild
                           size="lg"
                           variant="outline"
-                          className="border-white/35 bg-black/10 text-white hover:bg-white/10 hover:text-white"
+                          className="border-white/30 bg-white/5 text-white backdrop-blur-sm hover:bg-white/10 hover:text-white"
                         >
                           <Link href="/courses">Explore Courses</Link>
                         </Button>
                       </div>
                     </div>
 
-                    <div className="mt-10 grid gap-px overflow-hidden border border-white/18 bg-white/18 sm:grid-cols-3">
+                    {/* Proof strip — individual rounded cards */}
+                    <div className="mt-10 grid gap-3 sm:grid-cols-3">
                       {proofItems.map((item) => {
                         const ProofIcon = item.icon;
-
                         return (
-                          <div key={item.title} className="bg-black/35 px-4 py-4 backdrop-blur-sm sm:px-5">
-                            <ProofIcon className={`mb-3 size-5 ${item.color}`} />
+                          <div
+                            key={item.title}
+                            className={`rounded-2xl border ${item.borderColor} bg-black/30 px-5 py-4 backdrop-blur-sm`}
+                          >
+                            <ProofIcon className={`mb-2.5 size-5 ${item.iconColor}`} />
                             <p className="font-semibold">{item.title}</p>
-                            <p className="mt-1 text-sm text-white/70">{item.description}</p>
+                            <p className="mt-0.5 text-sm text-white/65">{item.description}</p>
                           </div>
                         );
                       })}
@@ -166,8 +176,8 @@ export default function Hero() {
           })}
         </CarouselContent>
 
-        <CarouselPrevious className="left-4 top-auto bottom-6 border-white/30 bg-black/35 text-white hover:bg-black/55 md:bottom-auto md:top-1/2" />
-        <CarouselNext className="right-4 top-auto bottom-6 border-white/30 bg-black/35 text-white hover:bg-black/55 md:bottom-auto md:top-1/2" />
+        <CarouselPrevious className="left-4 top-auto bottom-8 border-white/30 bg-black/35 text-white hover:bg-black/55 md:bottom-auto md:top-1/2" />
+        <CarouselNext className="right-4 top-auto bottom-8 border-white/30 bg-black/35 text-white hover:bg-black/55 md:bottom-auto md:top-1/2" />
       </Carousel>
     </section>
   );
