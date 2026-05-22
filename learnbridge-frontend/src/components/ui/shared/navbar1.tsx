@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/layout/ModeToggle";
 import logo from "../../../../public/logo.png";
+import { usePathname } from "next/navigation";
 import {
   Sheet,
   SheetContent,
@@ -63,6 +64,7 @@ const Navbar = ({
   className?: string;
   user?: User | null;
 }) => {
+  const pathname = usePathname();
   const [user, setUser] = useState<User | null>(
     userProp ?? (authService.getCurrentUser() as User | null)
   );
@@ -98,15 +100,23 @@ const Navbar = ({
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-7 lg:flex">
-          {menu.map((item) => (
-            <Link
-              key={item.title}
-              href={item.url}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              {item.title}
-            </Link>
-          ))}
+          {menu.map((item) => {
+            const isActive = pathname === item.url || (item.url !== "/" && pathname.startsWith(item.url));
+            return (
+              <Link
+                key={item.title}
+                href={item.url}
+                className={cn(
+                  "relative text-sm font-medium transition-colors hover:text-foreground",
+                  isActive
+                    ? "text-foreground after:absolute after:-bottom-1 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-primary"
+                    : "text-muted-foreground"
+                )}
+              >
+                {item.title}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Desktop auth + theme */}

@@ -40,11 +40,14 @@ export default function HowItWorks() {
         />
 
         <div className="relative grid gap-8 md:grid-cols-3">
+          {/* connector line between steps on desktop */}
+          <div className="absolute top-10 left-1/6 right-1/6 hidden h-px bg-border md:block" />
+
           {steps.map(({ number, icon: Icon, title, description, color }, i) => (
             <div key={i} className="flex flex-col items-center text-center">
-              <div className="relative mb-6">
+              <div className="relative mb-6 z-10">
                 <div
-                  className={`flex size-20 items-center justify-center rounded-2xl ${color} shadow-sm`}
+                  className={`flex size-20 items-center justify-center rounded-2xl ${color} shadow-sm ring-4 ring-background`}
                 >
                   <Icon className="size-9" />
                 </div>

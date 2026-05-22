@@ -16,9 +16,12 @@ export default function SectionHeader({
   centered = false,
 }: SectionHeaderProps) {
   return (
-    <div className={cn("mb-12", centered && "text-center", className)}>
+    <div className={cn("mb-12", centered && "flex flex-col text-center items-center", className)}>
       {label && (
-        <span className="mb-4 inline-flex border-l-2 border-primary pl-3 text-xs font-bold uppercase tracking-[0.2em] text-primary">
+        <span className={cn(
+          "mb-4 inline-flex border-l-2 border-primary pl-3 text-xs font-bold uppercase tracking-[0.2em] text-primary",
+          centered && "mx-auto"
+        )}>
           {label}
         </span>
       )}
