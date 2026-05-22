@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DashPageHeader from "@/components/layout/DashPageHeader";
 import { formatDate, formatTime } from "@/lib/utils";
+import StudentBookingChart from "./StudentBookingChart";
 
 export default async function StudentDashboardPage() {
   const user = await getCurrentUserFromServer();
@@ -57,6 +58,8 @@ export default async function StudentDashboardPage() {
           </Link>
         ))}
       </div>
+
+      <StudentBookingChart bookings={Array.isArray(bookings) ? bookings.map((b) => ({ createdAt: String(b?.createdAt ?? ""), status: String(b?.status ?? "") })) : []} />
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">

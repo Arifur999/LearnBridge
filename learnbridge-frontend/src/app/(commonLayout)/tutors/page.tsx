@@ -83,16 +83,6 @@ export default async function TutorsPage({
 
         <div className="relative mx-auto flex min-h-[58svh] max-w-7xl flex-col justify-end px-4 py-12 sm:px-6 md:py-16">
           <div className="max-w-3xl">
-            {/* Pill badge with pulsing dot */}
-            <div className="mb-5 inline-flex items-center gap-2.5 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm ring-1 ring-white/20">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-300 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-300" />
-              </span>
-              <Users className="size-3.5 opacity-80" />
-              Tutor Directory
-            </div>
-
             <h1 className="text-4xl font-black leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
               Find a tutor for the topic that is slowing you down
             </h1>

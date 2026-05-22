@@ -6,8 +6,6 @@ import {
   ArrowRight,
   BookOpen,
   CalendarClock,
-  GraduationCap,
-  Rocket,
   ShieldCheck,
 } from "lucide-react";
 import {
@@ -26,8 +24,6 @@ interface Slide {
   ctaHref: string;
   overlay: string;
   image: string;
-  icon: React.ComponentType<{ className?: string }>;
-  badge: string;
 }
 
 const slides: Slide[] = [
@@ -39,8 +35,6 @@ const slides: Slide[] = [
     ctaHref: "/tutors",
     overlay: "bg-indigo-950/52",
     image: "/book-with-green-board-background_1150-3837.jpg",
-    icon: BookOpen,
-    badge: "10,000+ Students",
   },
   {
     title: "Teach with clarity. Grow with LearnBridge.",
@@ -50,8 +44,6 @@ const slides: Slide[] = [
     ctaHref: "/register",
     overlay: "bg-cyan-950/52",
     image: "/front-view-academic-cap-with-books-pencils_23-2148756619.jpg",
-    icon: GraduationCap,
-    badge: "120+ Expert Tutors",
   },
   {
     title: "Courses and sessions for real progress",
@@ -61,8 +53,6 @@ const slides: Slide[] = [
     ctaHref: "/register",
     overlay: "bg-slate-950/48",
     image: "/front-view-stacked-books-earth-globe-with-graduation-cap-education-day_742418-47637.jpg",
-    icon: Rocket,
-    badge: "95% Success Rate",
   },
 ];
 
@@ -96,7 +86,6 @@ export default function Hero() {
       <Carousel className="w-full overflow-hidden">
         <CarouselContent>
           {slides.map((slide, index) => {
-            const Icon = slide.icon;
             return (
               <CarouselItem key={slide.title}>
                 <div className="relative min-h-[72svh] w-full overflow-hidden md:min-h-[78svh]">
@@ -114,16 +103,6 @@ export default function Hero() {
 
                   <div className="relative z-10 mx-auto flex min-h-[72svh] max-w-7xl flex-col justify-between px-4 py-12 sm:px-6 md:min-h-[78svh] md:py-16">
                     <div className="max-w-3xl">
-                      {/* Pill badge with pulsing live dot */}
-                      <div className="mb-6 inline-flex items-center gap-2.5 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm ring-1 ring-white/20">
-                        <span className="relative flex h-2 w-2">
-                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-300 opacity-75" />
-                          <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-300" />
-                        </span>
-                        <Icon className="size-3.5 opacity-80" />
-                        {slide.badge}
-                      </div>
-
                       <h1 className="max-w-4xl text-4xl font-black leading-[1.1] tracking-tight text-white drop-shadow sm:text-5xl lg:text-6xl">
                         {slide.title}
                       </h1>
