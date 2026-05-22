@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Target, Heart, Globe, Award, Users, BookOpen, ArrowRight } from "lucide-react";
+import { Target, Heart, Globe, Award, Users, BookOpen, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const values = [
@@ -37,15 +37,17 @@ const team = [
 ];
 
 const stats = [
-  { value: "10K+", label: "Students", icon: Users },
-  { value: "120+", label: "Expert Tutors", icon: BookOpen },
-  { value: "50+", label: "Subjects", icon: Award },
-  { value: "95%", label: "Satisfaction Rate", icon: Heart },
+  { value: "10K+", label: "Students", icon: Users, color: "bg-primary/10 text-primary" },
+  { value: "120+", label: "Expert Tutors", icon: BookOpen, color: "bg-violet-100 text-violet-600 dark:bg-violet-900/30 dark:text-violet-400" },
+  { value: "50+", label: "Subjects", icon: Award, color: "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400" },
+  { value: "95%", label: "Satisfaction Rate", icon: Heart, color: "bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400" },
 ];
 
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-background">
+
+      {/* Hero — left-aligned bottom, matching tutors/courses layout */}
       <section className="relative isolate overflow-hidden border-b bg-zinc-950 text-white">
         <Image
           src="/graduation-cap-with-earth-globe-concept-global-business-study-abroad-educational-back-school-education-global-world-study-abroad-business-universities-worldwide-language-study_721781-2163.jpg"
@@ -55,31 +57,37 @@ export default function AboutPage() {
           className="object-cover object-center"
           priority
         />
-        <div className="absolute inset-0 bg-zinc-950/50" />
-        <div className="absolute inset-0 bg-linear-to-r from-zinc-950/88 via-zinc-950/60 to-transparent" />
+        <div className="absolute inset-0 bg-zinc-950/52" />
+        <div className="absolute inset-0 bg-linear-to-r from-zinc-950/92 via-zinc-950/65 to-zinc-950/20" />
+        <div className="absolute inset-0 bg-linear-to-t from-zinc-950/55 via-transparent to-transparent" />
 
-        <div className="relative mx-auto flex min-h-[64svh] max-w-7xl items-center px-4 py-14 sm:px-6">
-          <div className="max-w-2xl border-l border-white/30 pl-5 sm:pl-8">
-            <p className="mb-5 text-sm font-semibold uppercase tracking-[0.26em] text-rose-100">
+        <div className="relative mx-auto flex min-h-[62svh] max-w-7xl flex-col justify-end px-4 py-12 sm:px-6 md:py-16">
+          <div className="max-w-3xl">
+            <p className="mb-4 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.22em] text-rose-300">
               Our Story
             </p>
-            <h1 className="text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">
+            <h1 className="text-4xl font-black leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
               Education feels closer when the right teacher is within reach
             </h1>
-            <p className="mt-6 text-base leading-7 text-white/82 sm:text-lg">
-              LearnBridge was built to connect motivated learners with tutors who can turn a difficult subject into a clear next step.
+            <p className="mt-5 max-w-2xl text-base leading-7 text-white/80 sm:text-lg">
+              LearnBridge was built to connect motivated learners with tutors who can turn a
+              difficult subject into a clear next step.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild size="lg" className="bg-rose-100 text-zinc-950 hover:bg-white">
+              <Button
+                asChild
+                size="lg"
+                className="group bg-white font-semibold text-zinc-950 hover:bg-white/90"
+              >
                 <Link href="/tutors">
-                  Explore tutors <ArrowRight className="size-4" />
+                  Explore tutors <ArrowRight className="ml-1 size-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
               </Button>
               <Button
                 asChild
                 size="lg"
                 variant="outline"
-                className="border-white/35 bg-transparent text-white hover:bg-white/10 hover:text-white"
+                className="border-white/30 bg-white/5 text-white backdrop-blur-sm hover:bg-white/10 hover:text-white"
               >
                 <Link href="/contact">Talk to us</Link>
               </Button>
@@ -87,19 +95,21 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
       {/* Stats */}
       <section className="border-b bg-muted/20 py-14">
         <div className="mx-auto max-w-7xl px-4">
-          <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-5 md:grid-cols-4">
             {stats.map((item) => {
               const Icon = item.icon;
               return (
                 <div
                   key={item.label}
-                  className="flex flex-col items-center gap-2 border bg-card/90 p-6 text-center shadow-sm dark:bg-card"
+                  className="relative flex flex-col items-center gap-3 overflow-hidden rounded-2xl border bg-background p-6 text-center shadow-sm"
                 >
-                  <div className="bg-indigo-50 p-3 dark:bg-indigo-950/45">
-                    <Icon className="size-6 text-indigo-600 dark:text-indigo-300" />
+                  <div className="absolute inset-x-0 top-0 h-1 bg-primary/20 rounded-t-2xl" />
+                  <div className={`flex size-12 items-center justify-center rounded-full ${item.color}`}>
+                    <Icon className="size-5" />
                   </div>
                   <h3 className="text-3xl font-extrabold tracking-tight text-primary">{item.value}</h3>
                   <p className="text-sm text-muted-foreground">{item.label}</p>
@@ -111,14 +121,14 @@ export default function AboutPage() {
       </section>
 
       {/* Our Story */}
-      <section className="py-20">
+      <section className="py-24">
         <div className="mx-auto max-w-7xl px-4">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div>
-              <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">
+              <p className="mb-3 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.18em] text-primary">
                 How It Started
               </p>
-              <h2 className="mb-5 text-3xl font-bold md:text-4xl">
+              <h2 className="mb-5 text-3xl font-bold leading-tight md:text-4xl">
                 Built for learners, by educators
               </h2>
               <div className="space-y-4 text-muted-foreground">
@@ -168,25 +178,25 @@ export default function AboutPage() {
       </section>
 
       {/* Values */}
-      <section className="border-t bg-muted/20 py-20">
+      <section className="border-t bg-muted/20 py-24">
         <div className="mx-auto max-w-7xl px-4">
           <div className="mb-12 text-center">
-            <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-primary">
+            <p className="mb-2 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.18em] text-primary">
               What Guides Us
             </p>
             <h2 className="text-3xl font-bold md:text-4xl">Our Core Values</h2>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {values.map((v) => {
               const Icon = v.icon;
               return (
                 <div
                   key={v.title}
-                  className="border bg-card/90 p-6 shadow-sm dark:bg-card"
+                  className="rounded-2xl border bg-background p-6 shadow-sm transition-shadow hover:shadow-md"
                 >
                   <div className={`mb-4 inline-flex rounded-xl p-3 ${v.color}`}>
-                    <Icon className="size-6" />
+                    <Icon className="size-5" />
                   </div>
                   <h3 className="mb-2 font-semibold">{v.title}</h3>
                   <p className="text-sm leading-relaxed text-muted-foreground">{v.desc}</p>
@@ -198,10 +208,10 @@ export default function AboutPage() {
       </section>
 
       {/* Team */}
-      <section className="py-20">
+      <section className="py-24">
         <div className="mx-auto max-w-7xl px-4">
           <div className="mb-12 text-center">
-            <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-primary">
+            <p className="mb-2 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.18em] text-primary">
               The People Behind LearnBridge
             </p>
             <h2 className="text-3xl font-bold md:text-4xl">Meet Our Team</h2>
@@ -209,18 +219,21 @@ export default function AboutPage() {
 
           <div className="flex flex-wrap justify-center gap-8">
             {team.map((member) => (
-              <div key={member.name} className="flex flex-col items-center text-center">
-                <div className="mb-4 size-28 overflow-hidden rounded-full border-4 border-indigo-100 shadow-md dark:border-indigo-950">
+              <div
+                key={member.name}
+                className="flex flex-col items-center rounded-2xl border bg-background p-6 text-center shadow-sm"
+              >
+                <div className="mb-4 size-24 overflow-hidden rounded-full ring-4 ring-primary/10 shadow-md">
                   <Image
                     src={member.img}
                     alt={member.name}
-                    width={112}
-                    height={112}
+                    width={96}
+                    height={96}
                     className="h-full w-full object-cover"
                   />
                 </div>
                 <h3 className="font-semibold">{member.name}</h3>
-                <p className="text-sm text-muted-foreground">{member.role}</p>
+                <p className="mt-0.5 text-sm text-muted-foreground">{member.role}</p>
               </div>
             ))}
           </div>
@@ -228,19 +241,43 @@ export default function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="border-t bg-zinc-950 py-16 text-white">
-        <div className="mx-auto max-w-2xl px-4 text-center">
-          <h2 className="mb-3 text-2xl font-bold">Ready to start learning?</h2>
-          <p className="mb-6 text-indigo-100">
-            Start with a tutor, a course, or the question already on your desk.
-          </p>
-          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <Button asChild size="lg" className="bg-white text-indigo-700 hover:bg-white/90">
-              <Link href="/register">Get Started Free</Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="border-white/40 bg-transparent text-white hover:bg-white/10">
-              <Link href="/contact">Talk to Us</Link>
-            </Button>
+      <section className="py-24">
+        <div className="mx-auto max-w-7xl px-4">
+          <div className="relative isolate overflow-hidden rounded-3xl bg-zinc-950 px-6 py-20 text-center text-white shadow-2xl sm:px-12">
+            <div className="absolute inset-0 bg-linear-to-br from-primary/15 via-transparent to-rose-900/15" />
+            <div className="absolute -right-24 -top-24 size-80 rounded-full border border-white/[0.06]" />
+            <div className="absolute -right-12 -top-12 size-56 rounded-full border border-white/[0.06]" />
+            <div className="absolute -bottom-24 -left-24 size-80 rounded-full border border-white/[0.06]" />
+
+            <div className="relative">
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold text-rose-300 ring-1 ring-white/15 backdrop-blur-sm">
+                <Sparkles className="size-3.5" />
+                Ready to start?
+              </div>
+              <h2 className="mb-4 text-3xl font-black md:text-4xl">
+                Ready to start learning?
+              </h2>
+              <p className="mx-auto mb-8 max-w-md text-base text-white/75">
+                Start with a tutor, a course, or the question already on your desk.
+              </p>
+              <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+                <Button
+                  asChild
+                  size="lg"
+                  className="min-w-[160px] bg-white font-semibold text-zinc-950 hover:bg-white/90"
+                >
+                  <Link href="/register">Get Started Free</Link>
+                </Button>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="min-w-[160px] border-white/25 bg-white/5 text-white backdrop-blur-sm hover:bg-white/10 hover:text-white"
+                >
+                  <Link href="/contact">Talk to Us</Link>
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </section>

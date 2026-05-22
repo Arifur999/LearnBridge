@@ -84,44 +84,36 @@ export default async function CoursesPage({
         <div className="absolute inset-0 bg-linear-to-b from-slate-950/30 via-slate-950/58 to-slate-950/92" />
         <div className="absolute inset-0 bg-linear-to-t from-slate-950/50 via-transparent to-transparent" />
 
-        <div className="relative mx-auto flex min-h-[62svh] max-w-7xl flex-col items-center justify-center px-4 py-14 text-center sm:px-6">
-          {/* Pill badge with pulsing dot */}
-          <div className="mb-6 inline-flex items-center gap-2.5 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm ring-1 ring-white/20">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-300 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-300" />
-            </span>
-            <BookOpen className="size-3.5 opacity-80" />
-            Course Library
-          </div>
-
-          <h1 className="max-w-4xl text-4xl font-black leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
-            Pick a course and build momentum topic by topic
-          </h1>
-          <p className="mt-5 max-w-2xl text-base leading-7 text-white/80 sm:text-lg">
-            Explore practical learning paths, compare categories and prices, and
-            keep your next goal in view.
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Button
-              asChild
-              size="lg"
-              className="group bg-white font-semibold text-slate-950 hover:bg-white/90"
-            >
-              <Link href="#course-results">Browse courses</Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="border-white/30 bg-white/5 text-white backdrop-blur-sm hover:bg-white/10 hover:text-white"
-            >
-              <Link href="/tutors">Find a tutor</Link>
-            </Button>
+        <div className="relative mx-auto flex min-h-[62svh] max-w-7xl flex-col justify-end px-4 py-12 sm:px-6 md:py-16">
+          <div className="max-w-3xl">
+            <h1 className="text-4xl font-black leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
+              Pick a course and build momentum topic by topic
+            </h1>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-white/80 sm:text-lg">
+              Explore practical learning paths, compare categories and prices, and
+              keep your next goal in view.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button
+                asChild
+                size="lg"
+                className="bg-white font-semibold text-slate-950 hover:bg-white/90"
+              >
+                <Link href="#course-results">Browse courses</Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="border-white/30 bg-white/5 text-white backdrop-blur-sm hover:bg-white/10 hover:text-white"
+              >
+                <Link href="/tutors">Find a tutor</Link>
+              </Button>
+            </div>
           </div>
 
           {/* Stat row */}
-          <div className="mt-12 grid grid-cols-3 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10">
+          <div className="mt-10 grid grid-cols-3 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:w-fit">
             {[
               { icon: BookOpen, value: meta?.total ?? "Curated", label: "Available courses" },
               { icon: LayoutGrid, value: categories.length || "Many", label: "Subject categories" },
