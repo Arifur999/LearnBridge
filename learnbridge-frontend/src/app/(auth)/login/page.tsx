@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BookOpen } from "lucide-react";
 import { LoginForm } from "@/components/login-form";
 
 export default function LoginPage() {
@@ -25,14 +24,17 @@ export default function LoginPage() {
       <div className="relative flex min-h-screen flex-col lg:flex-row">
 
         {/* ── Left — brand hero ─────────────────────────── */}
-        <div className="flex flex-1 flex-col justify-between p-8 sm:p-12 lg:p-16 lg:pb-20">
+        <div className="flex flex-col justify-between p-8 sm:p-12 lg:w-[55%] lg:p-16 lg:pb-20">
 
           {/* Logo */}
-          <Link href="/" className="inline-flex items-center gap-2.5">
-            <div className="flex size-9 items-center justify-center rounded-xl bg-primary shadow-lg">
-              <BookOpen className="size-[18px] text-white" />
-            </div>
-            <span className="text-lg font-black tracking-tight text-white">LearnBridge</span>
+          <Link href="/" className="inline-flex">
+            <Image
+              src="/logo.png"
+              alt="LearnBridge"
+              width={120}
+              height={48}
+              className="object-contain drop-shadow-lg"
+            />
           </Link>
 
           {/* Hero text — hidden on small screens */}
@@ -69,7 +71,7 @@ export default function LoginPage() {
         </div>
 
         {/* ── Right — glass form panel ───────────────────── */}
-        <div className="flex items-center justify-center p-6 sm:p-10 lg:w-[480px] lg:shrink-0">
+        <div className="flex items-center justify-center p-6 sm:p-10 lg:w-[45%] lg:shrink-0">
           <LoginForm />
         </div>
       </div>

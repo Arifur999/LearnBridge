@@ -37,53 +37,54 @@ function SignupFormInner({ className, ...props }: React.ComponentProps<"div">) {
   }, [state.success, state.message]);
 
   return (
-    <div className={cn("w-full max-w-sm", className)} {...props}>
+    <div className={cn("w-full max-w-md", className)} {...props}>
       {/* Glass card */}
       <div className="overflow-hidden rounded-3xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-2xl">
 
         {/* Card header */}
-        <div className="border-b border-white/10 px-8 py-6">
+        <div className="border-b border-white/10 px-8 py-5">
           <h2 className="text-xl font-black tracking-tight text-white">
             Create account
           </h2>
-          <p className="mt-1 text-sm text-white/55">
+          <p className="mt-0.5 text-sm text-white/55">
             Join LearnBridge and start learning today
           </p>
         </div>
 
         {/* Form */}
-        <form action={formAction} className="space-y-4 px-8 py-6">
+        <form action={formAction} className="px-8 py-5">
 
-          {/* Full Name */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
-              Full Name
-            </label>
-            <Input
-              name="name"
-              type="text"
-              placeholder="Your full name"
-              required
-              className="border-white/20 bg-white/10 text-white placeholder:text-white/35 focus-visible:border-primary focus-visible:ring-primary/30 backdrop-blur-sm"
-            />
-          </div>
+          {/* Name + Email row */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
+                Full Name
+              </label>
+              <Input
+                name="name"
+                type="text"
+                placeholder="Your name"
+                required
+                className="border-white/20 bg-white/10 text-white placeholder:text-white/35 focus-visible:border-primary focus-visible:ring-primary/30 backdrop-blur-sm"
+              />
+            </div>
 
-          {/* Email */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
-              Email
-            </label>
-            <Input
-              name="email"
-              type="email"
-              placeholder="you@example.com"
-              required
-              className="border-white/20 bg-white/10 text-white placeholder:text-white/35 focus-visible:border-primary focus-visible:ring-primary/30 backdrop-blur-sm"
-            />
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
+                Email
+              </label>
+              <Input
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                required
+                className="border-white/20 bg-white/10 text-white placeholder:text-white/35 focus-visible:border-primary focus-visible:ring-primary/30 backdrop-blur-sm"
+              />
+            </div>
           </div>
 
           {/* Role */}
-          <div className="space-y-1.5">
+          <div className="mt-3 space-y-1.5">
             <label className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
               I am a
             </label>
@@ -102,52 +103,53 @@ function SignupFormInner({ className, ...props }: React.ComponentProps<"div">) {
             </Select>
           </div>
 
-          {/* Password */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
-              Password
-            </label>
-            <Input
-              name="password"
-              type="password"
-              placeholder="••••••••••"
-              required
-              className="border-white/20 bg-white/10 text-white placeholder:text-white/35 focus-visible:border-primary focus-visible:ring-primary/30 backdrop-blur-sm"
-            />
-          </div>
+          {/* Password + Confirm row */}
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
+                Password
+              </label>
+              <Input
+                name="password"
+                type="password"
+                placeholder="••••••••••"
+                required
+                className="border-white/20 bg-white/10 text-white placeholder:text-white/35 focus-visible:border-primary focus-visible:ring-primary/30 backdrop-blur-sm"
+              />
+            </div>
 
-          {/* Confirm Password */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
-              Confirm Password
-            </label>
-            <Input
-              name="confirmPassword"
-              type="password"
-              placeholder="••••••••••"
-              required
-              className="border-white/20 bg-white/10 text-white placeholder:text-white/35 focus-visible:border-primary focus-visible:ring-primary/30 backdrop-blur-sm"
-            />
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
+                Confirm
+              </label>
+              <Input
+                name="confirmPassword"
+                type="password"
+                placeholder="••••••••••"
+                required
+                className="border-white/20 bg-white/10 text-white placeholder:text-white/35 focus-visible:border-primary focus-visible:ring-primary/30 backdrop-blur-sm"
+              />
+            </div>
           </div>
 
           {/* Submit */}
           <Button
             type="submit"
             disabled={isPending}
-            className="mt-2 w-full rounded-xl bg-primary font-semibold tracking-wide hover:bg-primary/90"
+            className="mt-5 w-full rounded-xl bg-primary font-semibold tracking-wide hover:bg-primary/90"
           >
             {isPending ? "Creating account…" : "Create Account"}
           </Button>
 
           {/* Divider */}
-          <div className="flex items-center gap-3">
+          <div className="mt-4 flex items-center gap-3">
             <div className="h-px flex-1 bg-white/15" />
             <span className="text-xs text-white/35">or</span>
             <div className="h-px flex-1 bg-white/15" />
           </div>
 
           {/* Login link */}
-          <p className="text-center text-sm text-white/50">
+          <p className="mt-4 text-center text-sm text-white/50">
             Already have an account?{" "}
             <Link
               href="/login"
