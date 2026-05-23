@@ -38,23 +38,30 @@ const TutorCard = ({
   return (
     <Link
       href={`/tutors/${id}`}
-      className="group relative flex flex-col overflow-hidden rounded-3xl border border-border/50 bg-card shadow-md transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-2xl"
+      className="group relative flex flex-col overflow-hidden rounded-3xl border border-border/60 bg-card shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/30 hover:shadow-xl"
     >
       {/* Hover glow ring */}
-      <div className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 ring-1 ring-primary/25 transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 ring-1 ring-primary/20 transition-opacity duration-300 group-hover:opacity-100" />
 
       {/* ── Header ─────────────────────────────────────────── */}
-      <div className="relative flex h-52 flex-col items-center justify-center overflow-hidden">
+      <div className="relative flex h-52 flex-col items-center justify-center overflow-hidden bg-muted/30 dark:bg-muted/10">
 
-        {/* Indigo gradient background — matches brand primary */}
-        <div className="absolute inset-0 bg-linear-to-br from-indigo-400 via-indigo-600 to-indigo-900 dark:from-indigo-600 dark:via-indigo-800 dark:to-indigo-950" />
+        {/* Very subtle primary tint — transparent feel */}
+        <div className="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-violet-400/5" />
 
-        {/* Radial centre-glow overlay */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_75%_at_50%_25%,rgba(165,180,252,0.30),transparent)]" />
+        {/* Soft dot mesh */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.25]"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle, oklch(0.511 0.262 264.05 / 0.4) 1px, transparent 1px)",
+            backgroundSize: "22px 22px",
+          }}
+        />
 
         {/* Rating pill — top left */}
         {typeof rating === "number" && rating > 0 && (
-          <div className="absolute left-3.5 top-3.5 z-10 flex items-center gap-1 rounded-full bg-black/25 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-sm">
+          <div className="absolute left-3.5 top-3.5 z-10 flex items-center gap-1 rounded-full border border-border/60 bg-background/80 px-2.5 py-1 text-xs font-semibold text-amber-600 shadow-sm backdrop-blur-sm dark:text-amber-400">
             <Star className="size-3 fill-amber-400 text-amber-400" />
             {rating.toFixed(1)}
           </div>
@@ -62,7 +69,7 @@ const TutorCard = ({
 
         {/* Category pill — top right */}
         {category && (
-          <div className="absolute right-3.5 top-3.5 z-10 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm ring-1 ring-white/30">
+          <div className="absolute right-3.5 top-3.5 z-10 rounded-full border border-primary/20 bg-background/80 px-3 py-1 text-xs font-semibold text-primary shadow-sm backdrop-blur-sm">
             {category}
           </div>
         )}
@@ -73,17 +80,17 @@ const TutorCard = ({
             <img
               src={profileImage}
               alt={title}
-              className="size-[88px] rounded-full object-cover ring-4 ring-white/90 shadow-xl transition-transform duration-500 group-hover:scale-105"
+              className="size-[88px] rounded-full object-cover ring-4 ring-background shadow-lg transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
-            <div className="flex size-[88px] items-center justify-center rounded-full bg-white/15 text-3xl font-black text-white ring-4 ring-white/90 shadow-xl backdrop-blur-sm transition-transform duration-500 group-hover:scale-105">
+            <div className="flex size-[88px] items-center justify-center rounded-full bg-primary/10 text-3xl font-black text-primary ring-4 ring-background shadow-lg transition-transform duration-500 group-hover:scale-105">
               {initials}
             </div>
           )}
 
           {/* Verified badge */}
-          <div className="absolute -bottom-1 -right-1 flex size-6 items-center justify-center rounded-full bg-white shadow-md">
-            <BadgeCheck className="size-3.5 text-indigo-600" />
+          <div className="absolute -bottom-1 -right-1 flex size-6 items-center justify-center rounded-full bg-background shadow-md ring-1 ring-border/50">
+            <BadgeCheck className="size-3.5 text-primary" />
           </div>
         </div>
 
@@ -95,52 +102,52 @@ const TutorCard = ({
             className="absolute bottom-0 h-full w-full"
             xmlns="http://www.w3.org/2000/svg"
           >
-            {/* Wave 1 — cyan (complements indigo) */}
+            {/* Wave 1 — cyan */}
             <path
               d="M0,42 C55,22 110,58 165,38 C220,18 275,54 330,36 C385,18 440,50 500,32 L500,64 L0,64 Z"
-              fill="rgba(34,211,238,0.18)"
+              fill="rgba(34,211,238,0.10)"
             />
             <path
               d="M0,42 C55,22 110,58 165,38 C220,18 275,54 330,36 C385,18 440,50 500,32"
               fill="none"
-              stroke="rgba(34,211,238,0.75)"
-              strokeWidth="1.6"
+              stroke="rgba(34,211,238,0.60)"
+              strokeWidth="1.5"
             />
 
             {/* Wave 2 — violet */}
             <path
               d="M0,50 C65,30 130,62 200,44 C270,26 335,58 400,40 C435,30 468,46 500,38 L500,64 L0,64 Z"
-              fill="rgba(167,139,250,0.15)"
+              fill="rgba(139,92,246,0.09)"
             />
             <path
               d="M0,50 C65,30 130,62 200,44 C270,26 335,58 400,40 C435,30 468,46 500,38"
               fill="none"
-              stroke="rgba(167,139,250,0.75)"
-              strokeWidth="1.6"
+              stroke="rgba(139,92,246,0.65)"
+              strokeWidth="1.5"
             />
 
             {/* Wave 3 — emerald */}
             <path
               d="M0,56 C80,38 160,64 240,50 C320,36 400,62 500,48 L500,64 L0,64 Z"
-              fill="rgba(52,211,153,0.12)"
+              fill="rgba(52,211,153,0.09)"
             />
             <path
               d="M0,56 C80,38 160,64 240,50 C320,36 400,62 500,48"
               fill="none"
-              stroke="rgba(52,211,153,0.72)"
-              strokeWidth="1.6"
+              stroke="rgba(52,211,153,0.65)"
+              strokeWidth="1.5"
             />
 
-            {/* Wave 4 — sky blue (closest to brand, front layer) */}
+            {/* Wave 4 — indigo/primary (front, thickest) */}
             <path
               d="M0,60 C70,44 150,66 230,55 C310,44 390,64 500,54 L500,64 L0,64 Z"
-              fill="rgba(147,197,253,0.18)"
+              fill="rgba(99,102,241,0.12)"
             />
             <path
               d="M0,60 C70,44 150,66 230,55 C310,44 390,64 500,54"
               fill="none"
-              stroke="rgba(147,197,253,0.85)"
-              strokeWidth="1.8"
+              stroke="rgba(99,102,241,0.75)"
+              strokeWidth="2"
             />
           </svg>
         </div>
@@ -208,7 +215,6 @@ const TutorCard = ({
             )}
           </div>
 
-          {/* CTA — indigo brand colors */}
           <span className="shrink-0 rounded-full border border-primary/30 bg-primary/8 px-3.5 py-1.5 text-xs font-semibold text-primary transition-all duration-200 group-hover:bg-primary group-hover:text-primary-foreground">
             View Profile →
           </span>
