@@ -1,6 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
-import { MessageCircleQuestion, Search } from "lucide-react";
+import {
+  GraduationCap,
+  BookOpen,
+  Globe,
+  ChevronRight,
+  MessageCircleQuestion,
+  Mail,
+  Sparkles,
+  Users,
+  Star,
+  Clock,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -9,14 +20,20 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
+/* ─── FAQ data ─────────────────────────────────────────────────────────── */
 const faqs = [
   {
     category: "For Students",
-    color: "bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-950/45 dark:text-indigo-200 dark:border-indigo-900",
+    icon: GraduationCap,
+    accent: "from-indigo-500 to-violet-600",
+    chipBg: "bg-indigo-50 dark:bg-indigo-950/40",
+    chipText: "text-indigo-700 dark:text-indigo-300",
+    chipBorder: "border-indigo-200 dark:border-indigo-800",
+    dotColor: "#6366f1",
     items: [
       {
         q: "How do I book a session with a tutor?",
-        a: "Simply browse our tutor listings, pick a tutor you like, select an available time slot, and confirm your booking. You'll receive a confirmation instantly.",
+        a: "Browse our tutor listings, pick a tutor you like, select an available time slot, and confirm your booking. You'll receive a confirmation instantly.",
       },
       {
         q: "Can I cancel or reschedule a booking?",
@@ -38,7 +55,12 @@ const faqs = [
   },
   {
     category: "For Tutors",
-    color: "bg-violet-50 text-violet-700 border-violet-100 dark:bg-violet-950/45 dark:text-violet-200 dark:border-violet-900",
+    icon: BookOpen,
+    accent: "from-violet-500 to-purple-600",
+    chipBg: "bg-violet-50 dark:bg-violet-950/40",
+    chipText: "text-violet-700 dark:text-violet-300",
+    chipBorder: "border-violet-200 dark:border-violet-800",
+    dotColor: "#8b5cf6",
     items: [
       {
         q: "How do I become a tutor on LearnBridge?",
@@ -60,7 +82,12 @@ const faqs = [
   },
   {
     category: "Platform & General",
-    color: "bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-950/45 dark:text-blue-200 dark:border-blue-900",
+    icon: Globe,
+    accent: "from-cyan-500 to-blue-600",
+    chipBg: "bg-cyan-50 dark:bg-cyan-950/40",
+    chipText: "text-cyan-700 dark:text-cyan-300",
+    chipBorder: "border-cyan-200 dark:border-cyan-800",
+    dotColor: "#06b6d4",
     items: [
       {
         q: "Is LearnBridge free to join?",
@@ -82,153 +109,203 @@ const faqs = [
   },
 ];
 
-const quickLinks = [
-  "Student bookings",
-  "Tutor profiles",
-  "Payments & reviews",
-  "Platform support",
+const stats = [
+  { icon: Users,  value: "10K+",  label: "Happy students"   },
+  { icon: Star,   value: "4.9",   label: "Average rating"   },
+  { icon: Clock,  value: "24h",   label: "Support response" },
+  { icon: BookOpen, value: "50+", label: "Subjects covered" },
 ];
 
+/* ─── Page ─────────────────────────────────────────────────────────────── */
 export default function FAQPage() {
   return (
     <div className="min-h-screen bg-background">
 
-      {/* Hero — left-aligned bottom, consistent with all other pages */}
-      <section className="relative isolate overflow-hidden border-b bg-zinc-950 text-white">
+      {/* ── Hero ───────────────────────────────────────────────────────── */}
+      <section className="relative isolate overflow-hidden bg-zinc-950 text-white">
         <Image
           src="/front-view-stacked-books-earth-globe-with-graduation-cap-education-day_742418-47637.jpg"
-          alt="A globe and graduation cap above an open book"
+          alt="Books and graduation cap"
           fill
           sizes="100vw"
           className="object-cover object-center"
           priority
         />
-        <div className="absolute inset-0 bg-zinc-950/60" />
-        <div className="absolute inset-0 bg-linear-to-r from-zinc-950 via-zinc-950/80 to-zinc-950/20" />
-        <div className="absolute inset-0 bg-linear-to-t from-zinc-950/50 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-zinc-950/65" />
+        <div className="absolute inset-0 bg-linear-to-r from-zinc-950/95 via-zinc-950/75 to-zinc-950/30" />
+        <div className="absolute inset-0 bg-linear-to-t from-zinc-950/60 via-transparent to-transparent" />
 
-        <div className="relative mx-auto flex min-h-[58svh] max-w-7xl flex-col justify-end px-4 py-12 sm:px-6 md:py-16">
-          <div className="max-w-3xl">
-            <p className="mb-4 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.22em] text-cyan-300">
+        {/* Decorative circles */}
+        <div className="pointer-events-none absolute -right-32 -top-32 size-[500px] rounded-full border border-white/[0.04]" />
+        <div className="pointer-events-none absolute -right-16 -top-16 size-[320px] rounded-full border border-white/[0.06]" />
+
+        <div className="relative mx-auto flex min-h-[62svh] max-w-7xl flex-col justify-end px-4 pb-14 pt-12 sm:px-6">
+          <div className="max-w-2xl">
+            {/* Badge */}
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-primary/90 ring-1 ring-white/15 backdrop-blur-sm">
+              <Sparkles className="size-3.5" />
               Help Center
-            </p>
-            <h1 className="text-4xl font-black leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
-              Answers before your next learning step
+            </div>
+
+            <h1 className="text-5xl font-black uppercase leading-[0.92] tracking-tight sm:text-6xl lg:text-7xl">
+              GOT<br />QUESTIONS?
             </h1>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-white/80 sm:text-lg">
-              Get quick guidance for booking, tutoring, payments, and account questions.
+            <p className="mt-5 max-w-lg text-base leading-relaxed text-white/70 sm:text-lg">
+              Everything you need to know about booking sessions, tutor profiles, payments, and platform support — all in one place.
             </p>
+
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button
-                asChild
-                size="lg"
-                className="group bg-white font-semibold text-zinc-950 hover:bg-white/90"
-              >
+              <Button asChild size="lg" className="bg-primary font-semibold hover:bg-primary/90">
                 <Link href="#faq-answers">
-                  <Search className="mr-1 size-4" />
-                  See answers
+                  Browse answers
+                  <ChevronRight className="ml-1 size-4" />
                 </Link>
               </Button>
               <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="border-white/30 bg-white/5 text-white backdrop-blur-sm hover:bg-white/10 hover:text-white"
+                asChild size="lg" variant="outline"
+                className="border-white/25 bg-white/8 text-white backdrop-blur-sm hover:bg-white/15 hover:text-white"
               >
-                <Link href="/contact">Contact support</Link>
+                <Link href="/contact">
+                  <Mail className="mr-1.5 size-4" />
+                  Contact support
+                </Link>
               </Button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Quick-nav pills */}
-      <section className="border-b bg-muted/25">
-        <div className="mx-auto flex max-w-7xl flex-wrap gap-2 px-4 py-4 sm:px-6">
-          {quickLinks.map((label) => (
-            <span
-              key={label}
-              className="rounded-full border bg-background px-3.5 py-1.5 text-xs font-medium text-muted-foreground"
-            >
-              {label}
-            </span>
-          ))}
-        </div>
-      </section>
-
-      {/* FAQ Sections */}
-      <section id="faq-answers" className="scroll-mt-24 py-20">
-        <div className="mx-auto max-w-4xl space-y-14 px-4">
-          {faqs.map((section) => (
-            <div key={section.category}>
-              <div
-                className={`mb-6 inline-flex items-center rounded-full border px-4 py-1.5 text-sm font-semibold ${section.color}`}
-              >
-                {section.category}
-              </div>
-
-              <Accordion type="single" collapsible className="space-y-3">
-                {section.items.map((item, i) => (
-                  <AccordionItem
-                    key={i}
-                    value={`${section.category}-${i}`}
-                    className="rounded-2xl border bg-card/90 px-5 shadow-sm transition-shadow hover:shadow-md data-[state=open]:border-primary/25 data-[state=open]:shadow-md dark:bg-card"
-                  >
-                    <AccordionTrigger className="py-5 text-left text-sm font-semibold hover:no-underline">
-                      {item.q}
-                    </AccordionTrigger>
-                    <AccordionContent className="pb-5 text-sm leading-relaxed text-muted-foreground">
-                      {item.a}
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
+      {/* ── Stats strip ────────────────────────────────────────────────── */}
+      <section className="border-b bg-zinc-950">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-white/8 px-4 sm:grid-cols-4 sm:px-6">
+          {stats.map(({ icon: Icon, value, label }) => (
+            <div key={label} className="flex flex-col items-center gap-1 py-7">
+              <Icon className="mb-1 size-4 text-primary/70" />
+              <p className="text-2xl font-black text-white">{value}</p>
+              <p className="text-xs text-white/45">{label}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* CTA — premium rounded-3xl style */}
-      <section className="py-24">
-        <div className="mx-auto max-w-7xl px-4">
-          <div className="relative isolate overflow-hidden rounded-3xl bg-zinc-950 px-6 py-20 text-center text-white shadow-2xl sm:px-12">
-            <div className="absolute inset-0 bg-linear-to-br from-primary/15 via-transparent to-cyan-900/15" />
-            <div className="absolute -right-24 -top-24 size-80 rounded-full border border-white/[0.06]" />
-            <div className="absolute -right-12 -top-12 size-56 rounded-full border border-white/[0.06]" />
-            <div className="absolute -bottom-24 -left-24 size-80 rounded-full border border-white/[0.06]" />
+      {/* ── FAQ Sections ────────────────────────────────────────────────── */}
+      <section id="faq-answers" className="scroll-mt-20 py-24">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6">
+
+          {/* Section intro */}
+          <div className="mb-16 text-center">
+            <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-primary">
+              Frequently asked
+            </p>
+            <h2 className="text-4xl font-black tracking-tight md:text-5xl">
+              Find your answer
+            </h2>
+            <p className="mx-auto mt-4 max-w-md text-base text-muted-foreground">
+              Browse by category below. Click any question to expand the answer.
+            </p>
+          </div>
+
+          {/* Categories */}
+          <div className="space-y-16">
+            {faqs.map((section) => {
+              const Icon = section.icon;
+              return (
+                <div key={section.category}>
+                  {/* Category header */}
+                  <div className="mb-6 flex items-center gap-3">
+                    <div
+                      className={`flex size-9 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br ${section.accent} shadow-sm`}
+                    >
+                      <Icon className="size-4 text-white" />
+                    </div>
+                    <h3 className="text-lg font-black tracking-tight">{section.category}</h3>
+                    <div className="h-px flex-1 bg-border/60" />
+                    <span
+                      className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${section.chipBg} ${section.chipText} ${section.chipBorder}`}
+                    >
+                      {section.items.length} questions
+                    </span>
+                  </div>
+
+                  {/* Accordion */}
+                  <Accordion type="single" collapsible className="space-y-2.5">
+                    {section.items.map((item, i) => (
+                      <AccordionItem
+                        key={i}
+                        value={`${section.category}-${i}`}
+                        className="group overflow-hidden rounded-2xl border bg-card px-0 shadow-sm transition-all duration-200 hover:border-primary/20 hover:shadow-md data-[state=open]:border-primary/30 data-[state=open]:shadow-md"
+                      >
+                        <AccordionTrigger className="flex items-center gap-4 px-5 py-4 text-left text-sm font-semibold hover:no-underline [&>svg]:shrink-0">
+                          {/* Number badge */}
+                          <span
+                            className="flex size-6 shrink-0 items-center justify-center rounded-full text-[10px] font-black text-white"
+                            style={{ background: `linear-gradient(135deg, ${section.dotColor}, ${section.dotColor}cc)` }}
+                          >
+                            {i + 1}
+                          </span>
+                          <span className="flex-1">{item.q}</span>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-5 pb-5 pt-0">
+                          <div className="ml-10 text-sm leading-relaxed text-muted-foreground">
+                            {item.a}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA ─────────────────────────────────────────────────────────── */}
+      <section className="pb-24 pt-4">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="relative isolate overflow-hidden rounded-3xl bg-zinc-950 px-8 py-20 text-center text-white shadow-2xl sm:px-16">
+            {/* Background glow */}
+            <div className="absolute inset-0 bg-linear-to-br from-primary/20 via-transparent to-violet-900/20" />
+
+            {/* Decorative rings */}
+            <div className="pointer-events-none absolute -right-28 -top-28 size-96 rounded-full border border-white/[0.05]" />
+            <div className="pointer-events-none absolute -right-14 -top-14 size-60 rounded-full border border-white/[0.07]" />
+            <div className="pointer-events-none absolute -bottom-28 -left-28 size-96 rounded-full border border-white/[0.05]" />
+            <div className="pointer-events-none absolute -bottom-14 -left-14 size-60 rounded-full border border-white/[0.07]" />
 
             <div className="relative">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold text-cyan-300 ring-1 ring-white/15 backdrop-blur-sm">
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold text-primary/90 ring-1 ring-white/15 backdrop-blur-sm">
                 <MessageCircleQuestion className="size-3.5" />
                 Still have questions?
               </div>
-              <h2 className="mb-4 text-3xl font-black md:text-4xl">
-                We&apos;re here to help
+              <h2 className="mb-4 text-3xl font-black tracking-tight md:text-4xl">
+                We&apos;re always here to help
               </h2>
-              <p className="mx-auto mb-8 max-w-md text-base text-white/75">
-                Our support team responds within 24 hours on business days. Reach out anytime.
+              <p className="mx-auto mb-10 max-w-md text-base text-white/65">
+                Our support team responds within 24 hours on business days. Don't hesitate to reach out.
               </p>
               <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
                 <Button
-                  asChild
-                  size="lg"
+                  asChild size="lg"
                   className="min-w-[160px] bg-white font-semibold text-zinc-950 hover:bg-white/90"
                 >
-                  <Link href="/contact">Contact Support</Link>
+                  <Link href="/contact">
+                    <Mail className="mr-1.5 size-4" />
+                    Contact support
+                  </Link>
                 </Button>
                 <Button
-                  asChild
-                  size="lg"
-                  variant="outline"
-                  className="min-w-[160px] border-white/25 bg-white/5 text-white backdrop-blur-sm hover:bg-white/10 hover:text-white"
+                  asChild size="lg" variant="outline"
+                  className="min-w-[160px] border-white/25 bg-white/8 text-white backdrop-blur-sm hover:bg-white/15 hover:text-white"
                 >
-                  <Link href="/tutors">Browse Tutors</Link>
+                  <Link href="/tutors">Browse tutors</Link>
                 </Button>
               </div>
             </div>
           </div>
         </div>
       </section>
+
     </div>
   );
 }
