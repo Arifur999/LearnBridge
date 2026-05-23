@@ -4,17 +4,10 @@ import { useActionState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { jwtDecode } from "jwt-decode";
+import Link from "next/link";
 
 import { loginAction } from "@/actions/auth.action";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
@@ -38,14 +31,12 @@ const initialState = { success: false, message: "" };
 
 function LoginFormInner({ className, ...props }: React.ComponentProps<"div">) {
   const searchParams = useSearchParams();
-  const [state, formAction] = useActionState(loginAction, initialState);
+  const [state, formAction, isPending] = useActionState(loginAction, initialState);
 
   useEffect(() => {
     if (!state.success) return;
-
     toast.success("Login successful!", { description: "Welcome back!" });
 
-    // Decode role directly from JWT — most reliable source
     let role = "student";
     const token = state.data?.accessToken;
     if (token) {
@@ -59,7 +50,6 @@ function LoginFormInner({ className, ...props }: React.ComponentProps<"div">) {
       role = state.data?.user?.role ?? "student";
     }
 
-    // Redirect to returnUrl if safe, otherwise to role dashboard
     const returnUrl = searchParams.get("returnUrl");
     if (returnUrl && returnUrl.startsWith("/") && !returnUrl.startsWith("//")) {
       window.location.href = returnUrl;
@@ -75,62 +65,87 @@ function LoginFormInner({ className, ...props }: React.ComponentProps<"div">) {
   }, [state.success, state.message]);
 
   return (
-    <div
-      className={cn(
-        "flex min-h-[calc(100vh-120px)] items-center justify-center",
-        className
-      )}
-      {...props}
-    >
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Login to your account</CardTitle>
-          <CardDescription>
-            Enter your email and password to continue
-          </CardDescription>
-        </CardHeader>
+    <div className={cn("w-full max-w-sm", className)} {...props}>
+      {/* Glass card */}
+      <div className="overflow-hidden rounded-3xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-2xl">
 
-        <CardContent>
-          <form action={formAction}>
-            <FieldGroup>
-              <Field>
-                <FieldLabel>Email</FieldLabel>
-                <Input
-                  name="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                />
-              </Field>
+        {/* Card header */}
+        <div className="border-b border-white/10 px-8 py-7">
+          <h2 className="text-xl font-black tracking-tight text-white">
+            Welcome back
+          </h2>
+          <p className="mt-1 text-sm text-white/55">
+            Sign in to your LearnBridge account
+          </p>
+        </div>
 
-              <Field>
-                <div className="flex items-center justify-between">
-                  <FieldLabel>Password</FieldLabel>
-                  <a
-                    href="#"
-                    className="text-sm text-muted-foreground hover:underline"
-                  >
-                    Forgot password?
-                  </a>
-                </div>
-                <Input name="password" type="password" required />
-              </Field>
+        {/* Form */}
+        <form action={formAction} className="space-y-5 px-8 py-7">
 
-              <Field>
-                <Button type="submit" className="w-full">
-                  Login
-                </Button>
-                <p className="text-center text-sm text-muted-foreground mt-4">
-                  Don&apos;t have an account?{" "}
-                  <a href="/register" className="underline">
-                    Sign up
-                  </a>
-                </p>
-              </Field>
-            </FieldGroup>
-          </form>
-        </CardContent>
-      </Card>
+          {/* Email */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
+              Email
+            </label>
+            <Input
+              name="email"
+              type="email"
+              placeholder="you@example.com"
+              required
+              className="border-white/20 bg-white/10 text-white placeholder:text-white/35 focus-visible:border-primary focus-visible:ring-primary/30 backdrop-blur-sm"
+            />
+          </div>
+
+          {/* Password */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
+                Password
+              </label>
+              <a
+                href="#"
+                className="text-xs text-white/50 transition-colors hover:text-white"
+              >
+                Forgot password?
+              </a>
+            </div>
+            <Input
+              name="password"
+              type="password"
+              placeholder="••••••••••"
+              required
+              className="border-white/20 bg-white/10 text-white placeholder:text-white/35 focus-visible:border-primary focus-visible:ring-primary/30 backdrop-blur-sm"
+            />
+          </div>
+
+          {/* Submit */}
+          <Button
+            type="submit"
+            disabled={isPending}
+            className="mt-2 w-full rounded-xl bg-primary font-semibold tracking-wide hover:bg-primary/90"
+          >
+            {isPending ? "Signing in…" : "Sign In"}
+          </Button>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3">
+            <div className="h-px flex-1 bg-white/15" />
+            <span className="text-xs text-white/35">or</span>
+            <div className="h-px flex-1 bg-white/15" />
+          </div>
+
+          {/* Register link */}
+          <p className="text-center text-sm text-white/50">
+            New to LearnBridge?{" "}
+            <Link
+              href="/register"
+              className="font-semibold text-white underline-offset-4 hover:text-primary hover:underline"
+            >
+              Create an account
+            </Link>
+          </p>
+        </form>
+      </div>
     </div>
   );
 }

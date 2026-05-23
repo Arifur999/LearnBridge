@@ -1,18 +1,11 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useState, Suspense } from "react";
 import { toast } from "sonner";
+import Link from "next/link";
 
 import { signupAction } from "@/actions/auth.action";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -21,13 +14,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 const initialState = { success: false, message: "" };
 
-export function SignupForm(props: React.ComponentProps<typeof Card>) {
-  const [state, formAction] = useActionState(signupAction, initialState);
-  // Track role in state so we can pass it via hidden input (Radix Select
-  // doesn't reliably populate FormData with Next.js server actions)
+function SignupFormInner({ className, ...props }: React.ComponentProps<"div">) {
+  const [state, formAction, isPending] = useActionState(signupAction, initialState);
   const [role, setRole] = useState<"student" | "tutor">("student");
 
   useEffect(() => {
@@ -45,69 +37,135 @@ export function SignupForm(props: React.ComponentProps<typeof Card>) {
   }, [state.success, state.message]);
 
   return (
-    <Card className="w-full" {...props}>
-      <CardHeader>
-        <CardTitle>Create an account</CardTitle>
-        <CardDescription>
-          Enter your information below to create your account
-        </CardDescription>
-      </CardHeader>
+    <div className={cn("w-full max-w-sm", className)} {...props}>
+      {/* Glass card */}
+      <div className="overflow-hidden rounded-3xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-2xl">
 
-      <CardContent>
-        <form action={formAction}>
-          <FieldGroup>
-            <Field>
-              <FieldLabel>Full Name</FieldLabel>
-              <Input name="name" type="text" required />
-            </Field>
+        {/* Card header */}
+        <div className="border-b border-white/10 px-8 py-6">
+          <h2 className="text-xl font-black tracking-tight text-white">
+            Create account
+          </h2>
+          <p className="mt-1 text-sm text-white/55">
+            Join LearnBridge and start learning today
+          </p>
+        </div>
 
-            <Field>
-              <FieldLabel>Email</FieldLabel>
-              <Input name="email" type="email" required />
-            </Field>
+        {/* Form */}
+        <form action={formAction} className="space-y-4 px-8 py-6">
 
-            <Field>
-              <FieldLabel>Role</FieldLabel>
-              {/* hidden input carries the actual value to FormData */}
-              <input type="hidden" name="role" value={role} />
-              <Select
-                value={role}
-                onValueChange={(v) => setRole(v as "student" | "tutor")}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="student">Student</SelectItem>
-                  <SelectItem value="tutor">Tutor</SelectItem>
-                </SelectContent>
-              </Select>
-            </Field>
+          {/* Full Name */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
+              Full Name
+            </label>
+            <Input
+              name="name"
+              type="text"
+              placeholder="Your full name"
+              required
+              className="border-white/20 bg-white/10 text-white placeholder:text-white/35 focus-visible:border-primary focus-visible:ring-primary/30 backdrop-blur-sm"
+            />
+          </div>
 
-            <Field>
-              <FieldLabel>Password</FieldLabel>
-              <Input name="password" type="password" required />
-            </Field>
+          {/* Email */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
+              Email
+            </label>
+            <Input
+              name="email"
+              type="email"
+              placeholder="you@example.com"
+              required
+              className="border-white/20 bg-white/10 text-white placeholder:text-white/35 focus-visible:border-primary focus-visible:ring-primary/30 backdrop-blur-sm"
+            />
+          </div>
 
-            <Field>
-              <FieldLabel>Confirm Password</FieldLabel>
-              <Input name="confirmPassword" type="password" required />
-            </Field>
+          {/* Role */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
+              I am a
+            </label>
+            <input type="hidden" name="role" value={role} />
+            <Select
+              value={role}
+              onValueChange={(v) => setRole(v as "student" | "tutor")}
+            >
+              <SelectTrigger className="w-full border-white/20 bg-white/10 text-white focus:border-primary focus:ring-primary/30 backdrop-blur-sm [&>span]:text-white/90 [&_svg]:text-white/60">
+                <SelectValue placeholder="Select role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="student">Student</SelectItem>
+                <SelectItem value="tutor">Tutor</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-            <Field>
-              <Button type="submit" className="w-full">
-                Create Account
-              </Button>
-              <p className="text-center text-sm text-muted-foreground mt-4">
-                Already have an account?{" "}
-                <a href="/login" className="underline">
-                  Sign in
-                </a>
-              </p>
-            </Field>
-          </FieldGroup>
+          {/* Password */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
+              Password
+            </label>
+            <Input
+              name="password"
+              type="password"
+              placeholder="••••••••••"
+              required
+              className="border-white/20 bg-white/10 text-white placeholder:text-white/35 focus-visible:border-primary focus-visible:ring-primary/30 backdrop-blur-sm"
+            />
+          </div>
+
+          {/* Confirm Password */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
+              Confirm Password
+            </label>
+            <Input
+              name="confirmPassword"
+              type="password"
+              placeholder="••••••••••"
+              required
+              className="border-white/20 bg-white/10 text-white placeholder:text-white/35 focus-visible:border-primary focus-visible:ring-primary/30 backdrop-blur-sm"
+            />
+          </div>
+
+          {/* Submit */}
+          <Button
+            type="submit"
+            disabled={isPending}
+            className="mt-2 w-full rounded-xl bg-primary font-semibold tracking-wide hover:bg-primary/90"
+          >
+            {isPending ? "Creating account…" : "Create Account"}
+          </Button>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3">
+            <div className="h-px flex-1 bg-white/15" />
+            <span className="text-xs text-white/35">or</span>
+            <div className="h-px flex-1 bg-white/15" />
+          </div>
+
+          {/* Login link */}
+          <p className="text-center text-sm text-white/50">
+            Already have an account?{" "}
+            <Link
+              href="/login"
+              className="font-semibold text-white underline-offset-4 hover:text-primary hover:underline"
+            >
+              Sign in
+            </Link>
+          </p>
         </form>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
+  );
+}
+
+export function SignupForm({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <Suspense fallback={null}>
+      <SignupFormInner className={className} {...props} />
+    </Suspense>
   );
 }
