@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Pencil, Save, X } from "lucide-react";
+import { Loader2, Pencil, Save, X, BadgeCheck } from "lucide-react";
 import { toast } from "sonner";
 import { updateUserProfileAction } from "@/actions/dashboard.action";
 import ImageUpload from "@/components/ui/ImageUpload";
@@ -13,9 +13,10 @@ import ImageUpload from "@/components/ui/ImageUpload";
 interface Props {
   initialName: string;
   initialImage: string;
+  userRole?: string;
 }
 
-export default function StudentProfileClient({ initialName, initialImage }: Props) {
+export default function StudentProfileClient({ initialName, initialImage, userRole = "Student" }: Props) {
   const [name, setName] = useState(initialName);
   const [image, setImage] = useState(initialImage);
   const [editing, setEditing] = useState(false);
@@ -40,57 +41,82 @@ export default function StudentProfileClient({ initialName, initialImage }: Prop
   }
 
   const initials = (name || "S").charAt(0).toUpperCase();
+  const displayRole = userRole.charAt(0).toUpperCase() + userRole.slice(1).toLowerCase();
 
   return (
-    <div className="rounded-2xl border bg-gradient-to-br from-primary/5 to-violet-50 dark:to-violet-950/20 p-6 space-y-5">
+    <div className="flex w-full flex-col items-center gap-5">
+
       {/* Avatar */}
-      <div className="flex items-center gap-5">
-        <div className="relative shrink-0">
+      <div className="relative">
+        <div className="size-24 overflow-hidden rounded-full ring-4 ring-background shadow-xl">
           {image ? (
-            <div className="size-20 overflow-hidden rounded-2xl border-2 border-primary/20">
-              <Image src={image} alt={name} width={80} height={80} className="object-cover size-full" />
-            </div>
+            <Image
+              src={image}
+              alt={name}
+              width={96}
+              height={96}
+              className="size-full object-cover"
+            />
           ) : (
-            <div className="flex size-20 items-center justify-center rounded-2xl bg-primary/10 text-3xl font-bold text-primary border-2 border-primary/20">
+            <div className="flex size-full items-center justify-center bg-primary text-3xl font-black text-white">
               {initials}
             </div>
           )}
         </div>
-        <div>
-          <p className="text-xl font-semibold">{name}</p>
-          <p className="text-sm text-muted-foreground capitalize">Student</p>
-          {!editing && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="mt-2 gap-1.5 h-8 text-xs"
-              onClick={() => setEditing(true)}
-            >
-              <Pencil className="size-3" /> Edit Profile
-            </Button>
-          )}
+        {/* Verified badge */}
+        <div className="absolute -bottom-1 -right-1 flex size-7 items-center justify-center rounded-full bg-emerald-500 ring-2 ring-background shadow-sm">
+          <BadgeCheck className="size-4 text-white" />
         </div>
       </div>
 
+      {/* Name + Role */}
+      <div className="text-center">
+        <h2 className="text-xl font-black tracking-tight">{name || "Student"}</h2>
+        <p className="mt-0.5 text-sm text-muted-foreground">{displayRole}</p>
+      </div>
+
+      {/* Edit Profile button */}
+      {!editing && (
+        <Button
+          onClick={() => setEditing(true)}
+          variant="outline"
+          className="gap-2 rounded-xl border-primary/30 px-5 text-primary hover:bg-primary hover:text-primary-foreground"
+        >
+          <Pencil className="size-3.5" />
+          Edit Profile
+        </Button>
+      )}
+
       {/* Edit form */}
       {editing && (
-        <div className="space-y-4 border-t pt-4">
-          <div className="space-y-2">
-            <Label>Display Name</Label>
+        <div className="w-full rounded-2xl border border-border/60 bg-muted/30 p-5 space-y-4">
+          <p className="text-sm font-semibold">Edit your profile</p>
+
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Display Name
+            </Label>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Your name"
+              className="rounded-xl"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label>Profile Photo</Label>
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Profile Photo
+            </Label>
             <ImageUpload value={image} onChange={setImage} />
           </div>
 
-          <div className="flex gap-3">
-            <Button onClick={handleSave} disabled={isPending} className="gap-2">
+          <div className="flex gap-2 pt-1">
+            <Button
+              onClick={handleSave}
+              disabled={isPending}
+              className="flex-1 gap-2 rounded-xl"
+            >
               {isPending ? (
                 <Loader2 className="size-4 animate-spin" />
               ) : (
@@ -98,8 +124,14 @@ export default function StudentProfileClient({ initialName, initialImage }: Prop
               )}
               Save Changes
             </Button>
-            <Button variant="outline" onClick={handleCancel} disabled={isPending} className="gap-2">
-              <X className="size-4" /> Cancel
+            <Button
+              variant="outline"
+              onClick={handleCancel}
+              disabled={isPending}
+              className="gap-2 rounded-xl"
+            >
+              <X className="size-4" />
+              Cancel
             </Button>
           </div>
         </div>
