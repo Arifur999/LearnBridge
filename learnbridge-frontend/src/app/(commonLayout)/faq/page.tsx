@@ -228,26 +228,47 @@ export default function FAQPage() {
                   </div>
 
                   {/* Accordion */}
-                  <Accordion type="single" collapsible className="space-y-2.5">
+                  <Accordion type="single" collapsible className="space-y-3">
                     {section.items.map((item, i) => (
                       <AccordionItem
                         key={i}
                         value={`${section.category}-${i}`}
-                        className="group overflow-hidden rounded-2xl border bg-card px-0 shadow-sm transition-all duration-200 hover:border-primary/20 hover:shadow-md data-[state=open]:border-primary/30 data-[state=open]:shadow-md"
+                        className="group overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm transition-all duration-300 hover:shadow-lg data-[state=open]:shadow-xl"
+                        style={{
+                          borderColor: undefined,
+                        }}
                       >
-                        <AccordionTrigger className="flex items-center gap-4 px-5 py-4 text-left text-sm font-semibold hover:no-underline [&>svg]:shrink-0">
+                        {/* Coloured top accent bar — always visible */}
+                        <div
+                          className="h-[3px] w-full opacity-0 transition-opacity duration-300 group-hover:opacity-60 group-data-[state=open]:opacity-100"
+                          style={{ background: `linear-gradient(to right, ${section.dotColor}, ${section.dotColor}88)` }}
+                        />
+
+                        <AccordionTrigger className="group/trigger flex items-start gap-4 px-6 py-5 text-left hover:no-underline [&>svg]:mt-0.5 [&>svg]:shrink-0 [&>svg]:text-muted-foreground [&>svg]:transition-colors group-data-[state=open]:[&>svg]:text-primary">
+
                           {/* Number badge */}
                           <span
-                            className="flex size-6 shrink-0 items-center justify-center rounded-full text-[10px] font-black text-white"
-                            style={{ background: `linear-gradient(135deg, ${section.dotColor}, ${section.dotColor}cc)` }}
+                            className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-xl text-xs font-black text-white shadow-sm transition-transform duration-200 group-hover/trigger:scale-110"
+                            style={{ background: `linear-gradient(135deg, ${section.dotColor}ee, ${section.dotColor}99)` }}
                           >
-                            {i + 1}
+                            {String(i + 1).padStart(2, "0")}
                           </span>
-                          <span className="flex-1">{item.q}</span>
+
+                          <span className="flex-1 text-[15px] font-semibold leading-snug tracking-tight transition-colors duration-200 group-data-[state=open]:text-primary">
+                            {item.q}
+                          </span>
                         </AccordionTrigger>
-                        <AccordionContent className="px-5 pb-5 pt-0">
-                          <div className="ml-10 text-sm leading-relaxed text-muted-foreground">
-                            {item.a}
+
+                        <AccordionContent className="px-6 pb-6 pt-0">
+                          {/* Answer area with left accent line */}
+                          <div className="ml-11 flex gap-4">
+                            <div
+                              className="w-[3px] shrink-0 rounded-full"
+                              style={{ background: `linear-gradient(to bottom, ${section.dotColor}99, transparent)` }}
+                            />
+                            <p className="text-sm leading-relaxed text-muted-foreground">
+                              {item.a}
+                            </p>
                           </div>
                         </AccordionContent>
                       </AccordionItem>
