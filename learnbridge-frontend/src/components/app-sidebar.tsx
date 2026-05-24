@@ -57,18 +57,22 @@ export function AppSidebar({
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <Link href="/" className="flex items-center gap-2 mb-1.5 p-1">
-          <div className="flex aspect-square size-8 items-center justify-center overflow-hidden rounded-lg bg-background">
-            <Image
-              src="/logo.png"
-              alt="LearnBridge"
-              width={32}
-              height={32}
-              className="size-8 object-contain"
-              onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-            />
-          </div>
-          <span className="text-lg font-semibold tracking-wide">LearnBridge</span>
+        <Link href="/" className="flex items-center px-1 py-2">
+          <Image
+            src="/logo.png"
+            alt="LearnBridge"
+            width={120}
+            height={40}
+            className="object-contain group-data-[collapsible=icon]:hidden"
+          />
+          {/* Collapsed: show small icon only */}
+          <Image
+            src="/logo.png"
+            alt="LearnBridge"
+            width={32}
+            height={32}
+            className="hidden object-contain group-data-[collapsible=icon]:block"
+          />
         </Link>
       </SidebarHeader>
 
