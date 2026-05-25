@@ -120,12 +120,12 @@ class DashboardService {
   }
 
   async updateTutorProfile(payload: ApiRecord) {
-    // Backend uses "TRAINER" role → routes are /trainer/*, not /tutor/*
+    // Backend registers: PUT /api/v1/tutors/profile/me  (tutor.route.ts)
     const attempts: { method: "PATCH" | "PUT" | "POST"; path: string }[] = [
       { method: "PUT",   path: "/tutors/profile/me" },
       { method: "PATCH", path: "/tutors/profile/me" },
-      { method: "PUT",   path: "/tutor/profile/me" },
-      { method: "PATCH", path: "/tutor/profile/me" },
+      { method: "PUT",   path: "/trainer/profile" },
+      { method: "PATCH", path: "/trainer/profile" },
     ];
     const errors: string[] = [];
     for (const { method, path } of attempts) {
@@ -135,17 +135,31 @@ class DashboardService {
         errors.push(`${method} ${path}: ${err instanceof Error ? err.message : "failed"}`);
       }
     }
-    // Surface the first meaningful error, not the generic fallback
     const meaningful = errors.find((e) => !e.includes("Request failed") && !e.includes("Cannot"));
     throw new Error(meaningful ?? errors[0] ?? "Failed to save profile");
   }
 
   async getTutorProfile() {
-    for (const path of ["/trainer/profile", "/tutor/profile", "/tutors/profile/me"]) {
+    for (const path of ["/tutors/profile/me", "/trainer/profile", "/tutor/profile"]) {
       try {
         const data = await safeFetch(path);
-        const raw = unwrapData(data);
-        if (isRecord(raw)) return raw;
+        const raw = unwrapData(data) as Record<string, unknown> | null;
+        if (!isRecord(raw)) continue;
+
+        // Backend returns { id, name, email, profile: { bio, subjects, … } }
+        // Flatten so callers can read bio/subjects/hourlyRate/profileImage directly
+        const nested = isRecord(raw.profile) ? raw.profile : {};
+        return {
+          ...nested,
+          ...raw,
+          // nested fields win over the top-level stub (except profile key itself)
+          bio:          nested.bio          ?? raw.bio,
+          subjects:     nested.subjects     ?? raw.subjects,
+          hourlyRate:   nested.hourlyRate   ?? raw.hourlyRate,
+          profileImage: nested.profileImage ?? raw.profileImage ?? raw.image,
+          category:     nested.category     ?? raw.category,
+          experience:   nested.experience   ?? raw.experience,
+        };
       } catch { /* try next */ }
     }
     return null;

@@ -38,28 +38,31 @@ export const updateTutorProfileAction = async (
   formData: FormData
 ): Promise<{ success: boolean; message: string }> => {
   try {
-    const rawSubjects = formData.get("subjects")?.toString().trim() ?? "";
-    // Backend stores subjects as a comma-separated string
-    const subjectsStr = rawSubjects
-      .split(",").map((s) => s.trim()).filter(Boolean).join(", ");
+    const bio          = formData.get("bio")?.toString().trim() ?? "";
+    const rawSubjects  = formData.get("subjects")?.toString().trim() ?? "";
+    const subjectsStr  = rawSubjects.split(",").map((s) => s.trim()).filter(Boolean).join(", ");
+    const categoryRaw  = formData.get("category")?.toString().trim() ?? "";
+    const profileImage = formData.get("profileImage")?.toString().trim() ?? "";
+    const hourlyRateRaw = formData.get("hourlyRate")?.toString().trim() ?? "";
+    const hourlyRate   = hourlyRateRaw !== "" ? Number(hourlyRateRaw) : undefined;
 
-    const categoryRaw = formData.get("category")?.toString() ?? "";
-    const profileImage = formData.get("profileImage")?.toString() || undefined;
+    // Always send all present fields so the backend can clear/update them
+    const payload: Record<string, unknown> = {
+      ...(bio          && { bio }),
+      ...(subjectsStr  && { subjects: subjectsStr }),
+      ...(categoryRaw  && { category: categoryRaw }),
+      ...(profileImage && { profileImage }),
+      ...(hourlyRate !== undefined && hourlyRate >= 0 && { hourlyRate }),
+    };
 
-    const hourlyRate = Number(formData.get("hourlyRate") || 0);
-    const bio = formData.get("bio")?.toString().trim() ?? "";
-
-    const payload: Record<string, unknown> = {};
-
-    if (bio) payload.bio = bio;
-    if (hourlyRate > 0) payload.hourlyRate = hourlyRate;
-    if (subjectsStr) payload.subjects = subjectsStr;
-    if (categoryRaw) payload.category = categoryRaw;
-    if (profileImage) payload.profileImage = profileImage;
+    if (Object.keys(payload).length === 0) {
+      return { success: false, message: "No changes to save" };
+    }
 
     await dashboardService.updateTutorProfile(payload);
     revalidatePath("/tutor/profile");
-    return { success: true, message: "Profile saved successfully" };
+    revalidatePath("/tutor/dashboard");
+    return { success: true, message: "Profile saved successfully!" };
   } catch (error) {
     return {
       success: false,
@@ -222,7 +225,9 @@ export const updateUserProfileAction = async (payload: {
     if (!res.ok) throw new Error(data?.message || "Update failed");
     revalidatePath("/dashboard/profile");
     revalidatePath("/tutor/profile");
-    return { success: true, message: "Profile updated successfully" };
+    revalidatePath("/tutor/dashboard");
+    revalidatePath("/dashboard");
+    return { success: true, message: "Profile updated successfully!" };
   } catch (error) {
     return {
       success: false,

@@ -1,64 +1,284 @@
-import DashPageHeader from "@/components/layout/DashPageHeader";
 import { paymentService } from "@/services/payment.service";
 import { formatDate } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { DollarSign } from "lucide-react";
+import {
+  TrendingUp, Receipt, Clock, CheckCircle2,
+  XCircle, CreditCard, Wallet, Users, BadgeDollarSign,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+type Payment = Record<string, unknown>;
+
+function getStatusCfg(status: string) {
+  switch (status.toUpperCase()) {
+    case "PAID":
+    case "SUCCESS":
+    case "COMPLETED":
+      return {
+        icon: CheckCircle2,
+        bg: "bg-emerald-100 dark:bg-emerald-900/30",
+        text: "text-emerald-700 dark:text-emerald-400",
+        dot: "bg-emerald-500",
+        label: "Paid",
+      };
+    case "PENDING":
+      return {
+        icon: Clock,
+        bg: "bg-amber-100 dark:bg-amber-900/30",
+        text: "text-amber-700 dark:text-amber-400",
+        dot: "bg-amber-500",
+        label: "Pending",
+      };
+    case "FAILED":
+    case "CANCELLED":
+      return {
+        icon: XCircle,
+        bg: "bg-red-100 dark:bg-red-900/30",
+        text: "text-red-600 dark:text-red-400",
+        dot: "bg-red-500",
+        label: status.charAt(0).toUpperCase() + status.slice(1).toLowerCase(),
+      };
+    default:
+      return {
+        icon: Clock,
+        bg: "bg-muted",
+        text: "text-muted-foreground",
+        dot: "bg-border",
+        label: status,
+      };
+  }
+}
+
+function formatAmount(amount: unknown): string {
+  const num = parseFloat(String(amount ?? 0));
+  return isNaN(num) ? "0.00" : num.toFixed(2);
+}
+
+const AVATAR_COLORS = [
+  "bg-primary/15 text-primary",
+  "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400",
+  "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+  "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+  "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400",
+];
 
 export default async function TutorPaymentsPage() {
   const payments = await paymentService.getTutorPayments();
-  const list = Array.isArray(payments) ? payments : [];
-  const total = list.reduce((sum, p) => sum + Number((p as Record<string, unknown>)?.amount ?? (p as Record<string, unknown>)?.price ?? 0), 0);
+  const list: Payment[] = Array.isArray(payments) ? payments : [];
+
+  /* ── derived stats ── */
+  const totalEarnings = list.reduce((s, p) => {
+    const status = String(p.status ?? "").toUpperCase();
+    if (status === "PAID" || status === "SUCCESS" || status === "COMPLETED") {
+      return s + parseFloat(String(p.amount ?? p.price ?? 0));
+    }
+    return s;
+  }, 0);
+
+  const paidCount    = list.filter((p) => ["PAID", "SUCCESS", "COMPLETED"].includes(String(p.status ?? "").toUpperCase())).length;
+  const pendingCount = list.filter((p) => String(p.status ?? "").toUpperCase() === "PENDING").length;
+
+  const uniqueStudents = new Set(
+    list.map((p) => {
+      const student = p.student as Record<string, unknown> | undefined;
+      return String(student?.id ?? student?._id ?? p.studentId ?? "");
+    }).filter(Boolean)
+  ).size;
+
+  const lastPayment = list[0];
+
+  const statCards = [
+    {
+      icon: Wallet,
+      label: "Total Earnings",
+      value: `$${totalEarnings.toFixed(2)}`,
+      sub: `${paidCount} paid session${paidCount !== 1 ? "s" : ""}`,
+      iconBg: "bg-emerald-100 dark:bg-emerald-900/30",
+      iconColor: "text-emerald-600 dark:text-emerald-400",
+      bar: "bg-emerald-500",
+      barW: "100%",
+    },
+    {
+      icon: Receipt,
+      label: "Transactions",
+      value: list.length,
+      sub: "All time",
+      iconBg: "bg-primary/10",
+      iconColor: "text-primary",
+      bar: "bg-primary",
+      barW: "100%",
+    },
+    {
+      icon: Users,
+      label: "Students",
+      value: uniqueStudents || list.length,
+      sub: "Unique paying students",
+      iconBg: "bg-violet-100 dark:bg-violet-900/30",
+      iconColor: "text-violet-600 dark:text-violet-400",
+      bar: "bg-violet-500",
+      barW: "100%",
+    },
+    {
+      icon: TrendingUp,
+      label: "Last Payment",
+      value: lastPayment ? `$${formatAmount(lastPayment.amount ?? lastPayment.price)}` : "—",
+      sub: lastPayment ? formatDate(String(lastPayment.createdAt ?? "")) : "No payments yet",
+      iconBg: "bg-amber-100 dark:bg-amber-900/30",
+      iconColor: "text-amber-600 dark:text-amber-400",
+      bar: "bg-amber-500",
+      barW: "100%",
+    },
+  ];
 
   return (
     <div className="space-y-6">
-      <DashPageHeader title="Payments" description="Your earnings from completed sessions." />
 
-      <Card className="max-w-xs">
-        <CardContent className="pt-6">
-          <div className="mb-2 inline-flex rounded-xl bg-emerald-100 p-3 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
-            <DollarSign className="size-5" />
+      {/* ── Header ─────────────────────────────────────────────── */}
+      <div>
+        <h1 className="text-2xl font-black tracking-tight">Payments</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Track your earnings from completed sessions
+        </p>
+      </div>
+
+      {/* ── Stats Card ─────────────────────────────────────────── */}
+      <Card className="overflow-hidden">
+        <div className="h-1 w-full bg-linear-to-r from-emerald-500 via-primary to-violet-500" />
+        <CardContent className="p-0">
+          <div className="grid divide-y sm:divide-x sm:divide-y-0 sm:grid-cols-4">
+            {statCards.map(({ icon: Icon, label, value, sub, iconBg, iconColor, bar, barW }) => (
+              <div key={label} className="flex flex-col gap-4 p-5 transition-colors hover:bg-muted/40">
+                <div className="flex items-start justify-between">
+                  <div className={`flex size-9 items-center justify-center rounded-2xl ${iconBg}`}>
+                    <Icon className={`size-4 ${iconColor}`} />
+                  </div>
+                  <span className="text-2xl font-black tabular-nums">{value}</span>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold">{label}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">{sub}</p>
+                </div>
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                  <div className={`h-full rounded-full ${bar}`} style={{ width: barW }} />
+                </div>
+              </div>
+            ))}
           </div>
-          <p className="text-3xl font-bold">${total.toFixed(2)}</p>
-          <p className="text-sm text-muted-foreground">Total Earnings</p>
         </CardContent>
       </Card>
 
-      {list.length === 0 ? (
-        <div className="rounded-2xl border border-dashed p-12 text-center">
-          <p className="text-muted-foreground text-sm">No payment records found.</p>
-        </div>
-      ) : (
-        <div className="overflow-hidden rounded-2xl border">
-          <table className="w-full text-sm">
-            <thead className="bg-muted">
-              <tr>
-                <th className="px-4 py-3 text-left font-semibold">Date</th>
-                <th className="px-4 py-3 text-left font-semibold">Student</th>
-                <th className="px-4 py-3 text-left font-semibold">Amount</th>
-                <th className="px-4 py-3 text-left font-semibold">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {list.map((p: Record<string, unknown>, i: number) => {
-                const student = p?.student as Record<string, unknown> | undefined;
-                return (
-                  <tr key={String(p.id ?? i)} className="hover:bg-muted/30">
-                    <td className="px-4 py-3">{formatDate(String(p.createdAt ?? ""))}</td>
-                    <td className="px-4 py-3">{String(student?.name ?? p.studentName ?? "—")}</td>
-                    <td className="px-4 py-3 font-semibold">${String(p.amount ?? p.price ?? 0)}</td>
-                    <td className="px-4 py-3">
-                      <Badge variant={String(p.status ?? "").toUpperCase() === "PAID" ? "default" : "outline"}>
-                        {String(p.status ?? "PAID")}
-                      </Badge>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {/* ── Transactions Table ─────────────────────────────────── */}
+      <Card className="overflow-hidden">
+        <div className="h-[3px] w-full bg-linear-to-r from-emerald-500 via-primary to-violet-500" />
+
+        <CardHeader className="border-b pb-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-base font-semibold">All Transactions</CardTitle>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {list.length} record{list.length !== 1 ? "s" : ""} found
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              {pendingCount > 0 && (
+                <span className="flex items-center gap-1.5 rounded-full bg-amber-100 dark:bg-amber-900/30 px-3 py-1 text-xs font-semibold text-amber-700 dark:text-amber-400">
+                  <span className="size-1.5 rounded-full bg-amber-500" />
+                  {pendingCount} pending
+                </span>
+              )}
+              <div className="flex size-9 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/30">
+                <BadgeDollarSign className="size-4 text-emerald-600 dark:text-emerald-400" />
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+
+        {list.length === 0 ? (
+          <CardContent className="py-20">
+            <div className="flex flex-col items-center gap-4 text-center">
+              <div className="flex size-20 items-center justify-center rounded-3xl bg-muted">
+                <Receipt className="size-9 text-muted-foreground/40" />
+              </div>
+              <div>
+                <p className="text-base font-semibold">No earnings yet</p>
+                <p className="mt-1 max-w-xs text-sm text-muted-foreground">
+                  Payments will appear here once students complete sessions with you.
+                </p>
+              </div>
+              <div className="mt-2 flex items-center gap-2 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 px-5 py-3 text-sm font-semibold text-emerald-700 dark:text-emerald-400">
+                <Wallet className="size-4" />
+                Add availability to start earning
+              </div>
+            </div>
+          </CardContent>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-muted/40">
+                  <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">#</th>
+                  <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Student</th>
+                  <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Date</th>
+                  <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Amount</th>
+                  <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/60">
+                {list.map((p, i) => {
+                  const student    = p?.student as Record<string, unknown> | undefined;
+                  const studentName = String(student?.name ?? p.studentName ?? "Student");
+                  const status     = String(p.status ?? "PAID");
+                  const cfg        = getStatusCfg(status);
+                  const StatusIcon = cfg.icon;
+                  const amount     = formatAmount(p.amount ?? p.price);
+                  const date       = formatDate(String(p.createdAt ?? ""));
+
+                  return (
+                    <tr key={String(p.id ?? i)} className="transition-colors hover:bg-muted/30">
+                      {/* # */}
+                      <td className="px-6 py-4 text-xs font-mono text-muted-foreground">
+                        {String(i + 1).padStart(2, "0")}
+                      </td>
+
+                      {/* Student */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`flex size-8 shrink-0 items-center justify-center rounded-xl text-xs font-black ${AVATAR_COLORS[i % AVATAR_COLORS.length]}`}>
+                            {studentName[0]?.toUpperCase() ?? "S"}
+                          </div>
+                          <span className="font-semibold">{studentName}</span>
+                        </div>
+                      </td>
+
+                      {/* Date */}
+                      <td className="px-6 py-4 text-muted-foreground">{date}</td>
+
+                      {/* Amount */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <div className="flex size-7 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/30">
+                            <CreditCard className="size-3.5 text-emerald-600 dark:text-emerald-400" />
+                          </div>
+                          <span className="text-base font-black tabular-nums text-emerald-600 dark:text-emerald-400">
+                            +${amount}
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* Status */}
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${cfg.bg} ${cfg.text}`}>
+                          <StatusIcon className="size-3.5" />
+                          {cfg.label}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
     </div>
   );
 }
