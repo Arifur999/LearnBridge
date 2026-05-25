@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import {
   Sidebar,
   SidebarContent,
@@ -45,6 +46,7 @@ export function AppSidebar({
 }: React.ComponentProps<typeof Sidebar> & { user?: User | null }) {
   const role = user?.role ?? "student";
   const routes = getRoutes(role);
+  const pathname = usePathname();
 
   const sidebarUser: User = {
     id: user?.id ?? "",
@@ -86,7 +88,11 @@ export function AppSidebar({
                   const Icon = item.icon;
                   return (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild tooltip={item.title}>
+                      <SidebarMenuButton
+                        asChild
+                        tooltip={item.title}
+                        isActive={pathname === item.url}
+                      >
                         <Link href={item.url} className="flex items-center gap-2">
                           {Icon && <Icon className="size-4" />}
                           <span>{item.title}</span>
