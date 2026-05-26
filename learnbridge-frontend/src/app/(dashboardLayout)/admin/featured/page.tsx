@@ -1,4 +1,3 @@
-import DashPageHeader from "@/components/layout/DashPageHeader";
 import { tutorService } from "@/services/tutor.service";
 import FeaturedTutorsClient from "./FeaturedTutorsClient";
 
@@ -54,10 +53,12 @@ export default async function AdminFeaturedPage() {
 
   return (
     <div className="space-y-6">
-      <DashPageHeader
-        title="Featured Tutors"
-        description="Choose which tutors are highlighted on the homepage and courses page."
-      />
+      <div>
+        <h1 className="text-2xl font-black tracking-tight">Featured Tutors</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Choose which tutors are highlighted on the homepage and courses page
+        </p>
+      </div>
       <FeaturedTutorsClient tutors={tutors} />
     </div>
   );

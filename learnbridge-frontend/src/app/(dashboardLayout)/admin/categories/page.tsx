@@ -16,9 +16,9 @@ export default async function AdminCategoriesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Categories</h1>
-        <p className="text-muted-foreground">
-          Manage tutoring subject categories on the platform.
+        <h1 className="text-2xl font-black tracking-tight">Category &amp; Subjects</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Manage tutoring subject categories on the platform
         </p>
       </div>
       <CategoriesManager initialCategories={normalizedCategories} />

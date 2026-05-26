@@ -1,4 +1,3 @@
-import DashPageHeader from "@/components/layout/DashPageHeader";
 import { getAdminCoursesAction } from "@/actions/dashboard.action";
 import AdminCoursesClient from "./AdminCoursesClient";
 
@@ -7,10 +6,12 @@ export default async function AdminCoursesPage() {
 
   return (
     <div className="space-y-6">
-      <DashPageHeader
-        title="Course Approvals"
-        description="Review, approve or reject courses submitted by tutors."
-      />
+      <div>
+        <h1 className="text-2xl font-black tracking-tight">Course Approvals</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Review, approve or reject courses submitted by tutors
+        </p>
+      </div>
       <AdminCoursesClient initialCourses={courses as unknown as AdminCourse[]} />
     </div>
   );
