@@ -1,7 +1,10 @@
 import { getAdminBookings, getAdminUsers, getCategories } from "@/actions/dashboard.action";
-import DashPageHeader from "@/components/layout/DashPageHeader";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, BookOpen, CheckCircle, TrendingUp } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Users, BookOpen, CheckCircle2,
+  TrendingUp, XCircle, Clock, LayoutGrid,
+} from "lucide-react";
+import AdminAnalyticsCharts from "./AdminAnalyticsCharts";
 
 export default async function AdminAnalyticsPage() {
   const [users, bookings, categories] = await Promise.all([
@@ -13,87 +16,153 @@ export default async function AdminAnalyticsPage() {
   const completed = bookings.filter((b) => String(b?.status ?? "").toUpperCase() === "COMPLETED").length;
   const confirmed = bookings.filter((b) => String(b?.status ?? "").toUpperCase() === "CONFIRMED").length;
   const cancelled = bookings.filter((b) => String(b?.status ?? "").toUpperCase() === "CANCELLED").length;
-  const students = users.filter((u) => String(u?.role ?? "").toLowerCase() === "student").length;
-  const tutors = users.filter((u) => {
-    const r = String(u?.role ?? "").toLowerCase();
-    return r === "tutor" || r === "trainer";
-  }).length;
+  const pending   = bookings.filter((b) => String(b?.status ?? "").toUpperCase() === "PENDING").length;
 
-  const stats = [
-    { icon: Users,      label: "Total Users",      value: users.length,      color: "bg-primary/10 text-primary" },
-    { icon: BookOpen,   label: "Total Bookings",    value: bookings.length,   color: "bg-violet-100 text-violet-600 dark:bg-violet-900/30 dark:text-violet-400" },
-    { icon: CheckCircle,label: "Completed",         value: completed,         color: "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400" },
-    { icon: TrendingUp, label: "Categories",        value: categories.length, color: "bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400" },
+  const students = users.filter((u) => String(u?.role ?? "").toLowerCase() === "student").length;
+  const tutors   = users.filter((u) => { const r = String(u?.role ?? "").toLowerCase(); return r === "tutor" || r === "trainer"; }).length;
+  const others   = users.length - students - tutors;
+
+  const completionRate = bookings.length > 0 ? Math.round((completed / bookings.length) * 100) : 0;
+
+  const statCards = [
+    {
+      icon: Users,
+      label: "Total Users",
+      value: users.length,
+      sub: `${students} students · ${tutors} tutors`,
+      iconBg: "bg-primary/10",
+      iconColor: "text-primary",
+      bar: "bg-primary",
+      barW: "100%",
+    },
+    {
+      icon: BookOpen,
+      label: "Total Bookings",
+      value: bookings.length,
+      sub: "All time",
+      iconBg: "bg-violet-100 dark:bg-violet-900/30",
+      iconColor: "text-violet-600 dark:text-violet-400",
+      bar: "bg-violet-500",
+      barW: "100%",
+    },
+    {
+      icon: CheckCircle2,
+      label: "Completed",
+      value: completed,
+      sub: `${completionRate}% completion rate`,
+      iconBg: "bg-emerald-100 dark:bg-emerald-900/30",
+      iconColor: "text-emerald-600 dark:text-emerald-400",
+      bar: "bg-emerald-500",
+      barW: bookings.length > 0 ? `${completionRate}%` : "0%",
+    },
+    {
+      icon: TrendingUp,
+      label: "Confirmed",
+      value: confirmed,
+      sub: "Awaiting session",
+      iconBg: "bg-blue-100 dark:bg-blue-900/30",
+      iconColor: "text-blue-600 dark:text-blue-400",
+      bar: "bg-blue-500",
+      barW: bookings.length > 0 ? `${Math.round((confirmed / bookings.length) * 100)}%` : "0%",
+    },
+    {
+      icon: XCircle,
+      label: "Cancelled",
+      value: cancelled,
+      sub: "Sessions cancelled",
+      iconBg: "bg-red-100 dark:bg-red-900/30",
+      iconColor: "text-red-600 dark:text-red-400",
+      bar: "bg-red-500",
+      barW: bookings.length > 0 ? `${Math.round((cancelled / bookings.length) * 100)}%` : "0%",
+    },
+    {
+      icon: Clock,
+      label: "Pending",
+      value: pending,
+      sub: "Awaiting confirmation",
+      iconBg: "bg-amber-100 dark:bg-amber-900/30",
+      iconColor: "text-amber-600 dark:text-amber-400",
+      bar: "bg-amber-500",
+      barW: bookings.length > 0 ? `${Math.round((pending / bookings.length) * 100)}%` : "0%",
+    },
+    {
+      icon: LayoutGrid,
+      label: "Categories",
+      value: categories.length,
+      sub: "Subject categories",
+      iconBg: "bg-cyan-100 dark:bg-cyan-900/30",
+      iconColor: "text-cyan-600 dark:text-cyan-400",
+      bar: "bg-cyan-500",
+      barW: "100%",
+    },
+    {
+      icon: Users,
+      label: "Tutors",
+      value: tutors,
+      sub: `${users.length > 0 ? Math.round((tutors / users.length) * 100) : 0}% of users`,
+      iconBg: "bg-indigo-100 dark:bg-indigo-900/30",
+      iconColor: "text-indigo-600 dark:text-indigo-400",
+      bar: "bg-indigo-500",
+      barW: users.length > 0 ? `${Math.round((tutors / users.length) * 100)}%` : "0%",
+    },
   ];
 
+  const chartBookings = bookings.map((b) => ({
+    createdAt: String(b.createdAt ?? b.date ?? ""),
+    status:    String(b.status ?? ""),
+  }));
+
+  const chartUsers = users.map((u) => ({ role: String(u.role ?? "") }));
+
   return (
-    <div className="space-y-8">
-      <DashPageHeader title="Analytics" description="Platform-wide statistics and insights." />
+    <div className="space-y-6">
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {stats.map(({ icon: Icon, label, value, color }) => (
-          <Card key={label}>
-            <CardContent className="pt-6">
-              <div className={`mb-3 inline-flex rounded-xl p-3 ${color}`}>
-                <Icon className="size-5" />
-              </div>
-              <p className="text-3xl font-bold">{value}</p>
-              <p className="mt-1 text-sm text-muted-foreground">{label}</p>
-            </CardContent>
-          </Card>
-        ))}
+      {/* ── Header ─────────────────────────────────────────────── */}
+      <div>
+        <h1 className="text-2xl font-black tracking-tight">Analytics</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Platform-wide statistics and insights
+        </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader><CardTitle>Booking Breakdown</CardTitle></CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[
-                { label: "Completed",  value: completed,  pct: bookings.length ? Math.round((completed / bookings.length) * 100) : 0,  color: "bg-emerald-500" },
-                { label: "Confirmed",  value: confirmed,  pct: bookings.length ? Math.round((confirmed / bookings.length) * 100) : 0,  color: "bg-primary" },
-                { label: "Cancelled",  value: cancelled,  pct: bookings.length ? Math.round((cancelled / bookings.length) * 100) : 0,  color: "bg-destructive" },
-              ].map(({ label, value, pct, color }) => (
-                <div key={label}>
-                  <div className="mb-1 flex justify-between text-sm">
-                    <span className="text-muted-foreground">{label}</span>
-                    <span className="font-medium">{value} ({pct}%)</span>
+      {/* ── Stats Card ─────────────────────────────────────────── */}
+      <Card className="overflow-hidden">
+        <div className="h-1 w-full bg-linear-to-r from-primary via-violet-500 to-emerald-500" />
+        <CardContent className="p-0">
+          <div className="grid divide-y sm:divide-x sm:divide-y-0 sm:grid-cols-4 lg:grid-cols-8">
+            {statCards.map(({ icon: Icon, label, value, sub, iconBg, iconColor, bar, barW }) => (
+              <div key={label} className="flex flex-col gap-3 p-4 transition-colors hover:bg-muted/40">
+                <div className="flex items-start justify-between">
+                  <div className={`flex size-8 items-center justify-center rounded-xl ${iconBg}`}>
+                    <Icon className={`size-3.5 ${iconColor}`} />
                   </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-muted">
-                    <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
-                  </div>
+                  <span className="text-xl font-black tabular-nums">{value}</span>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                <div>
+                  <p className="text-xs font-semibold">{label}</p>
+                  <p className="mt-0.5 truncate text-[10px] text-muted-foreground">{sub}</p>
+                </div>
+                <div className="h-1 w-full overflow-hidden rounded-full bg-muted">
+                  <div className={`h-full rounded-full ${bar}`} style={{ width: barW }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
-        <Card>
-          <CardHeader><CardTitle>User Distribution</CardTitle></CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[
-                { label: "Students",  value: students,              color: "bg-primary" },
-                { label: "Tutors",    value: tutors,                color: "bg-violet-500" },
-                { label: "Others",    value: users.length - students - tutors, color: "bg-muted-foreground" },
-              ].map(({ label, value, color }) => {
-                const pct = users.length ? Math.round((value / users.length) * 100) : 0;
-                return (
-                  <div key={label}>
-                    <div className="mb-1 flex justify-between text-sm">
-                      <span className="text-muted-foreground">{label}</span>
-                      <span className="font-medium">{value} ({pct}%)</span>
-                    </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-muted">
-                      <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* ── Charts ─────────────────────────────────────────────── */}
+      <AdminAnalyticsCharts
+        bookings={chartBookings}
+        users={chartUsers}
+        completed={completed}
+        confirmed={confirmed}
+        cancelled={cancelled}
+        pending={pending}
+        students={students}
+        tutors={tutors}
+        others={others}
+      />
     </div>
   );
 }
