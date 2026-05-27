@@ -2,7 +2,7 @@ import { paymentService } from "@/services/payment.service";
 import { formatDate } from "@/lib/utils";
 import {
   TrendingUp, Receipt, Clock, CheckCircle2,
-  XCircle, CreditCard, Wallet, Users, BadgeDollarSign,
+  XCircle, Wallet, Users, BadgeDollarSign, ArrowUpRight,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -13,38 +13,14 @@ function getStatusCfg(status: string) {
     case "PAID":
     case "SUCCESS":
     case "COMPLETED":
-      return {
-        icon: CheckCircle2,
-        bg: "bg-emerald-100 dark:bg-emerald-900/30",
-        text: "text-emerald-700 dark:text-emerald-400",
-        dot: "bg-emerald-500",
-        label: "Paid",
-      };
+      return { icon: CheckCircle2, bg: "bg-emerald-100 dark:bg-emerald-900/30", text: "text-emerald-700 dark:text-emerald-400", dot: "bg-emerald-500", label: "Paid" };
     case "PENDING":
-      return {
-        icon: Clock,
-        bg: "bg-amber-100 dark:bg-amber-900/30",
-        text: "text-amber-700 dark:text-amber-400",
-        dot: "bg-amber-500",
-        label: "Pending",
-      };
+      return { icon: Clock,        bg: "bg-amber-100 dark:bg-amber-900/30",     text: "text-amber-700 dark:text-amber-400",    dot: "bg-amber-500",   label: "Pending" };
     case "FAILED":
     case "CANCELLED":
-      return {
-        icon: XCircle,
-        bg: "bg-red-100 dark:bg-red-900/30",
-        text: "text-red-600 dark:text-red-400",
-        dot: "bg-red-500",
-        label: status.charAt(0).toUpperCase() + status.slice(1).toLowerCase(),
-      };
+      return { icon: XCircle,      bg: "bg-red-100 dark:bg-red-900/30",         text: "text-red-600 dark:text-red-400",        dot: "bg-red-500",     label: status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() };
     default:
-      return {
-        icon: Clock,
-        bg: "bg-muted",
-        text: "text-muted-foreground",
-        dot: "bg-border",
-        label: status,
-      };
+      return { icon: Clock,        bg: "bg-muted",                              text: "text-muted-foreground",                 dot: "bg-border",      label: status };
   }
 }
 
@@ -65,10 +41,10 @@ export default async function TutorPaymentsPage() {
   const payments = await paymentService.getTutorPayments();
   const list: Payment[] = Array.isArray(payments) ? payments : [];
 
-  /* ── derived stats ── */
+  /* ── Derived stats ── */
   const totalEarnings = list.reduce((s, p) => {
     const status = String(p.status ?? "").toUpperCase();
-    if (status === "PAID" || status === "SUCCESS" || status === "COMPLETED") {
+    if (["PAID", "SUCCESS", "COMPLETED"].includes(status)) {
       return s + parseFloat(String(p.amount ?? p.price ?? 0));
     }
     return s;
@@ -76,7 +52,6 @@ export default async function TutorPaymentsPage() {
 
   const paidCount    = list.filter((p) => ["PAID", "SUCCESS", "COMPLETED"].includes(String(p.status ?? "").toUpperCase())).length;
   const pendingCount = list.filter((p) => String(p.status ?? "").toUpperCase() === "PENDING").length;
-
   const uniqueStudents = new Set(
     list.map((p) => {
       const student = p.student as Record<string, unknown> | undefined;
@@ -90,7 +65,7 @@ export default async function TutorPaymentsPage() {
     {
       icon: Wallet,
       label: "Total Earnings",
-      value: `$${totalEarnings.toFixed(2)}`,
+      value: `৳${totalEarnings.toFixed(2)}`,
       sub: `${paidCount} paid session${paidCount !== 1 ? "s" : ""}`,
       iconBg: "bg-emerald-100 dark:bg-emerald-900/30",
       iconColor: "text-emerald-600 dark:text-emerald-400",
@@ -120,11 +95,11 @@ export default async function TutorPaymentsPage() {
     {
       icon: TrendingUp,
       label: "Last Payment",
-      value: lastPayment ? `$${formatAmount(lastPayment.amount ?? lastPayment.price)}` : "—",
+      value: lastPayment ? `৳${formatAmount(lastPayment.amount ?? lastPayment.price)}` : "—",
       sub: lastPayment ? formatDate(String(lastPayment.createdAt ?? "")) : "No payments yet",
-      iconBg: "bg-amber-100 dark:bg-amber-900/30",
-      iconColor: "text-amber-600 dark:text-amber-400",
-      bar: "bg-amber-500",
+      iconBg: "bg-blue-100 dark:bg-blue-900/30",
+      iconColor: "text-blue-600 dark:text-blue-400",
+      bar: "bg-blue-500",
       barW: "100%",
     },
   ];
@@ -146,7 +121,7 @@ export default async function TutorPaymentsPage() {
         <CardContent className="p-0">
           <div className="grid divide-y sm:divide-x sm:divide-y-0 sm:grid-cols-4">
             {statCards.map(({ icon: Icon, label, value, sub, iconBg, iconColor, bar, barW }) => (
-              <div key={label} className="flex flex-col gap-4 p-5 transition-colors hover:bg-muted/40">
+              <div key={label} className="flex flex-col gap-3 p-5 transition-colors hover:bg-muted/40">
                 <div className="flex items-start justify-between">
                   <div className={`flex size-9 items-center justify-center rounded-2xl ${iconBg}`}>
                     <Icon className={`size-4 ${iconColor}`} />
@@ -166,29 +141,29 @@ export default async function TutorPaymentsPage() {
         </CardContent>
       </Card>
 
-      {/* ── Transactions Table ─────────────────────────────────── */}
+      {/* ── Transactions List ──────────────────────────────────── */}
       <Card className="overflow-hidden">
         <div className="h-[3px] w-full bg-linear-to-r from-emerald-500 via-primary to-violet-500" />
 
         <CardHeader className="border-b pb-4">
           <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-base font-semibold">All Transactions</CardTitle>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                {list.length} record{list.length !== 1 ? "s" : ""} found
-              </p>
-            </div>
             <div className="flex items-center gap-2">
-              {pendingCount > 0 && (
-                <span className="flex items-center gap-1.5 rounded-full bg-amber-100 dark:bg-amber-900/30 px-3 py-1 text-xs font-semibold text-amber-700 dark:text-amber-400">
-                  <span className="size-1.5 rounded-full bg-amber-500" />
-                  {pendingCount} pending
-                </span>
-              )}
-              <div className="flex size-9 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/30">
+              <div className="flex size-8 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/30">
                 <BadgeDollarSign className="size-4 text-emerald-600 dark:text-emerald-400" />
               </div>
+              <div>
+                <CardTitle className="text-base font-semibold">All Transactions</CardTitle>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  {list.length} record{list.length !== 1 ? "s" : ""}
+                </p>
+              </div>
             </div>
+            {pendingCount > 0 && (
+              <span className="flex items-center gap-1.5 rounded-full bg-amber-100 dark:bg-amber-900/30 px-3 py-1 text-xs font-semibold text-amber-700 dark:text-amber-400">
+                <span className="size-1.5 rounded-full bg-amber-500" />
+                {pendingCount} pending
+              </span>
+            )}
           </div>
         </CardHeader>
 
@@ -211,72 +186,54 @@ export default async function TutorPaymentsPage() {
             </div>
           </CardContent>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-muted/40">
-                  <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">#</th>
-                  <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Student</th>
-                  <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Date</th>
-                  <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Amount</th>
-                  <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/60">
-                {list.map((p, i) => {
-                  const student    = p?.student as Record<string, unknown> | undefined;
-                  const studentName = String(student?.name ?? p.studentName ?? "Student");
-                  const status     = String(p.status ?? "PAID");
-                  const cfg        = getStatusCfg(status);
-                  const StatusIcon = cfg.icon;
-                  const amount     = formatAmount(p.amount ?? p.price);
-                  const date       = formatDate(String(p.createdAt ?? ""));
+          <CardContent className="p-0">
+            <div className="divide-y divide-border/60">
+              {list.map((p, i) => {
+                const student     = p?.student as Record<string, unknown> | undefined;
+                const studentName = String(student?.name ?? p.studentName ?? "Student");
+                const status      = String(p.status ?? "PAID");
+                const cfg         = getStatusCfg(status);
+                const StatusIcon  = cfg.icon;
+                const amount      = formatAmount(p.amount ?? p.price);
+                const date        = formatDate(String(p.createdAt ?? ""));
 
-                  return (
-                    <tr key={String(p.id ?? i)} className="transition-colors hover:bg-muted/30">
-                      {/* # */}
-                      <td className="px-6 py-4 text-xs font-mono text-muted-foreground">
-                        {String(i + 1).padStart(2, "0")}
-                      </td>
+                return (
+                  <div key={String(p.id ?? i)} className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-muted/30">
 
-                      {/* Student */}
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className={`flex size-8 shrink-0 items-center justify-center rounded-xl text-xs font-black ${AVATAR_COLORS[i % AVATAR_COLORS.length]}`}>
-                            {studentName[0]?.toUpperCase() ?? "S"}
-                          </div>
-                          <span className="font-semibold">{studentName}</span>
-                        </div>
-                      </td>
+                    {/* Index */}
+                    <span className="hidden w-6 shrink-0 text-center text-xs font-mono text-muted-foreground sm:block">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
 
-                      {/* Date */}
-                      <td className="px-6 py-4 text-muted-foreground">{date}</td>
+                    {/* Avatar */}
+                    <div className={`flex size-10 shrink-0 items-center justify-center rounded-2xl text-sm font-black ${AVATAR_COLORS[i % AVATAR_COLORS.length]}`}>
+                      {studentName[0]?.toUpperCase() ?? "S"}
+                    </div>
 
-                      {/* Amount */}
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <div className="flex size-7 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/30">
-                            <CreditCard className="size-3.5 text-emerald-600 dark:text-emerald-400" />
-                          </div>
-                          <span className="text-base font-black tabular-nums text-emerald-600 dark:text-emerald-400">
-                            +${amount}
-                          </span>
-                        </div>
-                      </td>
+                    {/* Student name */}
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold">{studentName}</p>
+                      <p className="text-xs text-muted-foreground">{date}</p>
+                    </div>
 
-                      {/* Status */}
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${cfg.bg} ${cfg.text}`}>
-                          <StatusIcon className="size-3.5" />
-                          {cfg.label}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                    {/* Amount */}
+                    <div className="flex items-center gap-1.5">
+                      <ArrowUpRight className="size-3.5 text-emerald-500 shrink-0" />
+                      <span className="text-base font-black tabular-nums text-emerald-600 dark:text-emerald-400">
+                        ৳{amount}
+                      </span>
+                    </div>
+
+                    {/* Status badge */}
+                    <span className={`hidden sm:inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${cfg.bg} ${cfg.text}`}>
+                      <StatusIcon className="size-3.5" />
+                      {cfg.label}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
         )}
       </Card>
     </div>

@@ -143,7 +143,7 @@ export default async function TutorBookingDetailPage({ params }: { params: Promi
                 iconBg="bg-emerald-100 dark:bg-emerald-900/30"
                 iconColor="text-emerald-600 dark:text-emerald-400"
                 label="Price"
-                value={<span className="text-emerald-600 dark:text-emerald-400">${String(booking.price)}</span>}
+                value={<span className="text-emerald-600 dark:text-emerald-400">৳{String(booking.price)}</span>}
               />
             )}
             {subject?.name != null && (

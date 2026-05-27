@@ -96,24 +96,49 @@ export default async function TutorDashboardPage() {
   }));
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
 
-      {/* ── Header ─────────────────────────────────────────────── */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-black tracking-tight">Tutor Dashboard</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Welcome back, <span className="font-bold text-foreground">{user?.name ?? "Tutor"}</span>. Here's your teaching overview.
-          </p>
+      {/* ── Welcome Banner ─────────────────────────────────────── */}
+      <Card className="overflow-hidden">
+        <div className="relative bg-linear-to-br from-primary via-violet-600 to-indigo-700 p-6 text-white">
+          {/* Decorative circles */}
+          <div className="absolute -top-8 -right-8 size-40 rounded-full bg-white/5" />
+          <div className="absolute -bottom-6 right-20 size-24 rounded-full bg-white/5" />
+          <div className="absolute top-4 right-48 size-12 rounded-full bg-white/10" />
+
+          <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <Zap className="size-4 text-white/70" />
+                <p className="text-sm font-medium text-white/70">Tutor Dashboard</p>
+              </div>
+              <h1 className="text-2xl font-black tracking-tight">
+                {user?.name ?? "Tutor"} 👋
+              </h1>
+              <p className="mt-1 text-sm text-white/70">
+                {bookings.length > 0
+                  ? `${confirmed} confirmed session${confirmed !== 1 ? "s" : ""} · ${completionRate}% completion rate`
+                  : "Add time slots so students can start booking sessions with you."
+                }
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button asChild variant="secondary" className="gap-2 rounded-xl font-semibold">
+                <Link href="/tutor/availability">
+                  <PlusCircle className="size-4" /> Add Slot
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="gap-2 rounded-xl font-semibold bg-white/10 border-white/20 text-white hover:bg-white/20">
+                <Link href="/tutor/bookings">
+                  <Calendar className="size-4" /> View Bookings
+                </Link>
+              </Button>
+            </div>
+          </div>
         </div>
-        <Button asChild className="hidden gap-2 rounded-xl sm:flex">
-          <Link href="/tutor/availability">
-            <PlusCircle className="size-4" /> Add Slot
-          </Link>
-        </Button>
-      </div>
+      </Card>
 
-      {/* ── Combined Stats Card ─────────────────────────────────── */}
+      {/* ── Stats Card ──────────────────────────────────────────── */}
       <Card className="overflow-hidden">
         <div className="h-1 w-full bg-linear-to-r from-primary via-blue-500 to-emerald-500" />
         <CardHeader className="border-b pb-4">
@@ -154,7 +179,7 @@ export default async function TutorDashboardPage() {
       {/* ── Chart ───────────────────────────────────────────────── */}
       <TutorChart bookings={chartBookings} />
 
-      {/* ── Bottom grid ─────────────────────────────────────────── */}
+      {/* ── Bottom Grid ─────────────────────────────────────────── */}
       <div className="grid gap-6 lg:grid-cols-[1fr_1.6fr]">
 
         {/* Quick Actions */}
@@ -165,46 +190,41 @@ export default async function TutorDashboardPage() {
               <div className="flex size-8 items-center justify-center rounded-xl bg-primary/10">
                 <Zap className="size-4 text-primary" />
               </div>
-              <CardTitle className="text-base font-semibold">Quick Actions</CardTitle>
+              <div>
+                <CardTitle className="text-base font-semibold">Quick Actions</CardTitle>
+                <p className="mt-0.5 text-xs text-muted-foreground">Jump to what you need</p>
+              </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-2.5 pt-5">
-            <Link
-              href="/tutor/availability"
-              className="flex items-center justify-between rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-            >
-              <span className="flex items-center gap-2">
-                <PlusCircle className="size-4" /> Add Availability
-              </span>
-              <ArrowRight className="size-4" />
-            </Link>
+          <CardContent className="space-y-2.5 p-5">
+            {[
+              { href: "/tutor/availability", label: "Add Availability",  icon: PlusCircle,    desc: "Set your free time slots",         bg: "bg-primary/10",                          color: "text-primary"                            },
+              { href: "/tutor/bookings",     label: "My Bookings",       icon: Calendar,      desc: "View all student bookings",         bg: "bg-blue-100 dark:bg-blue-900/30",        color: "text-blue-600 dark:text-blue-400"         },
+              { href: "/tutor/courses",      label: "My Courses",        icon: BookOpen,      desc: "Manage your published courses",     bg: "bg-emerald-100 dark:bg-emerald-900/30",  color: "text-emerald-600 dark:text-emerald-400"   },
+              { href: "/tutor/profile",      label: "Edit Profile",      icon: UserRoundCheck,desc: "Update your tutor profile",         bg: "bg-violet-100 dark:bg-violet-900/30",    color: "text-violet-600 dark:text-violet-400"     },
+            ].map(({ href, label, icon: Icon, desc, bg, color }) => (
+              <Link
+                key={href}
+                href={href}
+                className="flex items-center gap-3 rounded-2xl border p-3.5 transition-all hover:border-primary/30 hover:bg-muted/40 hover:shadow-sm group"
+              >
+                <div className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${bg}`}>
+                  <Icon className={`size-4 ${color}`} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold">{label}</p>
+                  <p className="text-xs text-muted-foreground">{desc}</p>
+                </div>
+                <ArrowRight className="size-4 shrink-0 text-muted-foreground/40 transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+              </Link>
+            ))}
 
-            <Link
-              href="/tutor/profile"
-              className="flex items-center justify-between rounded-xl border px-4 py-3 text-sm font-semibold transition-colors hover:bg-muted"
-            >
-              <span className="flex items-center gap-2">
-                <UserRoundCheck className="size-4 text-violet-500" /> Edit Profile
-              </span>
-              <ArrowRight className="size-4 text-muted-foreground" />
-            </Link>
-
-            <Link
-              href="/tutor/bookings"
-              className="flex items-center justify-between rounded-xl border px-4 py-3 text-sm font-semibold transition-colors hover:bg-muted"
-            >
-              <span className="flex items-center gap-2">
-                <BookOpen className="size-4 text-emerald-500" /> View All Bookings
-              </span>
-              <ArrowRight className="size-4 text-muted-foreground" />
-            </Link>
-
-            {/* Slot availability status */}
-            <div className="mt-2 flex items-center gap-3 rounded-xl bg-muted/50 px-4 py-3">
-              <div className={`size-2.5 rounded-full ${availableSlots > 0 ? "bg-emerald-500" : "bg-amber-500"}`} />
+            {/* Slot status pill */}
+            <div className={`flex items-center gap-3 rounded-2xl px-4 py-3 ${availableSlots > 0 ? "bg-emerald-50 dark:bg-emerald-900/20" : "bg-muted/50"}`}>
+              <div className={`size-2.5 rounded-full ${availableSlots > 0 ? "bg-emerald-500 animate-pulse" : "bg-muted-foreground/40"}`} />
               <p className="text-sm text-muted-foreground">
-                <span className="font-semibold text-foreground">{availableSlots}</span>{" "}
-                slot{availableSlots !== 1 ? "s" : ""} open for booking
+                <span className={`font-bold ${availableSlots > 0 ? "text-emerald-700 dark:text-emerald-400" : "text-foreground"}`}>{availableSlots}</span>{" "}
+                open slot{availableSlots !== 1 ? "s" : ""} available for booking
               </p>
             </div>
           </CardContent>
