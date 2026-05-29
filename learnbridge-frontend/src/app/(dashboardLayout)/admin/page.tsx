@@ -2,12 +2,15 @@ import Link from "next/link";
 import {
   BookOpenCheck, Tags, Users, TrendingUp, ArrowRight,
   CheckCircle2, XCircle, Clock, LayoutGrid, ShieldCheck,
+  Sparkles, CreditCard, Star, Activity,
 } from "lucide-react";
 import { getAdminBookings, getAdminUsers, getCategories } from "@/actions/dashboard.action";
 import { Card, CardContent } from "@/components/ui/card";
+import { getCurrentUserFromServer } from "@/lib/auth";
 
 export default async function AdminDashboardPage() {
-  const [users, bookings, categories] = await Promise.all([
+  const [user, users, bookings, categories] = await Promise.all([
+    getCurrentUserFromServer(),
     getAdminUsers(),
     getAdminBookings(),
     getCategories(),
@@ -77,24 +80,57 @@ export default async function AdminDashboardPage() {
   ];
 
   const quickLinks = [
-    { href: "/admin/users",      label: "Manage Users",       icon: Users,         color: "bg-primary/10 text-primary" },
-    { href: "/admin/bookings",   label: "View Bookings",      icon: BookOpenCheck, color: "bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400" },
-    { href: "/admin/categories", label: "Manage Categories",  icon: Tags,          color: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400" },
-    { href: "/admin/payments",   label: "View Payments",      icon: TrendingUp,    color: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400" },
-    { href: "/admin/tutors",     label: "All Tutors",         icon: LayoutGrid,    color: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400" },
-    { href: "/admin/analytics",  label: "Analytics",          icon: TrendingUp,    color: "bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400" },
+    { href: "/admin/users",      label: "Manage Users",      desc: "View & ban platform members",  icon: Users,         bg: "bg-primary/10",                          color: "text-primary"                            },
+    { href: "/admin/bookings",   label: "All Bookings",      desc: "View every session booking",   icon: BookOpenCheck, bg: "bg-violet-100 dark:bg-violet-900/30",    color: "text-violet-600 dark:text-violet-400"    },
+    { href: "/admin/tutors",     label: "All Tutors",        desc: "Manage tutor profiles",        icon: LayoutGrid,    bg: "bg-indigo-100 dark:bg-indigo-900/30",    color: "text-indigo-600 dark:text-indigo-400"    },
+    { href: "/admin/categories", label: "Categories",        desc: "Add & edit subject categories", icon: Tags,         bg: "bg-cyan-100 dark:bg-cyan-900/30",        color: "text-cyan-600 dark:text-cyan-400"        },
+    { href: "/admin/payments",   label: "Payments",          desc: "Track all transactions",       icon: CreditCard,    bg: "bg-emerald-100 dark:bg-emerald-900/30",  color: "text-emerald-600 dark:text-emerald-400"  },
+    { href: "/admin/featured",   label: "Featured Tutors",   desc: "Highlight top tutors",         icon: Star,          bg: "bg-amber-100 dark:bg-amber-900/30",      color: "text-amber-600 dark:text-amber-400"      },
+    { href: "/admin/analytics",  label: "Analytics",         desc: "Platform-wide insights",       icon: Activity,     bg: "bg-rose-100 dark:bg-rose-900/30",        color: "text-rose-600 dark:text-rose-400"        },
+    { href: "/admin/moderators", label: "Moderators",        desc: "Invite platform moderators",   icon: ShieldCheck,   bg: "bg-slate-100 dark:bg-slate-900/30",      color: "text-slate-600 dark:text-slate-400"      },
   ];
 
   return (
     <div className="space-y-6">
 
-      {/* ── Header ─────────────────────────────────────────────── */}
-      <div>
-        <h1 className="text-2xl font-black tracking-tight">Admin Dashboard</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Monitor users, bookings, and platform activity at a glance
-        </p>
-      </div>
+      {/* ── Welcome Banner ─────────────────────────────────────── */}
+      <Card className="overflow-hidden">
+        <div className="relative bg-linear-to-br from-slate-900 via-primary/90 to-violet-700 p-6 text-white">
+          {/* Decorative */}
+          <div className="absolute -top-10 -right-10 size-48 rounded-full bg-white/5" />
+          <div className="absolute -bottom-8 right-24 size-28 rounded-full bg-white/5" />
+          <div className="absolute top-3 right-52 size-14 rounded-full bg-white/10" />
+
+          <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <ShieldCheck className="size-4 text-white/70" />
+                <p className="text-sm font-medium text-white/70">Admin Panel</p>
+              </div>
+              <h1 className="text-2xl font-black tracking-tight">
+                {user?.name ?? "Admin"} 👋
+              </h1>
+              <p className="mt-1 text-sm text-white/70">
+                {users.length} users · {bookings.length} bookings · {completionRate}% completion rate
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Link
+                href="/admin/users"
+                className="flex items-center gap-1.5 rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/25"
+              >
+                <Users className="size-4" /> Users
+              </Link>
+              <Link
+                href="/admin/analytics"
+                className="flex items-center gap-1.5 rounded-xl bg-white/10 border border-white/20 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+              >
+                <Activity className="size-4" /> Analytics
+              </Link>
+            </div>
+          </div>
+        </div>
+      </Card>
 
       {/* ── Stats Card ─────────────────────────────────────────── */}
       <Card className="overflow-hidden">
@@ -105,19 +141,19 @@ export default async function AdminDashboardPage() {
               <Link
                 key={label}
                 href={href}
-                className="flex flex-col gap-3 p-4 transition-colors hover:bg-muted/40"
+                className="flex flex-col gap-3 p-4 transition-colors hover:bg-muted/40 group"
               >
                 <div className="flex items-start justify-between">
-                  <div className={`flex size-8 items-center justify-center rounded-xl ${iconBg}`}>
-                    <Icon className={`size-3.5 ${iconColor}`} />
+                  <div className={`flex size-9 items-center justify-center rounded-2xl ${iconBg}`}>
+                    <Icon className={`size-4 ${iconColor}`} />
                   </div>
-                  <span className="text-xl font-black tabular-nums">{value}</span>
+                  <span className="text-2xl font-black tabular-nums">{value}</span>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold">{label}</p>
-                  <p className="mt-0.5 truncate text-[10px] text-muted-foreground">{sub}</p>
+                  <p className="text-sm font-semibold group-hover:text-primary transition-colors">{label}</p>
+                  <p className="mt-0.5 truncate text-xs text-muted-foreground">{sub}</p>
                 </div>
-                <div className="h-1 w-full overflow-hidden rounded-full bg-muted">
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
                   <div className={`h-full rounded-full ${bar}`} style={{ width: barW }} />
                 </div>
               </Link>
@@ -168,7 +204,7 @@ export default async function AdminDashboardPage() {
           <div className="border-b px-5 py-4">
             <div className="flex items-center gap-2">
               <div className="flex size-8 items-center justify-center rounded-xl bg-primary/10">
-                <ArrowRight className="size-4 text-primary" />
+                <Sparkles className="size-4 text-primary" />
               </div>
               <div>
                 <p className="text-sm font-semibold">Quick Actions</p>
@@ -176,21 +212,23 @@ export default async function AdminDashboardPage() {
               </div>
             </div>
           </div>
-          <CardContent className="p-4">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {quickLinks.map(({ href, label, icon: Icon, color }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className="group flex flex-col items-center gap-2 rounded-2xl border p-4 text-center transition-all hover:border-primary/30 hover:bg-muted/40 hover:shadow-sm"
-                >
-                  <div className={`flex size-10 items-center justify-center rounded-2xl ${color}`}>
-                    <Icon className="size-5" />
-                  </div>
-                  <span className="text-xs font-semibold leading-tight">{label}</span>
-                </Link>
-              ))}
-            </div>
+          <CardContent className="space-y-1.5 p-4">
+            {quickLinks.map(({ href, label, desc, icon: Icon, bg, color }) => (
+              <Link
+                key={href}
+                href={href}
+                className="flex items-center gap-3 rounded-2xl border p-3 transition-all hover:border-primary/30 hover:bg-muted/40 hover:shadow-sm group"
+              >
+                <div className={`flex size-8 shrink-0 items-center justify-center rounded-xl ${bg}`}>
+                  <Icon className={`size-4 ${color}`} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold">{label}</p>
+                  <p className="text-xs text-muted-foreground truncate">{desc}</p>
+                </div>
+                <ArrowRight className="size-3.5 shrink-0 text-muted-foreground/40 transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+              </Link>
+            ))}
           </CardContent>
         </Card>
       </div>

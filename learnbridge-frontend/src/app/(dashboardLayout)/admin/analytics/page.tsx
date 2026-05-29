@@ -133,16 +133,16 @@ export default async function AdminAnalyticsPage() {
             {statCards.map(({ icon: Icon, label, value, sub, iconBg, iconColor, bar, barW }) => (
               <div key={label} className="flex flex-col gap-3 p-4 transition-colors hover:bg-muted/40">
                 <div className="flex items-start justify-between">
-                  <div className={`flex size-8 items-center justify-center rounded-xl ${iconBg}`}>
-                    <Icon className={`size-3.5 ${iconColor}`} />
+                  <div className={`flex size-9 items-center justify-center rounded-2xl ${iconBg}`}>
+                    <Icon className={`size-4 ${iconColor}`} />
                   </div>
-                  <span className="text-xl font-black tabular-nums">{value}</span>
+                  <span className="text-2xl font-black tabular-nums">{value}</span>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold">{label}</p>
-                  <p className="mt-0.5 truncate text-[10px] text-muted-foreground">{sub}</p>
+                  <p className="text-sm font-semibold">{label}</p>
+                  <p className="mt-0.5 truncate text-xs text-muted-foreground">{sub}</p>
                 </div>
-                <div className="h-1 w-full overflow-hidden rounded-full bg-muted">
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
                   <div className={`h-full rounded-full ${bar}`} style={{ width: barW }} />
                 </div>
               </div>

@@ -8,8 +8,17 @@ const AVATAR_COLORS = [
   "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400",
   "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
   "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-  "bg-cyan-100 text-cyan-700 dark:bg-rose-900/30 dark:text-cyan-400",
+  "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400",
   "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400",
+];
+
+const TUTOR_COLORS = [
+  "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400",
+  "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400",
+  "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400",
+  "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
+  "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400",
+  "bg-lime-100 text-lime-700 dark:bg-lime-900/30 dark:text-lime-400",
 ];
 
 const STATUS_CFG: Record<string, { bg: string; textColor: string; dot: string }> = {
@@ -100,7 +109,7 @@ export default async function AdminPaymentsPage() {
           ) : (
             <>
               {/* Table header */}
-              <div className="hidden border-b bg-muted/40 sm:grid sm:grid-cols-[1.5fr_2fr_2fr_1.2fr_1fr] gap-4 px-5 py-3">
+              <div className="hidden border-b bg-muted/40 sm:grid sm:grid-cols-[1.2fr_2fr_2fr_1.2fr_1fr] gap-4 px-5 py-3">
                 {["Date", "Student", "Tutor", "Amount", "Status"].map((h) => (
                   <p key={h} className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{h}</p>
                 ))}
@@ -109,8 +118,8 @@ export default async function AdminPaymentsPage() {
               {/* Rows */}
               <div className="divide-y divide-border/60">
                 {list.map((p, idx) => {
-                  const student  = p?.student  as Record<string, unknown> | undefined;
-                  const tutor    = p?.tutor    as Record<string, unknown> | undefined;
+                  const student   = p?.student  as Record<string, unknown> | undefined;
+                  const tutor     = p?.tutor    as Record<string, unknown> | undefined;
                   const tutorUser = tutor?.user as Record<string, unknown> | undefined;
                   const studentName = String(student?.name ?? p.studentName ?? "Student");
                   const tutorName   = String(tutorUser?.name ?? tutor?.name ?? p.tutorName ?? "Tutor");
@@ -121,7 +130,7 @@ export default async function AdminPaymentsPage() {
                   return (
                     <div
                       key={String(p.id ?? idx)}
-                      className="grid grid-cols-1 gap-3 px-5 py-4 transition-colors hover:bg-muted/30 sm:grid-cols-[1.5fr_2fr_2fr_1.2fr_1fr] sm:items-center sm:gap-4"
+                      className="grid grid-cols-1 gap-3 px-5 py-4 transition-colors hover:bg-muted/30 sm:grid-cols-[1.2fr_2fr_2fr_1.2fr_1fr] sm:items-center sm:gap-4"
                     >
                       {/* Date */}
                       <p className="text-xs text-muted-foreground">
@@ -137,7 +146,12 @@ export default async function AdminPaymentsPage() {
                       </div>
 
                       {/* Tutor */}
-                      <p className="truncate text-sm text-muted-foreground">{tutorName}</p>
+                      <div className="flex items-center gap-2.5">
+                        <div className={`flex size-8 shrink-0 items-center justify-center rounded-xl text-xs font-black ${TUTOR_COLORS[idx % TUTOR_COLORS.length]}`}>
+                          {tutorName[0]?.toUpperCase() ?? "T"}
+                        </div>
+                        <p className="truncate text-sm text-muted-foreground">{tutorName}</p>
+                      </div>
 
                       {/* Amount */}
                       <p className="text-sm font-black text-emerald-600 dark:text-emerald-400">

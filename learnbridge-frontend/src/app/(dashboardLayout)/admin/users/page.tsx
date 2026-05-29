@@ -1,32 +1,10 @@
 import { getAdminUsers } from "@/actions/dashboard.action";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Users, GraduationCap, BookOpen, ShieldCheck, UserX } from "lucide-react";
-import UserStatusToggle from "./UserStatusToggle";
+import AdminUsersClient from "./AdminUsersClient";
 
 const text = (value: unknown, fallback = "N/A") =>
   typeof value === "string" || typeof value === "number" ? String(value) : fallback;
-
-const ROLE_CFG: Record<string, { label: string; bg: string; text: string; dot: string }> = {
-  admin:   { label: "Admin",   bg: "bg-red-100 dark:bg-red-900/30",       text: "text-red-700 dark:text-red-400",       dot: "bg-red-500"     },
-  trainer: { label: "Tutor",   bg: "bg-violet-100 dark:bg-violet-900/30", text: "text-violet-700 dark:text-violet-400", dot: "bg-violet-500"  },
-  tutor:   { label: "Tutor",   bg: "bg-violet-100 dark:bg-violet-900/30", text: "text-violet-700 dark:text-violet-400", dot: "bg-violet-500"  },
-  student: { label: "Student", bg: "bg-blue-100 dark:bg-blue-900/30",     text: "text-blue-700 dark:text-blue-400",     dot: "bg-blue-500"    },
-};
-
-const STATUS_CFG: Record<string, { label: string; bg: string; text: string; dot: string }> = {
-  active:  { label: "Active",  bg: "bg-emerald-100 dark:bg-emerald-900/30", text: "text-emerald-700 dark:text-emerald-400", dot: "bg-emerald-500" },
-  blocked: { label: "Banned",  bg: "bg-red-100 dark:bg-red-900/30",         text: "text-red-700 dark:text-red-400",         dot: "bg-red-500"     },
-  banned:  { label: "Banned",  bg: "bg-red-100 dark:bg-red-900/30",         text: "text-red-700 dark:text-red-400",         dot: "bg-red-500"     },
-};
-
-const AVATAR_COLORS = [
-  "bg-primary/15 text-primary",
-  "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400",
-  "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-  "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-  "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400",
-  "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400",
-];
 
 export default async function AdminUsersPage() {
   const users = await getAdminUsers();
@@ -38,12 +16,25 @@ export default async function AdminUsersPage() {
   const banned   = users.filter((u) => ["blocked", "banned"].includes(String(u.status ?? "").toLowerCase())).length;
 
   const statCards = [
-    { icon: Users,        label: "Total Users", value: total,    sub: "All registered",    iconBg: "bg-primary/10",                          iconColor: "text-primary",                          bar: "bg-primary",     barW: "100%" },
-    { icon: GraduationCap,label: "Students",    value: students, sub: `${total > 0 ? Math.round((students/total)*100) : 0}% of users`,      iconBg: "bg-blue-100 dark:bg-blue-900/30",           iconColor: "text-blue-600 dark:text-blue-400",      bar: "bg-blue-500",    barW: total > 0 ? `${Math.round((students/total)*100)}%` : "0%" },
-    { icon: BookOpen,     label: "Tutors",      value: tutors,   sub: `${total > 0 ? Math.round((tutors/total)*100) : 0}% of users`,        iconBg: "bg-violet-100 dark:bg-violet-900/30",       iconColor: "text-violet-600 dark:text-violet-400",  bar: "bg-violet-500",  barW: total > 0 ? `${Math.round((tutors/total)*100)}%` : "0%" },
-    { icon: ShieldCheck,  label: "Admins",      value: admins,   sub: "Platform admins",   iconBg: "bg-amber-100 dark:bg-amber-900/30",      iconColor: "text-amber-600 dark:text-amber-400",    bar: "bg-amber-500",   barW: total > 0 ? `${Math.round((admins/total)*100)}%` : "0%" },
-    { icon: UserX,        label: "Banned",      value: banned,   sub: "Restricted access", iconBg: "bg-red-100 dark:bg-red-900/30",          iconColor: "text-red-600 dark:text-red-400",        bar: "bg-red-500",     barW: total > 0 ? `${Math.round((banned/total)*100)}%` : "0%" },
+    { icon: Users,         label: "Total Users", value: total,    sub: "All registered",    iconBg: "bg-primary/10",                          iconColor: "text-primary",                           bar: "bg-primary",     barW: "100%"  },
+    { icon: GraduationCap, label: "Students",    value: students, sub: `${total > 0 ? Math.round((students/total)*100) : 0}% of users`,      iconBg: "bg-blue-100 dark:bg-blue-900/30",           iconColor: "text-blue-600 dark:text-blue-400",       bar: "bg-blue-500",    barW: total > 0 ? `${Math.round((students/total)*100)}%` : "0%" },
+    { icon: BookOpen,      label: "Tutors",      value: tutors,   sub: `${total > 0 ? Math.round((tutors/total)*100) : 0}% of users`,        iconBg: "bg-violet-100 dark:bg-violet-900/30",       iconColor: "text-violet-600 dark:text-violet-400",   bar: "bg-violet-500",  barW: total > 0 ? `${Math.round((tutors/total)*100)}%` : "0%"   },
+    { icon: ShieldCheck,   label: "Admins",      value: admins,   sub: "Platform admins",   iconBg: "bg-emerald-100 dark:bg-emerald-900/30",  iconColor: "text-emerald-600 dark:text-emerald-400", bar: "bg-emerald-500", barW: total > 0 ? `${Math.round((admins/total)*100)}%` : "0%"   },
+    { icon: UserX,         label: "Banned",      value: banned,   sub: "Restricted access", iconBg: "bg-red-100 dark:bg-red-900/30",          iconColor: "text-red-600 dark:text-red-400",         bar: "bg-red-500",     barW: total > 0 ? `${Math.round((banned/total)*100)}%` : "0%"   },
   ];
+
+  /* Normalise for client component */
+  const normalised = users.map((u, idx) => ({
+    id:     text(u.id ?? u._id ?? u.email),
+    name:   text(u.name, "Unknown"),
+    email:  text(u.email),
+    role:   String(u.role ?? "student").toLowerCase(),
+    status: String(u.status ?? "active").toLowerCase(),
+    joined: u.createdAt
+      ? new Date(text(u.createdAt)).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
+      : "—",
+    idx,
+  }));
 
   return (
     <div className="space-y-6">
@@ -82,102 +73,8 @@ export default async function AdminUsersPage() {
         </CardContent>
       </Card>
 
-      {/* ── Users Table ────────────────────────────────────────── */}
-      <Card className="overflow-hidden">
-        <div className="h-[3px] w-full bg-linear-to-r from-primary to-violet-500" />
-        <CardHeader className="border-b pb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="flex size-8 items-center justify-center rounded-xl bg-primary/10">
-                <Users className="size-4 text-primary" />
-              </div>
-              <div>
-                <CardTitle className="text-base font-semibold">All Users</CardTitle>
-                <p className="mt-0.5 text-xs text-muted-foreground">{total} registered members</p>
-              </div>
-            </div>
-            {banned > 0 && (
-              <span className="flex items-center gap-1.5 rounded-full bg-red-100 dark:bg-red-900/30 px-3 py-1 text-xs font-semibold text-red-700 dark:text-red-400">
-                <span className="size-1.5 rounded-full bg-red-500" />
-                {banned} banned
-              </span>
-            )}
-          </div>
-        </CardHeader>
-
-        <CardContent className="p-0">
-          {users.length === 0 ? (
-            <div className="flex flex-col items-center gap-4 py-16 text-center">
-              <div className="flex size-16 items-center justify-center rounded-3xl bg-muted">
-                <Users className="size-8 text-muted-foreground/40" />
-              </div>
-              <p className="font-semibold">No users found</p>
-            </div>
-          ) : (
-            <>
-              {/* Table header */}
-              <div className="hidden border-b bg-muted/40 sm:grid sm:grid-cols-[2fr_2.5fr_1fr_1fr_1.2fr_auto] gap-4 px-5 py-3">
-                {["User", "Email", "Role", "Status", "Joined", "Action"].map((h) => (
-                  <p key={h} className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{h}</p>
-                ))}
-              </div>
-
-              {/* Rows */}
-              <div className="divide-y divide-border/60">
-                {users.map((user, idx) => {
-                  const userId        = text(user.id ?? user._id ?? user.email);
-                  const userName      = text(user.name, "Unknown");
-                  const userEmail     = text(user.email);
-                  const rawRole       = String(user.role ?? "student").toLowerCase();
-                  const rawStatus     = String(user.status ?? "active").toLowerCase();
-                  const isBanned      = ["blocked", "banned"].includes(rawStatus);
-                  const roleCfg       = ROLE_CFG[rawRole]   ?? ROLE_CFG.student;
-                  const statusCfg     = STATUS_CFG[rawStatus] ?? STATUS_CFG.active;
-                  const joined        = user.createdAt
-                    ? new Date(text(user.createdAt)).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
-                    : "—";
-
-                  return (
-                    <div
-                      key={userId}
-                      className="grid grid-cols-1 gap-3 px-5 py-4 transition-colors hover:bg-muted/30 sm:grid-cols-[2fr_2.5fr_1fr_1fr_1.2fr_auto] sm:items-center sm:gap-4"
-                    >
-                      {/* User */}
-                      <div className="flex items-center gap-3">
-                        <div className={`flex size-9 shrink-0 items-center justify-center rounded-2xl text-sm font-black ${AVATAR_COLORS[idx % AVATAR_COLORS.length]}`}>
-                          {userName[0]?.toUpperCase() ?? "U"}
-                        </div>
-                        <p className="truncate text-sm font-semibold">{userName}</p>
-                      </div>
-
-                      {/* Email */}
-                      <p className="truncate text-sm text-muted-foreground">{userEmail}</p>
-
-                      {/* Role */}
-                      <span className={`inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${roleCfg.bg} ${roleCfg.text}`}>
-                        <span className={`size-1.5 rounded-full ${roleCfg.dot}`} />
-                        {roleCfg.label}
-                      </span>
-
-                      {/* Status */}
-                      <span className={`inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${statusCfg.bg} ${statusCfg.text}`}>
-                        <span className={`size-1.5 rounded-full ${isBanned ? "bg-red-500" : "bg-emerald-500 animate-pulse"}`} />
-                        {statusCfg.label}
-                      </span>
-
-                      {/* Joined */}
-                      <p className="text-xs text-muted-foreground">{joined}</p>
-
-                      {/* Action */}
-                      <UserStatusToggle userId={userId} isBanned={isBanned} />
-                    </div>
-                  );
-                })}
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
+      {/* ── Interactive User List ──────────────────────────────── */}
+      <AdminUsersClient users={normalised} banned={banned} />
     </div>
   );
 }
