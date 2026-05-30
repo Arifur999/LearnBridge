@@ -78,8 +78,8 @@ export default async function AdminBookingDetailPage({
             </div>
             <div>
               <p className="text-lg font-black">{studentName}</p>
-              {student?.email && (
-                <p className="text-sm text-muted-foreground">{String(student.email)}</p>
+              {Boolean(student?.email) && (
+                <p className="text-sm text-muted-foreground">{String(student?.email)}</p>
               )}
               <span className={`mt-1.5 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${statusCfg.bg} ${statusCfg.textColor}`}>
                 <span className={`size-1.5 rounded-full ${statusCfg.dot}`} />

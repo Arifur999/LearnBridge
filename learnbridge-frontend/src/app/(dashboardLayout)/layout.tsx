@@ -17,13 +17,13 @@ export default async function DashboardLayout({
   mentor,
   moderator,
 }: {
-  children: React.ReactNode;
-  admin?: React.ReactNode;
-  tutor?: React.ReactNode;
-  student?: React.ReactNode;
-  institute?: React.ReactNode;
-  mentor?: React.ReactNode;
-  moderator?: React.ReactNode;
+  children:   React.ReactNode;
+  admin:      React.ReactNode;
+  tutor:      React.ReactNode;
+  student:    React.ReactNode;
+  institute:  React.ReactNode;
+  mentor:     React.ReactNode;
+  moderator:  React.ReactNode;
 }) {
   // Suppress unused-variable warnings — slots are required by Next.js for @-directories
   void admin; void tutor; void student; void institute; void mentor; void moderator;

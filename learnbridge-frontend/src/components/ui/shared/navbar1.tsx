@@ -65,9 +65,7 @@ const Navbar = ({
   user?: User | null;
 }) => {
   const pathname = usePathname();
-  const [user, setUser] = useState<User | null>(
-    userProp ?? (authService.getCurrentUser() as User | null)
-  );
+  const [user, setUser] = useState<User | null>(userProp ?? null);
 
   useEffect(() => {
     if (userProp || user) return;

@@ -16,11 +16,11 @@ export default async function TutorProfilePage() {
 
   const normalizedProfile = profile
     ? {
-        bio: String(profile.bio ?? profile.description ?? ""),
+        bio: String(profile.bio ?? (profile as Record<string, unknown>).description ?? ""),
         subjects: Array.isArray(profile.subjects)
           ? (profile.subjects as string[]).join(", ")
           : String(profile.subjects ?? ""),
-        hourlyRate: Number(profile.hourlyRate ?? profile.rate ?? 0),
+        hourlyRate: Number(profile.hourlyRate ?? (profile as Record<string, unknown>).rate ?? 0),
         category:
           typeof profile.category === "object" && profile.category !== null
             ? String((profile.category as { name?: unknown }).name ?? "")

@@ -13,13 +13,13 @@ export enum UserStatus {
 }
 
 export interface User {
-  id: string;
-  name: string;
-  email: string;
-  image?: string;
-  role: string;
-  status?: UserStatus;
-  tutor?: TutorProfile;
+  id:      string;
+  name:    string;
+  email:   string;
+  image?:  string;
+  role:    string;
+  status?: string;
+  tutor?:  TutorProfile;
 }
 
 export interface TutorProfile {
