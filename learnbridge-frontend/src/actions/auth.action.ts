@@ -1,369 +1,155 @@
 "use server";
 
-import { authService } from "@/services/auth.service";
-import { cookies } from "next/headers"; 
-import { jwtDecode } from "jwt-decode";
+import { setSessionTokenInCookies } from "@/lib/tokenUtils";
+import { deleteCookie } from "@/lib/cookiesUtils";
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000";
+
+// ── Types ──────────────────────────────────────────────────────
 
 export interface LoginActionState {
-  success: boolean;
+  success:  boolean;
   message?: string;
   data?: {
-    accessToken?: string;
+    token?: string;
     user?: {
-      id: string;
-      role: string;
+      id:     string;
+      role:   string;
+      email:  string;
+      name?:  string;
+    };
+  };
+}
+
+export interface SignupActionState {
+  success:  boolean;
+  message?: string;
+  data?: {
+    user?: {
+      id:    string;
+      role:  string;
       email: string;
       name?: string;
     };
   };
 }
 
-interface DecodedToken {
-  userId?: string;
-  id?: string;
-  email?: string;
-  role: string;
-  name?: string;
-  exp?: number;
-}
-
-const isJwt = (value: unknown) => {
-  return (
-    typeof value === "string" &&
-    /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/.test(value)
-  );
-};
-
-const isUserLike = (value: unknown) => {
-  if (!value || typeof value !== "object") return false;
-  const obj = value as Record<string, unknown>;
-  return (
-    typeof obj.email === "string" &&
-    typeof obj.role === "string"
-  );
-};
-
-const findJwtInObject = (
-  value: unknown,
-  depth = 0,
-  seen = new Set<unknown>()
-): string | null => {
-  if (depth > 6) return null;
-  if (isJwt(value)) return value as string;
-  if (!value || typeof value !== "object") return null;
-  if (seen.has(value)) return null;
-  seen.add(value);
-
-  if (Array.isArray(value)) {
-    for (const item of value) {
-      const found = findJwtInObject(item, depth + 1, seen);
-      if (found) return found;
-    }
-    return null;
-  }
-
-  for (const key of Object.keys(value as Record<string, unknown>)) {
-    const found = findJwtInObject((value as Record<string, unknown>)[key], depth + 1, seen);
-    if (found) return found;
-  }
-
-  return null;
-};
-
-const findUserInObject = (
-  value: unknown,
-  depth = 0,
-  seen = new Set<unknown>()
-): Record<string, unknown> | null => {
-  if (depth > 6) return null;
-  if (isUserLike(value)) return value as Record<string, unknown>;
-  if (!value || typeof value !== "object") return null;
-  if (seen.has(value)) return null;
-  seen.add(value);
-
-  if (Array.isArray(value)) {
-    for (const item of value) {
-      const found = findUserInObject(item, depth + 1, seen);
-      if (found) return found;
-    }
-    return null;
-  }
-
-  for (const key of Object.keys(value as Record<string, unknown>)) {
-    const found = findUserInObject((value as Record<string, unknown>)[key], depth + 1, seen);
-    if (found) return found;
-  }
-
-  return null;
-};
-
-const normalizeToken = (token: unknown) => {
-  if (typeof token !== "string") return null;
-  return token.startsWith("Bearer ") ? token.slice(7) : token;
-};
-
-const extractTokenFromSetCookie = (setCookie: string | null) => {
-  if (!setCookie) return null;
-  const candidates = ["accessToken", "token", "jwt"];
-  for (const name of candidates) {
-    const match = setCookie.match(new RegExp(`${name}=([^;]+)`));
-    if (match?.[1]) {
-      const raw = match[1];
-      try {
-        return decodeURIComponent(raw);
-      } catch {
-        return raw;
-      }
-    }
-  }
-  return null;
-};
-
-const extractAccessToken = (result: unknown, setCookie?: string | null) => {
-  const root =
-    result && typeof result === "object" && !Array.isArray(result)
-      ? (result as Record<string, unknown>)
-      : {};
-  const nested =
-    root.data && typeof root.data === "object" && !Array.isArray(root.data)
-      ? (root.data as Record<string, unknown>)
-      : {};
-  const token =
-    (
-    nested.accessToken ??
-    nested.token ??
-    nested.jwt ??
-    root.accessToken ??
-    root.token ??
-    root.jwt
-    );
-
-  return (
-    normalizeToken(token) ??
-    normalizeToken(findJwtInObject(result)) ??
-    normalizeToken(extractTokenFromSetCookie(setCookie ?? null))
-  );
-};
-
-const buildUserFromToken = (token: string | null) => {
-  if (!token) return null;
-  try {
-    const decoded = jwtDecode<DecodedToken>(token);
-    if (!decoded?.role) return null;
-    return {
-      id: decoded.userId ?? decoded.id ?? "",
-      email: decoded.email ?? "",
-      role: decoded.role.toLowerCase(),
-      name: decoded.name ?? "User",
-    };
-  } catch {
-    return null;
-  }
-};
-
-const buildFallbackUser = (email: string, name?: string) => {
-  const safeName = name ?? email.split("@")[0] ?? "User";
-  return {
-    id: email,
-    email,
-    role: "student",
-    name: safeName,
-  };
-};
-
-const normalizeRegisterRole = (role: FormDataEntryValue | null) => {
-  const r = role?.toString().toLowerCase();
-  return r === "tutor" ? "TUTOR" : "STUDENT";
-};
+// ── Login ──────────────────────────────────────────────────────
 
 export const loginAction = async (
   _prevState: LoginActionState,
-  formData: FormData
+  formData:   FormData,
 ): Promise<LoginActionState> => {
+  const email    = formData.get("email")?.toString();
+  const password = formData.get("password")?.toString();
+
+  if (!email || !password) {
+    return { success: false, message: "Email and password are required" };
+  }
+
   try {
-    const email = formData.get("email");
-    const password = formData.get("password");
-
-    if (!email || !password) {
-      return {
-        success: false,
-        message: "Email and password are required",
-      };
-    }
-
-    const result = await authService.login({
-      email: email.toString(),
-      password: password.toString(),
+    const res = await fetch(`${BACKEND_URL}/api/auth/sign-in/email`, {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ email, password }),
+      cache:   "no-store",
     });
 
-    const accessToken = extractAccessToken(result?.data, result?.setCookie);
+    const data = await res.json();
 
-    // Try to extract user: response body first, then decode from JWT
-    let user =
-      result?.data?.data?.user ??
-      result?.data?.user ??
-      findUserInObject(result?.data) ??
-      buildUserFromToken(accessToken) ??
-      null;
-
-    if (user && typeof user === "object") {
-      const u = user as Record<string, unknown>;
-      // Always prefer JWT role if available — never default to "student"
-      const jwtUser = buildUserFromToken(accessToken);
-      user = {
-        ...u,
-        id: String(u.id ?? u.userId ?? u._id ?? email.toString()),
-        role: (jwtUser?.role ?? String(u.role ?? "")).toLowerCase() || "student",
-        name: String(u.name ?? jwtUser?.name ?? email.toString().split("@")[0]),
-        email: String(u.email ?? jwtUser?.email ?? email.toString()),
-      };
-    }
-
-    // No fallback to "student" — if we have a token, trust the JWT
-    if (!user && accessToken) {
-      user = buildUserFromToken(accessToken);
-    }
-
-    if (!accessToken) {
+    if (!res.ok) {
       return {
         success: false,
-        message: "Login failed: no access token in response",
+        message: data?.message ?? data?.error?.message ?? "Login failed",
       };
     }
 
-    const cookieStore = await cookies();
-    cookieStore.set("accessToken", accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 7 * 24 * 60 * 60,
-      sameSite: "strict",
-    });
+    const token = data?.token as string | undefined;
+    const user  = data?.user;
 
-    if (user) {
-      cookieStore.set("authUser", encodeURIComponent(JSON.stringify(user)), {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-        maxAge: 7 * 24 * 60 * 60,
-        sameSite: "strict",
-      });
+    if (!token) {
+      return { success: false, message: "Login failed: no session token received" };
     }
+
+    // Store BetterAuth session token in httpOnly cookie
+    await setSessionTokenInCookies(token);
 
     return {
       success: true,
       data: {
-        accessToken,
-        user: user ?? undefined,
+        token,
+        user: user
+          ? {
+              id:    String(user.id    ?? ""),
+              email: String(user.email ?? email),
+              role:  String(user.role  ?? "student").toLowerCase(),
+              name:  String(user.name  ?? "User"),
+            }
+          : undefined,
       },
     };
-  } catch (error) {
+  } catch (err) {
     return {
       success: false,
-      message:
-        error instanceof Error ? error.message : "Login failed",
+      message: err instanceof Error ? err.message : "Login failed",
     };
   }
 };
 
-export interface SignupActionState {
-  success: boolean;
-  message?: string;
-  data?: {
-    accessToken?: string;
-    user?: {
-      id: string;
-      role: string;
-      email: string;
-      name?: string;
-    };
-  };
-}
+// ── Sign Up ────────────────────────────────────────────────────
 
 export const signupAction = async (
   _prevState: SignupActionState,
-  formData: FormData
+  formData:   FormData,
 ): Promise<SignupActionState> => {
+  const name     = formData.get("name")?.toString();
+  const email    = formData.get("email")?.toString();
+  const password = formData.get("password")?.toString();
+  const confirm  = formData.get("confirmPassword")?.toString();
+  const rawRole  = formData.get("role")?.toString() ?? "student";
+  const role     = rawRole.toUpperCase() === "TUTOR" || rawRole.toUpperCase() === "TRAINER"
+    ? "TRAINER"
+    : "STUDENT";
+
+  if (!name || !email || !password || !confirm) {
+    return { success: false, message: "All fields are required" };
+  }
+  if (password !== confirm) {
+    return { success: false, message: "Passwords do not match" };
+  }
+
   try {
-    const name = formData.get("name");
-    const email = formData.get("email");
-    const password = formData.get("password");
-    const confirmPassword = formData.get("confirmPassword");
-    const rawRole = formData.get("role");
-    const role = normalizeRegisterRole(rawRole);
+    const res = await fetch(`${BACKEND_URL}/api/auth/sign-up/email`, {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ name, email, password, role }),
+      cache:   "no-store",
+    });
 
-    if (!name || !email || !password || !confirmPassword) {
-      return { success: false, message: "All fields are required" };
-    }
+    const data = await res.json();
 
-    if (password !== confirmPassword) {
-      return { success: false, message: "Passwords do not match" };
-    }
-
-    const signupPayload = {
-      name: name.toString(),
-      email: email.toString(),
-      password: password.toString(),
-      role,
-    };
-    const result = await authService.signup(signupPayload);
-
-    const accessToken = extractAccessToken(result?.data, result?.setCookie);
-    let user =
-      result?.data?.data?.user ??
-      result?.data?.user ??
-      findUserInObject(result?.data) ??
-      buildUserFromToken(accessToken) ??
-      null;
-
-    if (user && typeof user === "object") {
-      const u = user as Record<string, unknown>;
-      const jwtUser = buildUserFromToken(accessToken);
-      user = {
-        ...u,
-        id: String(u.id ?? u.userId ?? u._id ?? email.toString()),
-        role: (jwtUser?.role ?? String(u.role ?? role)).toLowerCase(),
-        name: String(u.name ?? name.toString()),
-        email: String(u.email ?? email.toString()),
+    if (!res.ok) {
+      return {
+        success: false,
+        message: data?.message ?? data?.error?.message ?? "Signup failed",
       };
-    }
-
-    if (!user) {
-      // Signup: use the role the user selected if JWT has no role
-      user = buildUserFromToken(accessToken) ?? {
-        id: String(email),
-        email: String(email),
-        role: role,
-        name: String(name),
-      };
-    }
-
-    // For signup: don't set accessToken cookie — user must login explicitly
-    // Only store minimal authUser so pages know who just registered
-    const cookieStore = await cookies();
-    if (typeof accessToken === "string" && accessToken.length > 0) {
-      cookieStore.set("accessToken", accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-        maxAge: 7 * 24 * 60 * 60,
-        sameSite: "strict",
-      });
     }
 
     return {
       success: true,
-      message: "Account created successfully",
-      data: {
-        accessToken: accessToken ?? undefined,
-        user: user ?? undefined,
-      },
+      message: "Account created successfully! Please log in.",
+      data: { user: data?.user },
     };
-  } catch (error) {
+  } catch (err) {
     return {
       success: false,
-      message:
-        error instanceof Error ? error.message : "Signup failed",
+      message: err instanceof Error ? err.message : "Signup failed",
     };
   }
+};
+
+// ── Logout ─────────────────────────────────────────────────────
+
+export const logoutAction = async () => {
+  await deleteCookie("better-auth.session_token");
 };

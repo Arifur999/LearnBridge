@@ -1,14 +1,10 @@
-import { cookies } from "next/headers";
+import { getCookie } from "@/lib/cookiesUtils";
 
-const TOKEN_KEY = "accessToken";
-
-export const getAuthHeaders = async () => {
-  const cookieStore = await cookies();
-  const rawToken = cookieStore.get(TOKEN_KEY)?.value;
-  const token = rawToken?.startsWith("Bearer ") ? rawToken : rawToken ? `Bearer ${rawToken}` : "";
+export const getAuthHeaders = async (): Promise<HeadersInit> => {
+  const sessionToken = await getCookie("better-auth.session_token");
 
   return {
     "Content-Type": "application/json",
-    Authorization: token,
+    ...(sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {}),
   };
 };

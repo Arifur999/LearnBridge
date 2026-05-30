@@ -3,7 +3,6 @@
 import { useActionState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
 
 import { loginAction } from "@/actions/auth.action";
@@ -11,19 +10,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-interface DecodedToken {
-  role?: string;
-}
-
 function getDashboardForRole(role: string): string {
   switch (role.toUpperCase()) {
     case "ADMIN":      return "/admin/analytics";
     case "TUTOR":
     case "TRAINER":    return "/tutor/dashboard";
-    case "INSTITUTE":  return "/institute/dashboard";
-    case "MENTOR":     return "/mentor/dashboard";
-    case "MODERATOR":  return "/moderator/dashboard";
-    default:           return "/dashboard";
+    default:           return "/student";
   }
 }
 
@@ -37,18 +29,8 @@ function LoginFormInner({ className, ...props }: React.ComponentProps<"div">) {
     if (!state.success) return;
     toast.success("Login successful!", { description: "Welcome back!" });
 
-    let role = "student";
-    const token = state.data?.accessToken;
-    if (token) {
-      try {
-        const decoded = jwtDecode<DecodedToken>(token);
-        role = decoded.role ?? "student";
-      } catch {
-        role = state.data?.user?.role ?? "student";
-      }
-    } else {
-      role = state.data?.user?.role ?? "student";
-    }
+    // BetterAuth returns user.role directly — no JWT decode needed
+    const role = state.data?.user?.role ?? "student";
 
     const returnUrl = searchParams.get("returnUrl");
     if (returnUrl && returnUrl.startsWith("/") && !returnUrl.startsWith("//")) {

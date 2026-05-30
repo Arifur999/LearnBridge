@@ -1,82 +1,43 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-import { jwtDecode } from "jwt-decode";
-
-
-interface DecodedToken {
-  role: string;
-  exp: number;
-}
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
-  
+  const { pathname } = request.nextUrl;
 
-  const token = request.cookies.get('accessToken')?.value
+  // BetterAuth session cookie (http-only, set by backend)
+  const sessionToken =
+    request.cookies.get("better-auth.session_token")?.value;
 
   const roleHome = (role: string) => {
-    if (role === "admin") return "/admin";
-    if (role === "trainer" || role === "tutor") return "/tutor/dashboard";
+    if (role === "admin")                          return "/admin";
+    if (role === "trainer" || role === "tutor")    return "/tutor/dashboard";
     return "/student";
+  };
+
+  // ── Already logged in → redirect away from login/register ──
+  if (pathname === "/login" || pathname === "/register") {
+    if (sessionToken) {
+      // Can't decode role from opaque session token in edge runtime.
+      // Redirect to "/" — the root layout will send to correct dashboard.
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+    return NextResponse.next();
   }
 
-
-  if (pathname === '/login' || pathname === '/register') {
-    if (token) {
-      try {
-        const decoded = jwtDecode<DecodedToken>(token);
-        return NextResponse.redirect(new URL(roleHome((decoded.role ?? "").toLowerCase()), request.url))
-      } catch {
-
-        return NextResponse.next()
-      }
-    }
-    return NextResponse.next()
+  // ── Protected routes — require session token ────────────────
+  if (!sessionToken) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
-
-  if (!token) {
-    return NextResponse.redirect(new URL('/login', request.url))
-  }
-
-
-  try {
-    const decoded = jwtDecode<DecodedToken>(token);
-    // Normalize to lowercase — backend returns uppercase ("STUDENT", "TRAINER", "ADMIN")
-    const role = (decoded.role ?? "").toLowerCase();
-
-    if (pathname.startsWith('/admin') && role !== 'admin') {
-      return NextResponse.redirect(new URL(roleHome(role), request.url))
-    }
-
-    if (pathname.startsWith('/trainer') && role !== 'trainer' && role !== 'tutor') {
-      return NextResponse.redirect(new URL(roleHome(role), request.url))
-    }
-
-    if (pathname.startsWith('/tutor') && role !== 'trainer' && role !== 'tutor') {
-      return NextResponse.redirect(new URL(roleHome(role), request.url))
-    }
-
-    if (pathname.startsWith('/student') && role !== 'student') {
-      return NextResponse.redirect(new URL(roleHome(role), request.url))
-    }
-
-  } catch {
-
-    return NextResponse.redirect(new URL('/login', request.url))
-  }
-
-  return NextResponse.next()
+  return NextResponse.next();
 }
-
 
 export const config = {
   matcher: [
-    '/admin/:path*',    
-    '/trainer/:path*',  
-    '/tutor/:path*',  
-    '/student/:path*',  
-    '/login',           
-    '/register'         
+    "/admin/:path*",
+    "/tutor/:path*",
+    "/student/:path*",
+    "/login",
+    "/register",
   ],
-}
+};

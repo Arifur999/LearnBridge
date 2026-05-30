@@ -1,69 +1,35 @@
-import { cookies } from "next/headers";
-import { jwtDecode } from "jwt-decode";
+"use server";
+import { getCookie } from "./cookiesUtils";
 
-interface DecodedToken {
-  userId?: string;
-  id?: string;
-  email?: string;
-  role: string;
-  name?: string;
-  exp?: number;
-}
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000";
 
 export async function getCurrentUserFromServer() {
-  const cookieStore = await cookies();
-  const rawToken = cookieStore.get("accessToken")?.value;
-  const token = rawToken?.startsWith("Bearer ")
-    ? rawToken.slice(7)
-    : rawToken;
-
-  const rawUser = cookieStore.get("authUser")?.value;
-
-  const parseUserCookie = (value?: string) => {
-    if (!value) return null;
-    try {
-      return JSON.parse(value);
-    } catch {
-      // ignore
-    }
-    try {
-      return JSON.parse(decodeURIComponent(value));
-    } catch {
-      // ignore
-    }
-    try {
-      return JSON.parse(decodeURIComponent(decodeURIComponent(value)));
-    } catch {
-      return null;
-    }
-  };
-
-  const cookieUser = parseUserCookie(rawUser);
-
-  if (!token) {
-    if (!cookieUser) return null;
-    return {
-      ...cookieUser,
-      role: String(cookieUser.role ?? "student").toLowerCase(),
-    };
-  }
+  const sessionToken = await getCookie("better-auth.session_token");
+  if (!sessionToken) return null;
 
   try {
-    const decoded: DecodedToken = jwtDecode(token);
+    const res = await fetch(`${BACKEND_URL}/api/auth/get-session`, {
+      headers: {
+        Authorization: `Bearer ${sessionToken}`,
+        Cookie:        `better-auth.session_token=${sessionToken}`,
+      },
+      cache: "no-store",
+    });
 
-    if (decoded.exp && decoded.exp * 1000 < Date.now()) return null;
+    if (!res.ok) return null;
 
-    const id = decoded.userId ?? decoded.id ?? cookieUser?.id ?? "";
-    const role = (decoded.role ?? cookieUser?.role ?? "student").toLowerCase();
-    const email = decoded.email ?? cookieUser?.email ?? "";
-    const name = decoded.name ?? cookieUser?.name ?? "User";
+    const data = await res.json();
+    const user = data?.user;
+    if (!user) return null;
 
-    return { id, email, role, name };
-  } catch {
-    if (!cookieUser) return null;
     return {
-      ...cookieUser,
-      role: String(cookieUser.role ?? "student").toLowerCase(),
+      id:     String(user.id    ?? ""),
+      email:  String(user.email ?? ""),
+      name:   String(user.name  ?? "User"),
+      role:   String(user.role  ?? "student").toLowerCase(),
+      status: String(user.status ?? "active").toLowerCase(),
     };
+  } catch {
+    return null;
   }
 }
