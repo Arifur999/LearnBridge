@@ -51,7 +51,7 @@ export const bookAndPayAction = async (slotId: string): Promise<
   { success: true; stripeUrl: string } | { success: false; message: string }
 > => {
   try {
-    // Step 1: Create booking
+    // Create booking first
     const booking = await bookingService.bookSlot(slotId);
     const bookingData = booking?.data ?? booking;
     const bookingId: string =
@@ -61,7 +61,7 @@ export const bookAndPayAction = async (slotId: string): Promise<
 
     if (!bookingId) throw new Error("Booking created but no bookingId returned");
 
-    // Step 2: Create Stripe checkout session
+    // Then create Stripe checkout session
     const headers = await getAuthHeaders();
     const res = await fetch(`${API_V1_URL}/payments/booking/${bookingId}`, {
       method: "POST",

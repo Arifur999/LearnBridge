@@ -23,7 +23,7 @@ export default function LoginPage() {
       {/* Page grid */}
       <div className="relative flex min-h-screen flex-col lg:flex-row">
 
-        {/* ── Left — brand hero ─────────────────────────── */}
+        
         <div className="flex flex-col justify-between p-8 sm:p-12 lg:w-[55%] lg:p-16 lg:pb-20">
 
           {/* Logo */}
@@ -70,7 +70,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* ── Right — glass form panel ───────────────────── */}
+        
         <div className="flex items-center justify-center p-6 sm:p-10 lg:w-[45%] lg:shrink-0">
           <LoginForm />
         </div>

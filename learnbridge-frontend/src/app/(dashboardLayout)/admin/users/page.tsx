@@ -39,7 +39,7 @@ export default async function AdminUsersPage() {
   return (
     <div className="space-y-6">
 
-      {/* ── Header ─────────────────────────────────────────────── */}
+      
       <div>
         <h1 className="text-2xl font-black tracking-tight">User Management</h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -47,7 +47,7 @@ export default async function AdminUsersPage() {
         </p>
       </div>
 
-      {/* ── Stats Card ─────────────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         <div className="h-1 w-full bg-linear-to-r from-primary via-violet-500 to-emerald-500" />
         <CardContent className="p-0">
@@ -73,7 +73,7 @@ export default async function AdminUsersPage() {
         </CardContent>
       </Card>
 
-      {/* ── Interactive User List ──────────────────────────────── */}
+      
       <AdminUsersClient users={normalised} banned={banned} />
     </div>
   );

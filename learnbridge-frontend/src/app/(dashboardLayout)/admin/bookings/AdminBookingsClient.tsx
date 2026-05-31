@@ -9,7 +9,6 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
-/* ── Types ── */
 type Booking = Record<string, unknown>;
 
 const text = (value: unknown, fallback = "N/A") =>
@@ -20,7 +19,6 @@ const nestedName = (value: unknown) =>
     ? (value as { name?: unknown }).name
     : undefined;
 
-/* ── Config ── */
 const STATUS_CFG: Record<string, { label: string; bg: string; textColor: string; dot: string }> = {
   CONFIRMED: { label: "Confirmed", bg: "bg-blue-100 dark:bg-blue-900/30",       textColor: "text-blue-700 dark:text-blue-400",       dot: "bg-blue-500"             },
   COMPLETED: { label: "Completed", bg: "bg-emerald-100 dark:bg-emerald-900/30", textColor: "text-emerald-700 dark:text-emerald-400", dot: "bg-emerald-500 animate-pulse" },

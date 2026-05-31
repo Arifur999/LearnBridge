@@ -44,7 +44,6 @@ function buildChartData(bookings: BookingRecord[], days: number) {
   });
 }
 
-/* ── Custom Tooltip ─────────────────────────────── */
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   const date = new Date(label).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });

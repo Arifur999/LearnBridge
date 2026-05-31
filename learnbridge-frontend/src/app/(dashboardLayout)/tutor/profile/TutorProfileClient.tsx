@@ -119,7 +119,7 @@ export default function TutorProfileClient({
         </Button>
       )}
 
-      {/* ── Edit form (inline) ─────────────────────────────── */}
+      
       {editing && (
         <div className="w-full space-y-4 rounded-2xl border border-border/60 bg-muted/30 p-5">
 

@@ -49,7 +49,7 @@ export default async function AdminPaymentsPage() {
   return (
     <div className="space-y-6">
 
-      {/* ── Header ─────────────────────────────────────────────── */}
+      
       <div>
         <h1 className="text-2xl font-black tracking-tight">Payments</h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -57,7 +57,7 @@ export default async function AdminPaymentsPage() {
         </p>
       </div>
 
-      {/* ── Stats Card ─────────────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         <div className="h-1 w-full bg-linear-to-r from-emerald-500 via-primary to-violet-500" />
         <CardContent className="p-0">
@@ -83,7 +83,7 @@ export default async function AdminPaymentsPage() {
         </CardContent>
       </Card>
 
-      {/* ── Payments Table ─────────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         <div className="h-[3px] w-full bg-linear-to-r from-emerald-500 to-primary" />
         <CardHeader className="border-b pb-4">

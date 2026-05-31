@@ -98,7 +98,7 @@ export default async function TutorDashboardPage() {
   return (
     <div className="space-y-6">
 
-      {/* ── Welcome Banner ─────────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         <div className="relative bg-linear-to-br from-primary via-violet-600 to-indigo-700 p-6 text-white">
           {/* Decorative circles */}
@@ -138,7 +138,7 @@ export default async function TutorDashboardPage() {
         </div>
       </Card>
 
-      {/* ── Stats Card ──────────────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         <div className="h-1 w-full bg-linear-to-r from-primary via-blue-500 to-emerald-500" />
         <CardHeader className="border-b pb-4">
@@ -176,10 +176,10 @@ export default async function TutorDashboardPage() {
         </CardContent>
       </Card>
 
-      {/* ── Chart ───────────────────────────────────────────────── */}
+      
       <TutorChart bookings={chartBookings} />
 
-      {/* ── Bottom Grid ─────────────────────────────────────────── */}
+      
       <div className="grid gap-6 lg:grid-cols-[1fr_1.6fr]">
 
         {/* Quick Actions */}

@@ -41,7 +41,7 @@ export default async function TutorPaymentsPage() {
   const payments = await paymentService.getTutorPayments();
   const list: Payment[] = Array.isArray(payments) ? payments : [];
 
-  /* ── Derived stats ── */
+  
   const totalEarnings = list.reduce((s, p) => {
     const status = String(p.status ?? "").toUpperCase();
     if (["PAID", "SUCCESS", "COMPLETED"].includes(status)) {
@@ -107,7 +107,7 @@ export default async function TutorPaymentsPage() {
   return (
     <div className="space-y-6">
 
-      {/* ── Header ─────────────────────────────────────────────── */}
+      
       <div>
         <h1 className="text-2xl font-black tracking-tight">Payments</h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -115,7 +115,7 @@ export default async function TutorPaymentsPage() {
         </p>
       </div>
 
-      {/* ── Stats Card ─────────────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         <div className="h-1 w-full bg-linear-to-r from-emerald-500 via-primary to-violet-500" />
         <CardContent className="p-0">
@@ -141,7 +141,7 @@ export default async function TutorPaymentsPage() {
         </CardContent>
       </Card>
 
-      {/* ── Transactions List ──────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         <div className="h-[3px] w-full bg-linear-to-r from-emerald-500 via-primary to-violet-500" />
 

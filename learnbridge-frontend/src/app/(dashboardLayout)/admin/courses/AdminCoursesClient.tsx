@@ -13,7 +13,6 @@ import { toast } from "sonner";
 import { approveCourseAction, rejectCourseAction } from "@/actions/dashboard.action";
 import type { AdminCourse } from "./page";
 
-/* ── Config ─────────────────────────────────────────────────── */
 const TABS = ["ALL", "PENDING", "APPROVED", "REJECTED"] as const;
 type Tab = typeof TABS[number];
 
@@ -52,7 +51,6 @@ function getCourseImg(c: AdminCourse, idx: number) {
   return FALLBACK_IMGS[idx % FALLBACK_IMGS.length];
 }
 
-/* ── Course Card ─────────────────────────────────────────────── */
 function CourseCard({
   course, idx, onApprove, onReject, isPending,
 }: {
@@ -176,7 +174,6 @@ function CourseCard({
   );
 }
 
-/* ── Main Component ──────────────────────────────────────────── */
 export default function AdminCoursesClient({ initialCourses }: { initialCourses: AdminCourse[] }) {
   const [courses, setCourses]   = useState<AdminCourse[]>(initialCourses);
   const [tab, setTab]           = useState<Tab>("PENDING");

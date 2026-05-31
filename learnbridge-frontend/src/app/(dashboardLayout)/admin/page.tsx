@@ -93,7 +93,7 @@ export default async function AdminDashboardPage() {
   return (
     <div className="space-y-6">
 
-      {/* ── Welcome Banner ─────────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         <div className="relative bg-linear-to-br from-slate-900 via-primary/90 to-violet-700 p-6 text-white">
           {/* Decorative */}
@@ -132,7 +132,7 @@ export default async function AdminDashboardPage() {
         </div>
       </Card>
 
-      {/* ── Stats Card ─────────────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         <div className="h-1 w-full bg-linear-to-r from-primary via-violet-500 to-emerald-500" />
         <CardContent className="p-0">
@@ -162,7 +162,7 @@ export default async function AdminDashboardPage() {
         </CardContent>
       </Card>
 
-      {/* ── Bottom: Booking Summary + Quick Links ──────────────── */}
+      
       <div className="grid gap-6 lg:grid-cols-[1fr_1.4fr]">
 
         {/* Booking Summary */}
@@ -233,7 +233,7 @@ export default async function AdminDashboardPage() {
         </Card>
       </div>
 
-      {/* ── User Breakdown ─────────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         <div className="h-[3px] w-full bg-linear-to-r from-primary to-violet-500" />
         <div className="border-b px-5 py-4">

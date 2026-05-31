@@ -5,8 +5,6 @@ import { deleteCookie } from "@/lib/cookiesUtils";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000";
 
-// ── Types ──────────────────────────────────────────────────────
-
 export interface LoginActionState {
   success:  boolean;
   message?: string;
@@ -33,8 +31,6 @@ export interface SignupActionState {
     };
   };
 }
-
-// ── Login ──────────────────────────────────────────────────────
 
 export const loginAction = async (
   _prevState: LoginActionState,
@@ -71,7 +67,6 @@ export const loginAction = async (
       return { success: false, message: "Login failed: no session token received" };
     }
 
-    // Store BetterAuth session token in httpOnly cookie
     await setSessionTokenInCookies(token);
 
     return {
@@ -95,8 +90,6 @@ export const loginAction = async (
     };
   }
 };
-
-// ── Sign Up ────────────────────────────────────────────────────
 
 export const signupAction = async (
   _prevState: SignupActionState,
@@ -147,8 +140,6 @@ export const signupAction = async (
     };
   }
 };
-
-// ── Logout ─────────────────────────────────────────────────────
 
 export const logoutAction = async () => {
   await deleteCookie("better-auth.session_token");

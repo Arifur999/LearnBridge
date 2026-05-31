@@ -125,7 +125,7 @@ const CourseCard = ({
         style={{ background: `linear-gradient(to right, ${config.barFrom}, ${config.barTo})` }}
       />
 
-      {/* ── Image / Gradient banner ──────────────────── */}
+      
       <div className="relative h-48 overflow-hidden bg-muted">
         {!showGradient ? (
           <>
@@ -179,7 +179,7 @@ const CourseCard = ({
         />
       </div>
 
-      {/* ── Body ─────────────────────────────────────── */}
+      
       <div className="flex flex-1 flex-col p-5">
 
         {/* Category chip */}

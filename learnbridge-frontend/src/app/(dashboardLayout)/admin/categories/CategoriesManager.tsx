@@ -18,7 +18,6 @@ import { createCategoryAction, deleteCategoryAction } from "@/actions/dashboard.
 
 interface Category { id: string; name: string; description: string; }
 
-/* ── Cycling card accent colors ── */
 const CARD_ACCENTS = [
   { bar: "from-primary to-violet-500",       iconBg: "bg-primary/10",                         iconColor: "text-primary"                          },
   { bar: "from-violet-500 to-indigo-500",    iconBg: "bg-violet-100 dark:bg-violet-900/30",    iconColor: "text-violet-600 dark:text-violet-400"  },
@@ -46,7 +45,6 @@ function getCategoryIcon(name: string): React.ElementType {
   return Tags;
 }
 
-/* ── Delete confirm dialog ── */
 function DeleteDialog({
   category, open, onClose, onConfirm, isPending,
 }: { category: Category; open: boolean; onClose: () => void; onConfirm: () => void; isPending: boolean }) {
@@ -82,7 +80,6 @@ function DeleteDialog({
   );
 }
 
-/* ── Category Card ── */
 function CategoryCard({
   category, idx, onDelete, deletingId,
 }: { category: Category; idx: number; onDelete: (c: Category) => void; deletingId: string | null }) {
@@ -131,7 +128,6 @@ function CategoryCard({
   );
 }
 
-/* ── Main Component ── */
 export default function CategoriesManager({ initialCategories }: { initialCategories: Category[] }) {
   const [categories, setCategories]   = useState<Category[]>(initialCategories);
   const [name, setName]               = useState("");
@@ -185,7 +181,7 @@ export default function CategoriesManager({ initialCategories }: { initialCatego
     <>
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
 
-        {/* ── Left: Add Form ────────────────────────────────────── */}
+        
         <div>
           <Card className="overflow-hidden sticky top-4">
             <div className="h-[3px] w-full bg-linear-to-r from-primary to-violet-500" />
@@ -282,7 +278,7 @@ export default function CategoriesManager({ initialCategories }: { initialCatego
           </Card>
         </div>
 
-        {/* ── Right: Categories Grid ──────────────────────────── */}
+        
         <div>
           <Card className="overflow-hidden">
             <div className="h-[3px] w-full bg-linear-to-r from-violet-500 to-emerald-500" />

@@ -128,7 +128,7 @@ export default function TutorCoursesClient({ initialCourses }: { initialCourses:
   return (
     <div className="space-y-8">
 
-      {/* ── Header row ──────────────────────────────────────────── */}
+      
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         {/* Stats pills */}
         <div className="flex flex-wrap gap-2">
@@ -149,7 +149,7 @@ export default function TutorCoursesClient({ initialCourses }: { initialCourses:
         </Button>
       </div>
 
-      {/* ── Create / Edit Modal Overlay ─────────────────────────── */}
+      
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Backdrop */}
@@ -301,7 +301,7 @@ export default function TutorCoursesClient({ initialCourses }: { initialCourses:
         </div>
       )}
 
-      {/* ── Empty state ─────────────────────────────────────────── */}
+      
       {courses.length === 0 && !showForm && (
         <div className="flex flex-col items-center gap-5 rounded-3xl border-2 border-dashed py-20 text-center">
           <div className="flex size-20 items-center justify-center rounded-3xl bg-muted">
@@ -319,7 +319,7 @@ export default function TutorCoursesClient({ initialCourses }: { initialCourses:
         </div>
       )}
 
-      {/* ── Course grid ─────────────────────────────────────────── */}
+      
       {courses.length > 0 && (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {courses.map((c) => {

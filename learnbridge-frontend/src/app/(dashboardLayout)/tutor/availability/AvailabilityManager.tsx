@@ -82,7 +82,7 @@ export default function AvailabilityManager({ initialSlots }: Props) {
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_1.5fr]">
 
-      {/* ── Add Slot Form ──────────────────────────────────── */}
+      
       <Card className="overflow-hidden self-start">
         <div className="h-[3px] w-full bg-linear-to-r from-primary to-violet-500" />
         <CardHeader className="border-b pb-4">
@@ -164,7 +164,7 @@ export default function AvailabilityManager({ initialSlots }: Props) {
         </CardContent>
       </Card>
 
-      {/* ── Slots List ─────────────────────────────────────── */}
+      
       <Card className="overflow-hidden self-start">
         <div className="h-[3px] w-full bg-linear-to-r from-emerald-500 to-cyan-500" />
         <CardHeader className="border-b pb-4">

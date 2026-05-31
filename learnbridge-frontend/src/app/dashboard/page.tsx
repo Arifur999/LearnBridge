@@ -81,7 +81,7 @@ export default async function StudentDashboardPage() {
         description="Here's an overview of your learning activity."
       />
 
-      {/* ── Combined Stats Card ───────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         {/* Subtle gradient header strip */}
         <div className="h-1 w-full bg-linear-to-r from-primary via-violet-500 to-emerald-500" />
@@ -144,7 +144,7 @@ export default async function StudentDashboardPage() {
         </CardContent>
       </Card>
 
-      {/* ── Booking Activity Chart ────────────────────────────────── */}
+      
       <StudentBookingChart
         bookings={allBookings.map((b) => ({
           createdAt: String(b?.createdAt ?? ""),
@@ -152,7 +152,7 @@ export default async function StudentDashboardPage() {
         }))}
       />
 
-      {/* ── Recent Bookings ───────────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         {/* accent bar */}
         <div className="h-[3px] w-full bg-linear-to-r from-primary via-violet-500 to-emerald-500" />

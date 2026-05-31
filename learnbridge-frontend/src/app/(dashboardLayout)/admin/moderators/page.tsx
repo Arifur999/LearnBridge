@@ -76,7 +76,7 @@ export default function AdminModeratorsPage() {
   return (
     <div className="space-y-6">
 
-      {/* ── Header ─────────────────────────────────────────────── */}
+      
       <div>
         <h1 className="text-2xl font-black tracking-tight">Moderators</h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -84,7 +84,7 @@ export default function AdminModeratorsPage() {
         </p>
       </div>
 
-      {/* ── Role Banner ────────────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         <div className="h-1 w-full bg-linear-to-r from-primary via-violet-500 to-indigo-500" />
         <CardContent className="flex flex-wrap items-center gap-5 p-5">
@@ -104,7 +104,7 @@ export default function AdminModeratorsPage() {
         </CardContent>
       </Card>
 
-      {/* ── Main Grid ──────────────────────────────────────────── */}
+      
       <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
 
         {/* Left: Invite Form */}

@@ -10,11 +10,9 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-/* ── Types ── */
 interface Booking { createdAt?: string; status?: string; }
 interface User    { role?: string; }
 
-/* ── Area chart: bookings over time ── */
 function buildBookingTrend(bookings: Booking[], days: number) {
   const now = new Date();
   return Array.from({ length: days }, (_, i) => {
@@ -54,7 +52,6 @@ function AreaTooltip({ active, payload, label }: any) {
   );
 }
 
-/* ── Bar chart: bookings by status ── */
 function BarTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
@@ -70,7 +67,6 @@ function BarTooltip({ active, payload, label }: any) {
   );
 }
 
-/* ── Pie label ── */
 function PieLabel({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }: any) {
   if (percent < 0.05) return null;
   const RADIAN = Math.PI / 180;
@@ -84,7 +80,6 @@ function PieLabel({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }:
   );
 }
 
-/* ── Props ── */
 interface Props {
   bookings: Booking[];
   users: User[];
@@ -128,7 +123,7 @@ export default function AdminAnalyticsCharts({
   return (
     <div className="space-y-6">
 
-      {/* ── Area Chart: Booking Trend ── */}
+      
       <Card className="overflow-hidden border-border/40 bg-zinc-950 shadow-2xl">
         <div className="h-[3px] w-full" style={{ background: "linear-gradient(to right,#6366f1,#10b981,#f59e0b)" }} />
         <CardHeader className="flex items-center gap-2 space-y-0 border-b border-white/10 py-5 sm:flex-row">
@@ -193,7 +188,7 @@ export default function AdminAnalyticsCharts({
         </CardContent>
       </Card>
 
-      {/* ── Bottom: Bar + Pie ── */}
+      
       <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
 
         {/* Bar chart: booking breakdown */}

@@ -12,10 +12,10 @@ import { cn } from "@/lib/utils";
 
 function getDashboardForRole(role: string): string {
   switch (role.toUpperCase()) {
-    case "ADMIN":      return "/admin/analytics";
+    case "ADMIN":   return "/admin/analytics";
     case "TUTOR":
-    case "TRAINER":    return "/tutor/dashboard";
-    default:           return "/student";
+    case "TRAINER": return "/tutor/dashboard";
+    default:        return "/student";
   }
 }
 
@@ -27,7 +27,7 @@ const BACKEND_URL =
 const initialState = { success: false, message: "" };
 
 function LoginFormInner({ className, ...props }: React.ComponentProps<"div">) {
-  const searchParams  = useSearchParams();
+  const searchParams = useSearchParams();
   const [state, formAction, isPending] = useActionState(loginAction, initialState);
   const [googleLoading, setGoogleLoading] = useState(false);
 
@@ -39,7 +39,7 @@ function LoginFormInner({ className, ...props }: React.ComponentProps<"div">) {
         headers:     { "Content-Type": "application/json" },
         body:        JSON.stringify({
           provider:    "google",
-          callbackURL: "http://localhost:3000/",
+          callbackURL: `${window.location.origin}/`,
         }),
         credentials: "include",
       });
@@ -60,10 +60,7 @@ function LoginFormInner({ className, ...props }: React.ComponentProps<"div">) {
   useEffect(() => {
     if (!state.success) return;
     toast.success("Login successful!", { description: "Welcome back!" });
-
-    // BetterAuth returns user.role directly — no JWT decode needed
     const role = state.data?.user?.role ?? "student";
-
     const returnUrl = searchParams.get("returnUrl");
     if (returnUrl && returnUrl.startsWith("/") && !returnUrl.startsWith("//")) {
       window.location.href = returnUrl;
@@ -80,10 +77,7 @@ function LoginFormInner({ className, ...props }: React.ComponentProps<"div">) {
 
   return (
     <div className={cn("w-full max-w-sm", className)} {...props}>
-      {/* Glass card */}
       <div className="overflow-hidden rounded-3xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-2xl">
-
-        {/* Card header */}
         <div className="border-b border-white/10 px-8 py-7">
           <h2 className="text-xl font-black tracking-tight text-white">
             Welcome back
@@ -93,10 +87,7 @@ function LoginFormInner({ className, ...props }: React.ComponentProps<"div">) {
           </p>
         </div>
 
-        {/* Form */}
         <form action={formAction} className="space-y-5 px-8 py-7">
-
-          {/* Email */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
               Email
@@ -110,16 +101,12 @@ function LoginFormInner({ className, ...props }: React.ComponentProps<"div">) {
             />
           </div>
 
-          {/* Password */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <label className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
                 Password
               </label>
-              <a
-                href="#"
-                className="text-xs text-white/50 transition-colors hover:text-white"
-              >
+              <a href="#" className="text-xs text-white/50 transition-colors hover:text-white">
                 Forgot password?
               </a>
             </div>
@@ -132,7 +119,6 @@ function LoginFormInner({ className, ...props }: React.ComponentProps<"div">) {
             />
           </div>
 
-          {/* Submit */}
           <Button
             type="submit"
             disabled={isPending}
@@ -141,14 +127,12 @@ function LoginFormInner({ className, ...props }: React.ComponentProps<"div">) {
             {isPending ? "Signing in…" : "Sign In"}
           </Button>
 
-          {/* Divider */}
           <div className="flex items-center gap-3">
             <div className="h-px flex-1 bg-white/15" />
             <span className="text-xs text-white/35">or</span>
             <div className="h-px flex-1 bg-white/15" />
           </div>
 
-          {/* Google Login */}
           <button
             type="button"
             onClick={handleGoogleLogin}
@@ -171,7 +155,6 @@ function LoginFormInner({ className, ...props }: React.ComponentProps<"div">) {
             {googleLoading ? "Redirecting…" : "Continue with Google"}
           </button>
 
-          {/* Register link */}
           <p className="text-center text-sm text-white/50">
             New to LearnBridge?{" "}
             <Link

@@ -20,7 +20,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-/* ─── FAQ data ─────────────────────────────────────────────────────────── */
+
 const faqs = [
   {
     category: "For Students",
@@ -116,12 +116,12 @@ const stats = [
   { icon: BookOpen, value: "50+", label: "Subjects covered" },
 ];
 
-/* ─── Page ─────────────────────────────────────────────────────────────── */
+
 export default function FAQPage() {
   return (
     <div className="min-h-screen bg-background">
 
-      {/* ── Hero ───────────────────────────────────────────────────────── */}
+      
       <section className="relative isolate overflow-hidden bg-zinc-950 text-white">
         <Image
           src="/front-view-stacked-books-earth-globe-with-graduation-cap-education-day_742418-47637.jpg"
@@ -175,7 +175,7 @@ export default function FAQPage() {
         </div>
       </section>
 
-      {/* ── Stats strip ────────────────────────────────────────────────── */}
+      
       <section className="border-b bg-zinc-950">
         <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-white/8 px-4 sm:grid-cols-4 sm:px-6">
           {stats.map(({ icon: Icon, value, label }) => (
@@ -188,7 +188,7 @@ export default function FAQPage() {
         </div>
       </section>
 
-      {/* ── FAQ Sections ────────────────────────────────────────────────── */}
+      
       <section id="faq-answers" className="scroll-mt-20 py-24">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
 
@@ -281,7 +281,7 @@ export default function FAQPage() {
         </div>
       </section>
 
-      {/* ── CTA ─────────────────────────────────────────────────────────── */}
+      
       <section className="pb-24 pt-4">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="relative isolate overflow-hidden rounded-3xl bg-zinc-950 px-8 py-20 text-center text-white shadow-2xl sm:px-16">

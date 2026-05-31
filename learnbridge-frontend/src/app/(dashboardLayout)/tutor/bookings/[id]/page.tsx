@@ -62,14 +62,14 @@ export default async function TutorBookingDetailPage({ params }: { params: Promi
   return (
     <div className="space-y-6">
 
-      {/* ── Back ──────────────────────────────────────────────── */}
+      
       <Button asChild variant="ghost" size="sm" className="gap-2 rounded-xl">
         <Link href="/tutor/bookings">
           <ArrowLeft className="size-4" /> Back to Bookings
         </Link>
       </Button>
 
-      {/* ── Hero Card ─────────────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         <div className="h-1 w-full bg-linear-to-r from-primary via-violet-500 to-emerald-500" />
         <CardContent className="p-6">
@@ -97,7 +97,7 @@ export default async function TutorBookingDetailPage({ params }: { params: Promi
         </CardContent>
       </Card>
 
-      {/* ── Detail Grid ───────────────────────────────────────── */}
+      
       <div className="grid gap-5 md:grid-cols-2">
 
         {/* Session Info */}

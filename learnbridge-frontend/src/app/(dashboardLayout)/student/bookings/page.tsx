@@ -57,7 +57,7 @@ export default async function StudentBookingsPage() {
   return (
     <div className="space-y-6">
 
-      {/* ── Header ─────────────────────────────────────────────── */}
+      
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-black tracking-tight">My Bookings</h1>
@@ -72,7 +72,7 @@ export default async function StudentBookingsPage() {
         </Button>
       </div>
 
-      {/* ── Stats ──────────────────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         <div className="h-1 w-full bg-linear-to-r from-primary via-violet-500 to-emerald-500" />
         <CardContent className="p-0">
@@ -98,7 +98,7 @@ export default async function StudentBookingsPage() {
         </CardContent>
       </Card>
 
-      {/* ── Bookings List ──────────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         <div className="h-[3px] w-full bg-linear-to-r from-primary to-violet-500" />
         <CardHeader className="border-b pb-4">

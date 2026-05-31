@@ -64,7 +64,7 @@ export default async function StudentPaymentsPage() {
   const payments = await paymentService.getMyPayments();
   const list: Payment[] = Array.isArray(payments) ? payments : [];
 
-  /* ── derived stats ── */
+  
   const totalSpent = list.reduce((s, p) => {
     const status = String(p.status ?? "").toUpperCase();
     if (status === "PAID" || status === "SUCCESS" || status === "COMPLETED") {
@@ -126,7 +126,7 @@ export default async function StudentPaymentsPage() {
   return (
     <div className="space-y-8">
 
-      {/* ── Header ───────────────────────────────────────────── */}
+      
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-black tracking-tight">Payment History</h1>
@@ -143,7 +143,7 @@ export default async function StudentPaymentsPage() {
         </Link>
       </div>
 
-      {/* ── Stat cards ───────────────────────────────────────── */}
+      
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {statCards.map(({ icon: Icon, label, value, sub, iconBg, iconColor, accent }) => (
           <Card key={label} className="overflow-hidden">
@@ -164,7 +164,7 @@ export default async function StudentPaymentsPage() {
         ))}
       </div>
 
-      {/* ── Table / Empty ─────────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         {/* accent bar */}
         <div className="h-[3px] w-full bg-linear-to-r from-primary via-violet-500 to-emerald-500" />
@@ -184,7 +184,7 @@ export default async function StudentPaymentsPage() {
         </CardHeader>
 
         {list.length === 0 ? (
-          /* ── Empty state ── */
+          
           <CardContent className="py-20">
             <div className="flex flex-col items-center gap-4 text-center">
               <div className="flex size-20 items-center justify-center rounded-3xl bg-muted">
@@ -206,7 +206,7 @@ export default async function StudentPaymentsPage() {
             </div>
           </CardContent>
         ) : (
-          /* ── Table ── */
+          
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>

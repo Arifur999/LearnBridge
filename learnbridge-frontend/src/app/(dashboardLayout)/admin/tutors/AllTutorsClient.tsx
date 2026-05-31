@@ -47,7 +47,6 @@ const AVATAR_COLORS = [
   "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400",
 ];
 
-/* ── Detail Modal ─────────────────────────────────────────── */
 function TutorDetailModal({ tutor, open, onClose }: { tutor: AdminTutor; open: boolean; onClose: () => void }) {
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -116,7 +115,6 @@ function TutorDetailModal({ tutor, open, onClose }: { tutor: AdminTutor; open: b
   );
 }
 
-/* ── Delete Confirm Dialog ────────────────────────────────── */
 function DeleteWarningDialog({
   tutor, open, onClose, onConfirm, isPending,
 }: { tutor: AdminTutor; open: boolean; onClose: () => void; onConfirm: () => void; isPending: boolean }) {
@@ -152,7 +150,6 @@ function DeleteWarningDialog({
   );
 }
 
-/* ── Single Tutor Row ─────────────────────────────────────── */
 function TutorRow({ tutor, idx, onDeleted }: { tutor: AdminTutor; idx: number; onDeleted: (id: string) => void }) {
   const [viewOpen, setViewOpen]     = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -281,7 +278,6 @@ function TutorRow({ tutor, idx, onDeleted }: { tutor: AdminTutor; idx: number; o
   );
 }
 
-/* ── Main Export ──────────────────────────────────────────── */
 export default function AllTutorsClient({ initialTutors }: { initialTutors: AdminTutor[] }) {
   const [tutors, setTutors] = useState<AdminTutor[]>(initialTutors);
   const featuredCount = tutors.filter((t) => t.isFeatured).length;

@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type Review = Record<string, unknown>;
 
-/* ── Star renderer using Font Awesome ── */
 function StarRating({ rating, size = "sm" }: { rating: number; size?: "sm" | "lg" }) {
   const full  = Math.floor(rating);
   const half  = rating % 1 >= 0.5 ? 1 : 0;
@@ -47,7 +46,7 @@ export default async function TutorReviewsPage() {
   return (
     <div className="space-y-6">
 
-      {/* ── Header ─────────────────────────────────────────────── */}
+      
       <div>
         <h1 className="text-2xl font-black tracking-tight">Reviews</h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -55,7 +54,7 @@ export default async function TutorReviewsPage() {
         </p>
       </div>
 
-      {/* ── Rating summary card ────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         <div className="h-1 w-full bg-linear-to-r from-amber-400 via-yellow-300 to-amber-400" />
         <CardContent className="p-0">
@@ -98,7 +97,7 @@ export default async function TutorReviewsPage() {
         </CardContent>
       </Card>
 
-      {/* ── Reviews list ───────────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         <div className="h-[3px] w-full bg-linear-to-r from-amber-400 to-yellow-300" />
         <CardHeader className="border-b pb-4">

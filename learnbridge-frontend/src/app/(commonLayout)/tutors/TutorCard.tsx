@@ -43,7 +43,7 @@ const TutorCard = ({
       {/* Hover glow ring */}
       <div className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 ring-1 ring-primary/20 transition-opacity duration-300 group-hover:opacity-100" />
 
-      {/* ── Header ─────────────────────────────────────────── */}
+      
       <div className="relative flex h-52 flex-col items-center justify-center overflow-hidden bg-muted/30 dark:bg-muted/10">
 
         {/* Very subtle primary tint — transparent feel */}
@@ -94,7 +94,7 @@ const TutorCard = ({
           </div>
         </div>
 
-        {/* ── Colorful wave lines ── */}
+        
         <div className="absolute bottom-0 left-0 right-0 h-16 overflow-hidden">
           <svg
             viewBox="0 0 500 64"
@@ -153,7 +153,7 @@ const TutorCard = ({
         </div>
       </div>
 
-      {/* ── Body ───────────────────────────────────────────── */}
+      
       <div className="flex flex-1 flex-col px-5 pb-5 pt-4">
 
         {/* Active indicator */}
@@ -198,7 +198,7 @@ const TutorCard = ({
           </div>
         )}
 
-        {/* ── Footer ── */}
+        
         <div className="mt-auto flex items-center justify-between gap-3 border-t border-border/40 pt-3.5">
           <div>
             {priceLabel ? (

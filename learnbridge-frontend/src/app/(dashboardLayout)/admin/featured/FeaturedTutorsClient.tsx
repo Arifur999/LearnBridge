@@ -30,7 +30,6 @@ const AVATAR_COLORS = [
   "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400",
 ];
 
-/* ── Single Tutor Card ─────────────────────────────────────── */
 function TutorCard({
   tutor, idx, onToggle, isPending,
 }: {
@@ -141,7 +140,6 @@ function TutorCard({
   );
 }
 
-/* ── Main Component ────────────────────────────────────────── */
 export default function FeaturedTutorsClient({ tutors: initial }: { tutors: Tutor[] }) {
   const [tutors, setTutors]       = useState(initial);
   const [search, setSearch]       = useState("");

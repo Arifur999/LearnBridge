@@ -25,7 +25,7 @@ const initialState = { success: false, message: "" };
 
 function SignupFormInner({ className, ...props }: React.ComponentProps<"div">) {
   const [state, formAction, isPending] = useActionState(signupAction, initialState);
-  const [role, setRole]               = useState<"student" | "tutor">("student");
+  const [role, setRole] = useState<"student" | "tutor">("student");
   const [googleLoading, setGoogleLoading] = useState(false);
 
   const handleGoogleSignup = async () => {
@@ -36,7 +36,7 @@ function SignupFormInner({ className, ...props }: React.ComponentProps<"div">) {
         headers:     { "Content-Type": "application/json" },
         body:        JSON.stringify({
           provider:    "google",
-          callbackURL: "http://localhost:3000/",
+          callbackURL: `${window.location.origin}/`,
         }),
         credentials: "include",
       });
@@ -70,10 +70,7 @@ function SignupFormInner({ className, ...props }: React.ComponentProps<"div">) {
 
   return (
     <div className={cn("w-full max-w-md", className)} {...props}>
-      {/* Glass card */}
       <div className="overflow-hidden rounded-3xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-2xl">
-
-        {/* Card header */}
         <div className="border-b border-white/10 px-8 py-5">
           <h2 className="text-xl font-black tracking-tight text-white">
             Create account
@@ -83,10 +80,7 @@ function SignupFormInner({ className, ...props }: React.ComponentProps<"div">) {
           </p>
         </div>
 
-        {/* Form */}
         <form action={formAction} className="px-8 py-5">
-
-          {/* Name + Email row */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
@@ -115,7 +109,6 @@ function SignupFormInner({ className, ...props }: React.ComponentProps<"div">) {
             </div>
           </div>
 
-          {/* Role */}
           <div className="mt-3 space-y-1.5">
             <label className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
               I am a
@@ -135,7 +128,6 @@ function SignupFormInner({ className, ...props }: React.ComponentProps<"div">) {
             </Select>
           </div>
 
-          {/* Password + Confirm row */}
           <div className="mt-3 grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
@@ -164,7 +156,6 @@ function SignupFormInner({ className, ...props }: React.ComponentProps<"div">) {
             </div>
           </div>
 
-          {/* Submit */}
           <Button
             type="submit"
             disabled={isPending}
@@ -173,14 +164,12 @@ function SignupFormInner({ className, ...props }: React.ComponentProps<"div">) {
             {isPending ? "Creating account…" : "Create Account"}
           </Button>
 
-          {/* Divider */}
           <div className="mt-4 flex items-center gap-3">
             <div className="h-px flex-1 bg-white/15" />
             <span className="text-xs text-white/35">or</span>
             <div className="h-px flex-1 bg-white/15" />
           </div>
 
-          {/* Google Signup */}
           <button
             type="button"
             onClick={handleGoogleSignup}
@@ -203,7 +192,6 @@ function SignupFormInner({ className, ...props }: React.ComponentProps<"div">) {
             {googleLoading ? "Redirecting…" : "Continue with Google"}
           </button>
 
-          {/* Login link */}
           <p className="mt-4 text-center text-sm text-white/50">
             Already have an account?{" "}
             <Link

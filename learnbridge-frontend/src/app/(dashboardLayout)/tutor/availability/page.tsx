@@ -27,7 +27,7 @@ export default async function TutorAvailabilityPage() {
   return (
     <div className="space-y-6">
 
-      {/* ── Header ─────────────────────────────────────────── */}
+      
       <div>
         <h1 className="text-2xl font-black tracking-tight">Availability</h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -35,7 +35,7 @@ export default async function TutorAvailabilityPage() {
         </p>
       </div>
 
-      {/* ── Stats ──────────────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         <div className="h-1 w-full bg-linear-to-r from-primary via-emerald-500 to-amber-500" />
         <CardContent className="p-0">

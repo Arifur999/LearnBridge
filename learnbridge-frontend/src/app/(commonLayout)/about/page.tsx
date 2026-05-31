@@ -84,7 +84,7 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-background">
 
-      {/* ── Hero ──────────────────────────────────────────── */}
+      
       <section className="relative isolate overflow-hidden border-b bg-zinc-950 text-white">
         <Image
           src="/graduation-cap-with-earth-globe-concept-global-business-study-abroad-educational-back-school-education-global-world-study-abroad-business-universities-worldwide-language-study_721781-2163.jpg"
@@ -126,7 +126,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── Stats strip ───────────────────────────────────── */}
+      
       <section className="border-b bg-zinc-950 text-white">
         <div className="mx-auto max-w-7xl px-4">
           <div className="grid grid-cols-2 divide-x divide-white/8 md:grid-cols-4">
@@ -142,7 +142,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── Our Story ─────────────────────────────────────── */}
+      
       <section className="py-28">
         <div className="mx-auto max-w-7xl px-4">
           <div className="grid items-center gap-16 lg:grid-cols-2">
@@ -232,7 +232,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── Timeline / Journey ────────────────────────────── */}
+      
       <section className="border-y bg-muted/20 py-24">
         <div className="mx-auto max-w-7xl px-4">
           <div className="mb-14 text-center">
@@ -267,7 +267,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── Values ────────────────────────────────────────── */}
+      
       <section className="py-28">
         <div className="mx-auto max-w-7xl px-4">
           <div className="mb-14 text-center">
@@ -310,7 +310,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── Team ──────────────────────────────────────────── */}
+      
       <section className="border-t bg-muted/15 py-28">
         <div className="mx-auto max-w-7xl px-4">
           <div className="mb-14 text-center">
@@ -382,7 +382,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── CTA ───────────────────────────────────────────── */}
+      
       <section className="py-24">
         <div className="mx-auto max-w-7xl px-4">
           <div className="relative isolate overflow-hidden rounded-3xl bg-zinc-950 px-6 py-24 text-center text-white shadow-2xl sm:px-12">

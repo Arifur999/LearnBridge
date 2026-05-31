@@ -55,7 +55,7 @@ export default async function StudentDashboardPage() {
   return (
     <div className="space-y-6">
 
-      {/* ── Welcome Banner ─────────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         <div className="relative bg-linear-to-br from-primary via-violet-600 to-indigo-700 p-6 text-white">
           {/* Decorative circles */}
@@ -87,7 +87,7 @@ export default async function StudentDashboardPage() {
         </div>
       </Card>
 
-      {/* ── Stats Card ─────────────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         <div className="h-1 w-full bg-linear-to-r from-primary via-violet-500 to-emerald-500" />
         <CardContent className="p-0">
@@ -113,7 +113,7 @@ export default async function StudentDashboardPage() {
         </CardContent>
       </Card>
 
-      {/* ── Bottom Grid ────────────────────────────────────────── */}
+      
       <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
 
         {/* Recent Bookings */}

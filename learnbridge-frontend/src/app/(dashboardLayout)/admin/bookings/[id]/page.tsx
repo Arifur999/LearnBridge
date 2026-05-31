@@ -60,7 +60,7 @@ export default async function AdminBookingDetailPage({
   return (
     <div className="space-y-6">
 
-      {/* ── Back ───────────────────────────────────────────────── */}
+      
       <Link
         href="/admin/bookings"
         className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
@@ -68,7 +68,7 @@ export default async function AdminBookingDetailPage({
         <ArrowLeft className="size-4" /> Back to All Bookings
       </Link>
 
-      {/* ── Hero ───────────────────────────────────────────────── */}
+      
       <Card className="overflow-hidden">
         <div className="h-[3px] w-full bg-linear-to-r from-primary to-violet-500" />
         <CardContent className="flex flex-wrap items-center justify-between gap-4 p-6">
@@ -94,7 +94,7 @@ export default async function AdminBookingDetailPage({
         </CardContent>
       </Card>
 
-      {/* ── Details Grid ───────────────────────────────────────── */}
+      
       <div className="grid gap-6 md:grid-cols-2">
 
         {/* Session Info */}

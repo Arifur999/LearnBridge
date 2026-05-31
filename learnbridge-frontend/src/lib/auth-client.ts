@@ -10,8 +10,8 @@ export interface SessionUser {
 }
 
 export interface Session {
-  user:       SessionUser | null;
-  isPending:  boolean;
+  user:      SessionUser | null;
+  isPending: boolean;
 }
 
 const BACKEND_URL =
@@ -19,11 +19,10 @@ const BACKEND_URL =
   process.env.NEXT_PUBLIC_API_URL ??
   "http://localhost:5000";
 
-// Client-side session fetch using the session token cookie
 async function fetchSession(): Promise<SessionUser | null> {
   try {
     const res = await fetch(`${BACKEND_URL}/api/auth/get-session`, {
-      credentials: "include", // sends httpOnly cookies automatically
+      credentials: "include",
       cache:       "no-store",
     });
     if (!res.ok) return null;
