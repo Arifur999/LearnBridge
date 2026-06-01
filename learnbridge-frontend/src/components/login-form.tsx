@@ -39,7 +39,7 @@ function LoginFormInner({ className, ...props }: React.ComponentProps<"div">) {
         headers:     { "Content-Type": "application/json" },
         body:        JSON.stringify({
           provider:    "google",
-          callbackURL: `${window.location.origin}/`,
+          callbackURL: `${window.location.origin}/auth/callback`,
         }),
         credentials: "include",
       });
