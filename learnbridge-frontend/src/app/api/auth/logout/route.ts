@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000";
+const BACKEND_URL  = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000";
+const FRONTEND_URL = process.env.NEXT_PUBLIC_APP_URL      ?? "http://localhost:3000";
 
 export async function POST() {
   const cookieStore = await cookies();
@@ -15,6 +16,7 @@ export async function POST() {
         headers: {
           Authorization: `Bearer ${sessionToken}`,
           Cookie:        `better-auth.session_token=${sessionToken}`,
+          Origin:        FRONTEND_URL,
         },
         cache: "no-store",
       });
