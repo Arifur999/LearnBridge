@@ -3,8 +3,8 @@
 import { setSessionTokenInCookies } from "@/lib/tokenUtils";
 import { deleteCookie } from "@/lib/cookiesUtils";
 
-const BACKEND_URL  = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000";
-const FRONTEND_URL = process.env.NEXT_PUBLIC_APP_URL      ?? "http://localhost:3000";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000";
+const APP_URL     = process.env.NEXT_PUBLIC_APP_URL     ?? "http://localhost:3000";
 
 export interface LoginActionState {
   success:  boolean;
@@ -47,12 +47,9 @@ export const loginAction = async (
   try {
     const res = await fetch(`${BACKEND_URL}/api/auth/sign-in/email`, {
       method:  "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Origin":       FRONTEND_URL,
-      },
-      body:  JSON.stringify({ email, password }),
-      cache: "no-store",
+      headers: { "Content-Type": "application/json", "Origin": APP_URL },
+      body:    JSON.stringify({ email, password }),
+      cache:   "no-store",
     });
 
     const data = await res.json();
@@ -118,12 +115,9 @@ export const signupAction = async (
   try {
     const res = await fetch(`${BACKEND_URL}/api/auth/sign-up/email`, {
       method:  "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Origin":       FRONTEND_URL,
-      },
-      body:  JSON.stringify({ name, email, password, role }),
-      cache: "no-store",
+      headers: { "Content-Type": "application/json", "Origin": APP_URL },
+      body:    JSON.stringify({ name, email, password, role }),
+      cache:   "no-store",
     });
 
     const data = await res.json();

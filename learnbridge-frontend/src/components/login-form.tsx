@@ -31,30 +31,11 @@ function LoginFormInner({ className, ...props }: React.ComponentProps<"div">) {
   const [state, formAction, isPending] = useActionState(loginAction, initialState);
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleLogin = () => {
     setGoogleLoading(true);
-    try {
-      const res = await fetch(`${BACKEND_URL}/api/auth/sign-in/social`, {
-        method:      "POST",
-        headers:     { "Content-Type": "application/json" },
-        body:        JSON.stringify({
-          provider:    "google",
-          callbackURL: `${window.location.origin}/auth/callback`,
-        }),
-        credentials: "include",
-      });
-      const data = await res.json();
-      const redirectUrl = data?.url ?? data?.redirectURL ?? data?.redirect;
-      if (redirectUrl) {
-        window.location.href = redirectUrl;
-      } else {
-        toast.error("Google login failed — no redirect URL");
-        setGoogleLoading(false);
-      }
-    } catch {
-      toast.error("Google login failed");
-      setGoogleLoading(false);
-    }
+    // Navigate directly to backend — cookie set as first-party, avoiding CHIPS state_mismatch
+    const callbackURL = `${window.location.origin}/auth/callback`;
+    window.location.href = `${BACKEND_URL}/api/auth/sign-in/google?callbackURL=${encodeURIComponent(callbackURL)}`;
   };
 
   useEffect(() => {
