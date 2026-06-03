@@ -1,8 +1,7 @@
 "use server";
 import { getCookie } from "./cookiesUtils";
 
-const BACKEND_URL  = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000";
-const FRONTEND_URL = process.env.NEXT_PUBLIC_APP_URL      ?? "http://localhost:3000";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000";
 
 export async function getCurrentUserFromServer() {
   const sessionToken = await getCookie("better-auth.session_token");
@@ -12,8 +11,6 @@ export async function getCurrentUserFromServer() {
     const res = await fetch(`${BACKEND_URL}/api/auth/get-session`, {
       headers: {
         Authorization: `Bearer ${sessionToken}`,
-        Cookie:        `better-auth.session_token=${sessionToken}`,
-        Origin:        FRONTEND_URL,
       },
       cache: "no-store",
     });
