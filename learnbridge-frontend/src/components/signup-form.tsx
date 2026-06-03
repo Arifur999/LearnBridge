@@ -30,9 +30,8 @@ function SignupFormInner({ className, ...props }: React.ComponentProps<"div">) {
 
   const handleGoogleSignup = () => {
     setGoogleLoading(true);
-    // Navigate directly to backend — cookie set as first-party, avoiding CHIPS state_mismatch
     const callbackURL = `${window.location.origin}/auth/callback`;
-    window.location.href = `${BACKEND_URL}/api/auth/sign-in/google?callbackURL=${encodeURIComponent(callbackURL)}`;
+    window.location.href = `${BACKEND_URL}/api/google-auth?callbackURL=${encodeURIComponent(callbackURL)}`;
   };
 
   useEffect(() => {
