@@ -4,7 +4,13 @@ import { setSessionTokenInCookies } from "@/lib/tokenUtils";
 import { deleteCookie } from "@/lib/cookiesUtils";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000";
-const APP_URL     = process.env.NEXT_PUBLIC_APP_URL     ?? "http://localhost:3000";
+// Origin header for the server-side relay calls. better-auth's CSRF check
+// rejects requests that carry a cookie but no Origin/Referer ("Missing or null
+// Origin"). NEXT_PUBLIC_APP_URL is often unset/empty on Vercel, so we fall back
+// (with `||`, which also catches empty strings) to BACKEND_URL — the backend's
+// own origin is always in its trustedOrigins, so this always passes.
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL || BACKEND_URL || "http://localhost:3000";
 
 export interface LoginActionState {
   success:  boolean;

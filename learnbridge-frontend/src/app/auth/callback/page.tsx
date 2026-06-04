@@ -3,17 +3,15 @@
 /**
  * OAuth Callback Page
  *
- * After Google OAuth completes, BetterAuth redirects here.
- * The backend's session cookie (SameSite=None) is still in the browser,
- * so we cross-fetch /api/auth/get-session to retrieve the token, then
- * set it as a frontend-domain cookie via a server action.
+ * After Google OAuth completes, the backend auth-bridge reads the session
+ * server-side (first-party cookie on the backend domain) and redirects here
+ * with `?token=...`. We read that token straight from the URL and store it as
+ * a frontend-domain cookie — no cross-site / third-party cookie dependency.
  */
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { setSessionTokenInCookies } from "@/lib/tokenUtils";
-
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000";
 
 export default function AuthCallbackPage() {
   const router = useRouter();
@@ -22,17 +20,7 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     const finishAuth = async () => {
       try {
-        // The backend cookie (SameSite=None; Secure) is sent cross-site by
-        // the browser even though we are on the frontend domain.
-        const res = await fetch(`${BACKEND_URL}/api/auth/get-session`, {
-          credentials: "include",
-          cache:       "no-store",
-        });
-
-        if (!res.ok) { setError(true); return; }
-
-        const data  = await res.json();
-        const token = data?.session?.token as string | undefined;
+        const token = new URLSearchParams(window.location.search).get("token");
 
         if (!token) { setError(true); return; }
 
