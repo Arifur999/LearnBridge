@@ -202,7 +202,7 @@ export const forgotPasswordAction = async (
     const res = await fetch(`${BACKEND_URL}/api/auth/forget-password`, {
       method:  "POST",
       headers: { "Content-Type": "application/json", "Origin": APP_URL },
-      body:    JSON.stringify({ email, redirectTo: `${APP_URL}/forgot-password` }),
+      body:    JSON.stringify({ email }),
       cache:   "no-store",
     });
     if (!res.ok) {
