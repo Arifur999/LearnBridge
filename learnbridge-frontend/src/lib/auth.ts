@@ -22,11 +22,12 @@ export async function getCurrentUserFromServer() {
     if (!user) return null;
 
     return {
-      id:     String(user.id    ?? ""),
-      email:  String(user.email ?? ""),
-      name:   String(user.name  ?? "User"),
-      role:   String(user.role  ?? "student").toLowerCase(),
-      status: String(user.status ?? "active").toLowerCase(),
+      id:            String(user.id    ?? ""),
+      email:         String(user.email ?? ""),
+      name:          String(user.name  ?? "User"),
+      role:          String(user.role  ?? "student").toLowerCase(),
+      status:        String(user.status ?? "active").toLowerCase(),
+      emailVerified: Boolean(user.emailVerified ?? false),
     };
   } catch {
     return null;

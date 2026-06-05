@@ -5,18 +5,20 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Pencil, Save, X, BadgeCheck } from "lucide-react";
+import { Loader2, Pencil, Save, X, BadgeCheck, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { updateUserProfileAction } from "@/actions/dashboard.action";
 import ImageUpload from "@/components/ui/ImageUpload";
 
 interface Props {
-  initialName: string;
-  initialImage: string;
-  userRole?: string;
+  initialName:   string;
+  initialImage:  string;
+  userRole?:     string;
+  userEmail?:    string;
+  emailVerified?: boolean;
 }
 
-export default function StudentProfileClient({ initialName, initialImage, userRole = "Student" }: Props) {
+export default function StudentProfileClient({ initialName, initialImage, userRole = "Student", userEmail = "", emailVerified = false }: Props) {
   const [name, setName] = useState(initialName);
   const [image, setImage] = useState(initialImage);
   const [editing, setEditing] = useState(false);
@@ -63,16 +65,29 @@ export default function StudentProfileClient({ initialName, initialImage, userRo
             </div>
           )}
         </div>
-        {/* Verified badge */}
-        <div className="absolute -bottom-1 -right-1 flex size-7 items-center justify-center rounded-full bg-emerald-500 ring-2 ring-background shadow-sm">
-          <BadgeCheck className="size-4 text-white" />
-        </div>
+        {emailVerified ? (
+          <div className="absolute -bottom-1 -right-1 flex size-7 items-center justify-center rounded-full bg-emerald-500 ring-2 ring-background shadow-sm" title="Email verified">
+            <BadgeCheck className="size-4 text-white" />
+          </div>
+        ) : (
+          <div className="absolute -bottom-1 -right-1 flex size-7 items-center justify-center rounded-full bg-amber-500 ring-2 ring-background shadow-sm" title="Email not verified">
+            <AlertCircle className="size-4 text-white" />
+          </div>
+        )}
       </div>
 
       {/* Name + Role */}
       <div className="text-center">
         <h2 className="text-xl font-black tracking-tight">{name || "Student"}</h2>
         <p className="mt-0.5 text-sm text-muted-foreground">{displayRole}</p>
+        {!emailVerified && (
+          <a
+            href={`/verify-email${userEmail ? `?email=${encodeURIComponent(userEmail)}` : ""}`}
+            className="mt-1 inline-block text-xs font-semibold text-amber-500 hover:underline"
+          >
+            Verify your email
+          </a>
+        )}
       </div>
 
       {/* Edit Profile button */}

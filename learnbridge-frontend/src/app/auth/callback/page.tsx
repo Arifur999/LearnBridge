@@ -13,16 +13,20 @@ import { useEffect, useState } from "react";
 import { setSessionTokenInCookies } from "@/lib/tokenUtils";
 
 export default function AuthCallbackPage() {
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const finishAuth = async () => {
       try {
         const params = new URLSearchParams(window.location.search);
-        const token = params.get("token");
-        const role  = (params.get("role") ?? "student").toLowerCase();
+        const token     = params.get("token");
+        const role      = (params.get("role") ?? "student").toLowerCase();
+        const urlError  = params.get("error");
 
-        if (!token) { setError(true); return; }
+        if (!token) {
+          setError(urlError ?? "no_token");
+          return;
+        }
 
         // Server action — sets an httpOnly cookie on the *frontend* domain
         await setSessionTokenInCookies(token);
@@ -37,8 +41,8 @@ export default function AuthCallbackPage() {
         } else {
           window.location.href = "/student";
         }
-      } catch {
-        setError(true);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "unknown_error");
       }
     };
 
@@ -49,6 +53,7 @@ export default function AuthCallbackPage() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background text-white">
         <p className="text-lg font-semibold">Google sign-in failed</p>
+        <p className="text-sm text-white/50">Error: {error}</p>
         <a href="/login" className="text-sm text-primary underline underline-offset-4">
           Back to login
         </a>

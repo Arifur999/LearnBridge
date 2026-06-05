@@ -29,6 +29,8 @@ export default async function StudentProfilePage() {
       <StudentProfileClient
         initialName={user?.name ?? ""}
         initialImage={userImage}
+        userEmail={user?.email ?? ""}
+        emailVerified={(user as { emailVerified?: boolean } | null)?.emailVerified ?? false}
       />
 
       {/* Stats */}

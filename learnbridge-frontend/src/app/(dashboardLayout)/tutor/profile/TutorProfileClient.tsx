@@ -10,7 +10,7 @@ import {
   SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Loader2, Pencil, Save, X, BadgeCheck,
+  Loader2, Pencil, Save, X, BadgeCheck, AlertCircle,
   Tag, DollarSign, LayoutGrid, BookOpen, Camera,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -28,17 +28,19 @@ interface Profile {
 interface Category { id: string; name: string; }
 
 interface Props {
-  initialName: string;
-  initialImage: string;
-  userRole?: string;
-  profile: Profile | null;
-  categories: Category[];
+  initialName:   string;
+  initialImage:  string;
+  userRole?:     string;
+  userEmail?:    string;
+  emailVerified?: boolean;
+  profile:       Profile | null;
+  categories:    Category[];
 }
 
 const initialState = { success: false, message: "" };
 
 export default function TutorProfileClient({
-  initialName, initialImage, userRole = "Tutor", profile, categories,
+  initialName, initialImage, userRole = "Tutor", userEmail = "", emailVerified = false, profile, categories,
 }: Props) {
   const [name, setName]       = useState(initialName);
   const [image, setImage]     = useState(initialImage);
@@ -96,15 +98,29 @@ export default function TutorProfileClient({
             </div>
           )}
         </div>
-        <div className="absolute -bottom-1 -right-1 flex size-7 items-center justify-center rounded-full bg-emerald-500 ring-2 ring-background shadow-sm">
-          <BadgeCheck className="size-4 text-white" />
-        </div>
+        {emailVerified ? (
+          <div className="absolute -bottom-1 -right-1 flex size-7 items-center justify-center rounded-full bg-emerald-500 ring-2 ring-background shadow-sm" title="Email verified">
+            <BadgeCheck className="size-4 text-white" />
+          </div>
+        ) : (
+          <div className="absolute -bottom-1 -right-1 flex size-7 items-center justify-center rounded-full bg-amber-500 ring-2 ring-background shadow-sm" title="Email not verified">
+            <AlertCircle className="size-4 text-white" />
+          </div>
+        )}
       </div>
 
       {/* Name + Role */}
       <div className="text-center">
         <h2 className="text-xl font-black tracking-tight">{name || "Tutor"}</h2>
         <p className="mt-0.5 text-sm text-muted-foreground">{displayRole}</p>
+        {!emailVerified && (
+          <a
+            href={`/verify-email${userEmail ? `?email=${encodeURIComponent(userEmail)}` : ""}`}
+            className="mt-1 inline-block text-xs font-semibold text-amber-500 hover:underline"
+          >
+            Verify your email
+          </a>
+        )}
       </div>
 
       {/* Edit button */}

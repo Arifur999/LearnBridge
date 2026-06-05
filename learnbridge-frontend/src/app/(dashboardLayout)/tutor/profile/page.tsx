@@ -109,6 +109,8 @@ export default async function TutorProfilePage() {
             initialName={user.name ?? ""}
             initialImage={userImage}
             userRole={String(user.role ?? "Tutor")}
+            userEmail={user.email ?? ""}
+            emailVerified={(user as { emailVerified?: boolean }).emailVerified ?? false}
             profile={normalizedProfile}
             categories={normalizedCategories}
           />

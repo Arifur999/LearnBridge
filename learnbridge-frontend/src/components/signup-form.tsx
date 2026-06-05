@@ -37,10 +37,11 @@ function SignupFormInner({ className, ...props }: React.ComponentProps<"div">) {
   useEffect(() => {
     if (!state.success) return;
     toast.success("Account created!", {
-      description: "Please log in with your credentials.",
+      description: "Please check your email for a 6-digit verification code.",
     });
-    window.location.href = "/login";
-  }, [state.success]);
+    const email = (state as { data?: { user?: { email?: string } } }).data?.user?.email ?? "";
+    window.location.href = `/verify-email${email ? `?email=${encodeURIComponent(email)}` : ""}`;
+  }, [state.success]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!state.success && state.message) {

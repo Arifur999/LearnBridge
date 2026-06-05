@@ -151,3 +151,87 @@ export const signupAction = async (
 export const logoutAction = async () => {
   await deleteCookie("better-auth.session_token");
 };
+
+export const sendVerificationOTPAction = async (
+  email: string,
+): Promise<{ success: boolean; message?: string }> => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/auth/email-otp/send-verification-otp`, {
+      method:  "POST",
+      headers: { "Content-Type": "application/json", "Origin": APP_URL },
+      body:    JSON.stringify({ email }),
+      cache:   "no-store",
+    });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      return { success: false, message: d?.message ?? "Failed to send OTP" };
+    }
+    return { success: true };
+  } catch (err) {
+    return { success: false, message: err instanceof Error ? err.message : "Failed to send OTP" };
+  }
+};
+
+export const verifyEmailOTPAction = async (
+  email: string,
+  otp:   string,
+): Promise<{ success: boolean; message?: string; token?: string }> => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/auth/email-otp/verify-email`, {
+      method:  "POST",
+      headers: { "Content-Type": "application/json", "Origin": APP_URL },
+      body:    JSON.stringify({ email, otp }),
+      cache:   "no-store",
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return { success: false, message: data?.message ?? data?.error?.message ?? "Invalid OTP" };
+    }
+    const token = data?.token as string | undefined;
+    if (token) await setSessionTokenInCookies(token);
+    return { success: true, token };
+  } catch (err) {
+    return { success: false, message: err instanceof Error ? err.message : "Verification failed" };
+  }
+};
+
+export const forgotPasswordAction = async (
+  email: string,
+): Promise<{ success: boolean; message?: string }> => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/auth/forget-password`, {
+      method:  "POST",
+      headers: { "Content-Type": "application/json", "Origin": APP_URL },
+      body:    JSON.stringify({ email, redirectTo: `${APP_URL}/forgot-password` }),
+      cache:   "no-store",
+    });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      return { success: false, message: d?.message ?? "Failed to send reset email" };
+    }
+    return { success: true };
+  } catch (err) {
+    return { success: false, message: err instanceof Error ? err.message : "Failed to send reset email" };
+  }
+};
+
+export const resetPasswordAction = async (
+  token:       string,
+  newPassword: string,
+): Promise<{ success: boolean; message?: string }> => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/auth/reset-password`, {
+      method:  "POST",
+      headers: { "Content-Type": "application/json", "Origin": APP_URL },
+      body:    JSON.stringify({ token, newPassword }),
+      cache:   "no-store",
+    });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      return { success: false, message: d?.message ?? "Password reset failed" };
+    }
+    return { success: true };
+  } catch (err) {
+    return { success: false, message: err instanceof Error ? err.message : "Password reset failed" };
+  }
+};

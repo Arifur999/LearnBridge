@@ -86,7 +86,7 @@ function LoginFormInner({ className, ...props }: React.ComponentProps<"div">) {
               <label className="text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
                 Password
               </label>
-              <a href="#" className="text-xs text-white/50 transition-colors hover:text-white">
+              <a href="/forgot-password" className="text-xs text-white/50 transition-colors hover:text-white">
                 Forgot password?
               </a>
             </div>
