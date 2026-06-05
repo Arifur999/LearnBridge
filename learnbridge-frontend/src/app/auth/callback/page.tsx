@@ -29,6 +29,10 @@ export default function AuthCallbackPage() {
         // Server action — sets an httpOnly cookie on the *frontend* domain
         await setSessionTokenInCookies(token);
 
+        // Bust the Next.js client-side router cache so all layouts re-fetch
+        // the session server-side and the navbar reflects the new login state.
+        router.refresh();
+
         // Redirect to the correct dashboard based on role
         if (role === "admin") {
           router.replace("/admin/analytics");

@@ -44,7 +44,7 @@ function getDashboardUrl(role: string): string {
   if (r === "institute")             return "/institute/dashboard";
   if (r === "mentor")                return "/mentor/dashboard";
   if (r === "moderator")             return "/moderator/dashboard";
-  return "/dashboard";
+  return "/student";
 }
 
 function getDashboardLabel(role: string): string {
