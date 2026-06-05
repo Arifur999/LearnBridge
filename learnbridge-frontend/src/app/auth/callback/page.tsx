@@ -20,15 +20,23 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     const finishAuth = async () => {
       try {
-        const token = new URLSearchParams(window.location.search).get("token");
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get("token");
+        const role  = (params.get("role") ?? "student").toLowerCase();
 
         if (!token) { setError(true); return; }
 
         // Server action — sets an httpOnly cookie on the *frontend* domain
         await setSessionTokenInCookies(token);
 
-        // Redirect to home; middleware will forward to the right dashboard
-        router.replace("/");
+        // Redirect to the correct dashboard based on role
+        if (role === "admin") {
+          router.replace("/admin/analytics");
+        } else if (role === "trainer" || role === "tutor") {
+          router.replace("/tutor/dashboard");
+        } else {
+          router.replace("/student");
+        }
       } catch {
         setError(true);
       }
