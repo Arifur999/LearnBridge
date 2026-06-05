@@ -10,11 +10,9 @@
  */
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { setSessionTokenInCookies } from "@/lib/tokenUtils";
 
 export default function AuthCallbackPage() {
-  const router = useRouter();
   const [error, setError] = useState(false);
 
   useEffect(() => {
@@ -29,17 +27,15 @@ export default function AuthCallbackPage() {
         // Server action — sets an httpOnly cookie on the *frontend* domain
         await setSessionTokenInCookies(token);
 
-        // Bust the Next.js client-side router cache so all layouts re-fetch
-        // the session server-side and the navbar reflects the new login state.
-        router.refresh();
-
-        // Redirect to the correct dashboard based on role
+        // Full page navigation (same as email login) so the server-side
+        // commonLayout re-runs getCurrentUserFromServer() with the new cookie
+        // and the navbar shows Dashboard/Logout instead of Login/Register.
         if (role === "admin") {
-          router.replace("/admin/analytics");
+          window.location.href = "/admin/analytics";
         } else if (role === "trainer" || role === "tutor") {
-          router.replace("/tutor/dashboard");
+          window.location.href = "/tutor/dashboard";
         } else {
-          router.replace("/student");
+          window.location.href = "/student";
         }
       } catch {
         setError(true);
