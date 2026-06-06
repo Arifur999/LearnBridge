@@ -37,7 +37,7 @@ export default function ForgotPasswordPage() {
     if (password !== confirm) { toast.error("Passwords do not match"); return; }
     if (otp.length < 6) { toast.error("Enter the 6-digit code from your email"); return; }
     setLoading(true);
-    const res = await resetPasswordAction(otp.trim(), password);
+    const res = await resetPasswordAction(otp.trim(), password, email.trim());
     setLoading(false);
     if (res.success) {
       toast.success("Password updated!", { description: "You can now sign in with your new password." });

@@ -199,7 +199,7 @@ export const forgotPasswordAction = async (
   email: string,
 ): Promise<{ success: boolean; message?: string }> => {
   try {
-    const res = await fetch(`${BACKEND_URL}/api/auth/forget-password`, {
+    const res = await fetch(`${BACKEND_URL}/api/auth/email-otp/request-password-reset`, {
       method:  "POST",
       headers: { "Content-Type": "application/json", "Origin": APP_URL },
       body:    JSON.stringify({ email }),
@@ -216,14 +216,15 @@ export const forgotPasswordAction = async (
 };
 
 export const resetPasswordAction = async (
-  token:       string,
+  otp:         string,
   newPassword: string,
+  email:       string,
 ): Promise<{ success: boolean; message?: string }> => {
   try {
-    const res = await fetch(`${BACKEND_URL}/api/auth/reset-password`, {
+    const res = await fetch(`${BACKEND_URL}/api/auth/email-otp/reset-password`, {
       method:  "POST",
       headers: { "Content-Type": "application/json", "Origin": APP_URL },
-      body:    JSON.stringify({ token, newPassword }),
+      body:    JSON.stringify({ email, otp, password: newPassword }),
       cache:   "no-store",
     });
     if (!res.ok) {
